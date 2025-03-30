@@ -74,6 +74,10 @@ templ IndexPage(cssQuery, navEndpoint string) {
 						  animation: 150,
 						  ghostClass: 'blue-background-class',
 
+						  delay: 100, // time in milliseconds to define when the sorting should start
+						  delayOnTouchOnly: true, // only delay if user is using touch
+
+
 						  // Make the `.htmx-indicator` unsortable
 						  filter: ".htmx-indicator",
 						  onMove: function (evt) {
