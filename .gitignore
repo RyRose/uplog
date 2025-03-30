@@ -1,0 +1,15 @@
+
+# Generated templ files.
+*_templ.go
+
+# Temporary files.
+tmp/
+
+# Generated tailwind css file.
+web/static/css/output.css
+
+# Tailwind build-time dependencies.
+node_modules/
+
+# Generated sqlc files.
+internal/sqlc/workoutdb/

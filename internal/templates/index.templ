@@ -1,0 +1,137 @@
+package templates
+
+import "net/url"
+
+templ AuthorizationURL(url string) {
+	<a href={ templ.URL(url) } class="btn btn-ghost btn-xs text-xs" target="_blank">G</a>
+}
+
+templ Alert(errorMessage string) {
+	<div
+		hx-swap-oob="beforeend:#alerts"
+	>
+		<div
+			role="alert"
+			class="alert alert-error"
+			hx-ext="remove-me"
+			remove-me="5s"
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-6 w-6 shrink-0 stroke-current"
+				fill="none"
+				viewBox="0 0 24 24"
+			>
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					stroke-width="2"
+					d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+				></path>
+			</svg>
+			<span>{ errorMessage }</span>
+		</div>
+	</div>
+}
+
+templ IndexPage(cssQuery, navEndpoint string) {
+	<!DOCTYPE html>
+	<html class="h-full">
+		<head>
+			<title>UpLog</title>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<script src="/web/vendor/js/htmx@2.0.2.min.js"></script>
+			<script src="/web/vendor/js/htmx-ext-remove-me@2.0.0.js"></script>
+			<script src="/web/vendor/js/sortable@1.15.6.min.js"></script>
+			<link rel="icon" type="image/x-icon" href="/web/static/img/favicon.ico"/>
+			<link href={ "/web/static/css/output.css?" + url.QueryEscape(cssQuery) } rel="stylesheet"/>
+			<!--
+			  * 204 No Content by default does nothing, but is not an error
+			  * 2xx and 3xx responses are non-errors and are swapped
+			  * 422 responses are errors and are swapped
+			  * 4xx & 5xx responses are not swapped and are errors
+			  * all other responses are swapped using "..." as a catch-all
+			-->
+			<meta
+				name="htmx-config"
+				content='{
+					"responseHandling":[
+						{"code":"204", "swap": false},
+						{"code":"[23]..", "swap": true},
+						{"code":"422", "swap": true, "error": true},
+						{"code":"[45]..", "swap": false, "error":true},
+						{"code":"...", "swap": true}
+					]
+				}'
+			/>
+			<script type="text/javascript">
+				htmx.onLoad(function(content) {
+					var sortables = content.querySelectorAll(".sortable");
+					for (var i = 0; i < sortables.length; i++) {
+					  var sortable = sortables[i];
+					  var sortableInstance = new Sortable(sortable, {
+						  animation: 150,
+						  ghostClass: 'blue-background-class',
+
+						  // Make the `.htmx-indicator` unsortable
+						  filter: ".htmx-indicator",
+						  onMove: function (evt) {
+							return evt.related.className.indexOf('htmx-indicator') === -1;
+						  },
+
+						  // Disable sorting on the `end` event
+						  onEnd: function (evt) {
+							this.option("disabled", true);
+						  }
+					  });
+
+					  // Re-enable sorting on the `htmx:afterSwap` event
+					  sortable.addEventListener("htmx:afterSwap", function() {
+						sortableInstance.option("disabled", false);
+					  });
+					}
+				})
+			</script>
+		</head>
+		<body class="flex flex-col items-center h-full">
+			<div class="flex flex-col w-full max-w-screen-md items-center h-full">
+				<header class="navbar bg-base-100" hx-boost="true">
+					<div class="navbar-start">
+						<a href="/" class="btn btn-ghost text-lg">
+							UpLog
+						</a>
+					</div>
+					<div class="navbar-end">
+						<ul class="menu menu-horizontal px-1">
+							<li>
+								<a href="/schedule" class="btn btn-ghost btn-xs text-xs">
+									Schedule
+								</a>
+							</li>
+							<li>
+								<a href="/data" class="btn btn-ghost btn-xs text-xs">
+									Data
+								</a>
+							</li>
+							<li>
+								<div
+									hx-get="/view/calendarauthurl"
+									hx-trigger="load"
+									hx-target="this"
+									hx-swap="outerHTML"
+								></div>
+							</li>
+						</ul>
+					</div>
+				</header>
+				<div id="alerts"></div>
+				<article
+					class="w-full flex flex-col items-center pb-32"
+					hx-get={ string(templ.URL(navEndpoint)) }
+					hx-trigger="load"
+				></article>
+			</div>
+		</body>
+	</html>
+}

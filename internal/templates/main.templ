@@ -1,0 +1,351 @@
+package templates
+
+import (
+	"fmt"
+	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
+	"net/url"
+	"github.com/RyRose/uplog/internal/ui"
+	"encoding/json"
+)
+
+templ ProgressTable(inputs []workoutdb.Progress) {
+	<table class="text-center table table-xs pt-6 w-full" id="progresstable">
+		<thead>
+			<tr>
+				<th>Lift</th>
+				<th>⚖️ </th>
+				<th>Side</th>
+				<th>S</th>
+				<th>R</th>
+				<th class="w-20"></th>
+			</tr>
+		</thead>
+		@ProgressTableBody(inputs)
+	</table>
+}
+
+templ ProgressTableBody(inputs []workoutdb.Progress) {
+	<tbody hx-target="closest tr" hx-swap="outerHTML">
+		for _, input := range inputs {
+			@ProgressTableRow(input)
+		}
+	</tbody>
+}
+
+templ ProgressTableRow(input workoutdb.Progress) {
+	<tr>
+		<td>
+			{ input.Lift }
+			<input hidden type="text" name="lift" value={ input.Lift }/>
+		</td>
+		<td>
+			{ fmt.Sprint(input.Weight) }
+			<input hidden type="text" name="weight" value={ fmt.Sprint(input.Weight) }/>
+		</td>
+		<td>
+			{ fmt.Sprint(input.SideWeight) }
+			<input hidden type="text" name="side" value={ fmt.Sprint(input.SideWeight) }/>
+		</td>
+		<td>
+			{ fmt.Sprint(input.Sets) }
+			<input hidden type="text" name="sets" value={ fmt.Sprint(input.Sets) }/>
+		</td>
+		<td>
+			{ fmt.Sprint(input.Reps) }
+			<input hidden type="text" name="reps" value={ fmt.Sprint(input.Reps) }/>
+		</td>
+		<td>
+			<button
+				hx-post="/view/progressform"
+				hx-target="previous form"
+				hx-include="closest tr"
+				class="btn btn-square btn-outline btn-xs"
+			>
+				@ui.SvgUp()
+			</button>
+			<button
+				hx-delete={ fmt.Sprintf("/view/progresstablerow/%d", input.ID) }
+				hx-target="closest tr"
+				class="btn btn-square btn-outline btn-xs"
+			>
+				@ui.SvgClose()
+			</button>
+		</td>
+	</tr>
+}
+
+templ ProgressTitle(workout string) {
+	<h1 class="self-start">{ workout }</h1>
+}
+
+type RoutineTableRow struct {
+	Percent    string
+	Weight     string
+	SideWeight string
+	Sets       string
+	Reps       string
+}
+
+type RoutineTable struct {
+	Lift       string
+	SideWeight string
+	Rows       []RoutineTableRow
+}
+
+templ RoutineTableView(table RoutineTable) {
+	<table class="table text-center table-xs">
+		<thead>
+			<tr>
+				<th class="text-sm"><strong>{ table.Lift }</strong></th>
+				<th class="text-sm">Weight</th>
+				<th class="text-sm">{ table.SideWeight }</th>
+				<th class="text-sm">Sets</th>
+				<th class="text-sm">Reps</th>
+			</tr>
+		</thead>
+		<tbody>
+			for _, row := range table.Rows {
+				<tr>
+					<td class="text-base">{ row.Percent }</td>
+					<td class="text-base">{ row.Weight }</td>
+					<td class="text-base">{ row.SideWeight }</td>
+					<td class="text-base">{ row.Sets }</td>
+					<td class="text-base">{ row.Reps }</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}
+
+templ SideweightSelect(name string, selected string, options []string) {
+	<select
+		class="select select-bordered select-multiple w-full pl-2 pr-2 text-center"
+		name={ name }
+		if (selected != "") {
+			hx-on--load={ fmt.Sprintf("this.value = '%s'", selected) }
+		}
+	>
+		<option selected disabled hidden>{ name }</option>
+		for _, option := range options {
+			<option value={ option }>{ option }</option>
+		}
+	</select>
+}
+
+type LiftSelectGroup struct {
+	Name    string
+	Options []string
+}
+
+templ LiftSelect(name, selected string, groups []LiftSelectGroup) {
+	<select
+		class="select select-bordered select-multiple w-full"
+		name={ name }
+		hx-post="/view/progressform"
+		hx-trigger="input changed"
+		hx-target="closest form"
+		hx-swap="outerHTML"
+		if (selected != "") {
+			hx-on--load={ fmt.Sprintf("this.value = '%s'", selected) }
+		}
+	>
+		<option selected disabled hidden>{ name }</option>
+		for _, group := range groups {
+			<optgroup label={ group.Name }>
+				for _, option := range group.Options {
+					<option value={ option }>{ option }</option>
+				}
+			</optgroup>
+		}
+	</select>
+}
+
+type ProgressFormData struct {
+	Lift       string
+	Progress   []workoutdb.Progress
+	SideWeight string
+	Weight     string
+	Sets       string
+	Reps       string
+}
+
+func mapToJson(m map[string]string) (string, error) {
+	out, err := json.Marshal(m)
+	if err != nil {
+		return "", fmt.Errorf("failed to marshal map to json: %w", err)
+	}
+	return string(out), nil
+}
+
+templ ProgressForm(data ProgressFormData) {
+	<form class="py-2 w-full flex flex-wrap justify-center">
+		<div class="w-full flex flex-row">
+			<div class="grow">
+				<label for="lift"></label>
+				<select
+					class="select select-bordered select-multiple w-full"
+					hx-get={ "/view/liftselect?" + url.Values(map[string][]string{
+						"name": {"lift"},
+						"lift": {data.Lift},
+					}).Encode() }
+					hx-trigger="load"
+					hx-target="this"
+					hx-swap="outerHTML"
+				>
+					<option selected disabled hidden>{ "lift" }</option>
+				</select>
+			</div>
+			<div class="basis-16">
+				<label for="side"></label>
+				<select
+					class="select select-bordered select-multiple w-full pl-2 pr-2 text-center"
+					hx-get={ "/view/sideweightselect?" + url.Values(map[string][]string{
+						"name": {"side"},
+						"lift": {data.Lift},
+					}).Encode() }
+					hx-trigger="load"
+					hx-target="this"
+					hx-swap="outerHTML"
+				>
+					<option selected disabled hidden>{ "side" }</option>
+				</select>
+			</div>
+		</div>
+		<div class="basis-1/4 grow">
+			<label for="weight"></label>
+			// TODO: Use mathjs instead of javascript eval.
+			<input
+				type="text"
+				name="weight"
+				placeholder="lbs"
+				value={ data.Weight }
+				required
+				class="input input-bordered w-full appearance-none"
+				onblur="
+				try {
+				    var result = eval(this.value);
+				    if (!isNaN(result)) {
+					    this.value = result;
+				    }
+				} catch(e) {
+				    console.error('Invalid expression:', e);
+				}"
+			/>
+		</div>
+		<div class="basis-1/4">
+			<label for="sets"></label>
+			<input
+				type="number"
+				name="sets"
+				min="1"
+				step="1"
+				required
+				placeholder="sets"
+				if data.Sets == "" {
+					value="1"
+				} else {
+					value={ data.Sets }
+				}
+				class="input input-bordered w-full appearance-none"
+			/>
+		</div>
+		<div class="basis-1/4">
+			<label for="reps"></label>
+			<input
+				type="number"
+				name="reps"
+				min="1"
+				step="1"
+				required
+				placeholder="reps"
+				value={ data.Reps }
+				class="input input-bordered w-full appearance-none"
+			/>
+		</div>
+		<button
+			class="btn"
+			id="progressbutton"
+			hx-post="/view/progresstablerow"
+			hx-target="#progresstable > tbody"
+			hx-swap="beforeend"
+		>
+			@ui.SvgOK()
+		</button>
+		<div
+			hx-trigger="newProgress from:body"
+			hx-target="closest form"
+			hx-swap="outerHTML"
+			hx-get="/view/progressform"
+			hidden="true"
+		></div>
+		if len(data.Progress) > 0 {
+			<table class="text-center table table-xs">
+				<thead>
+					<tr>
+						<th>Date</th>
+						<th>Weight</th>
+						<th>Side</th>
+						<th>Sets</th>
+						<th>Reps</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					for _, progress := range data.Progress {
+						<tr>
+							<td>{ progress.Date }</td>
+							<td>{ fmt.Sprint(progress.Weight) }</td>
+							<td>{ fmt.Sprint(progress.SideWeight) }</td>
+							<td>{ fmt.Sprint(progress.Sets) }</td>
+							<td>{ fmt.Sprint(progress.Reps) }</td>
+							<td>
+								<button
+									hx-post="/view/progressform"
+									hx-target="closest form"
+									hx-vals={ mapToJson(map[string]string{
+										"reps": fmt.Sprint(progress.Reps),
+										"sets": fmt.Sprint(progress.Sets),
+										"side": fmt.Sprint(progress.SideWeight),
+										"weight": fmt.Sprint(progress.Weight),
+										"lift": data.Lift,
+									}) }
+									hx-swap="outerHTML"
+									class="btn btn-square btn-outline btn-xs"
+								>
+									@ui.SvgUp()
+								</button>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		}
+	</form>
+}
+
+templ LiftGroupList(groups []workoutdb.QueryLiftGroupsForDateRow) {
+	<ul class="flex justify-around w-full sm:w-1/2">
+		for _, lg := range groups {
+			<li>{ fmt.Sprint(*lg.LiftGroup) }:{ fmt.Sprint(*lg.TotalReps) }</li>
+		}
+	</ul>
+}
+
+type MainViewData struct {
+	Routines   []RoutineTable
+	Progress   []workoutdb.Progress
+	LiftGroups []workoutdb.QueryLiftGroupsForDateRow
+}
+
+templ MainView(data MainViewData) {
+	<div hx-trigger="newProgress from:body, deleteProgress from:body" hx-target="this" hx-get="/view/liftgroups" class="w-full flex justify-center">
+		if len(data.LiftGroups) > 0 {
+			@LiftGroupList(data.LiftGroups)
+		}
+	</div>
+	for _, routine := range data.Routines {
+		@RoutineTableView(routine)
+	}
+	@ProgressForm(ProgressFormData{})
+	@ProgressTable(data.Progress)
+}

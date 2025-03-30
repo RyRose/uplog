@@ -1,0 +1,233 @@
+package templates
+
+import "github.com/RyRose/uplog/internal/ui"
+import "path"
+import "strconv"
+
+type DataTableHeader struct {
+	Values []string
+}
+
+type DataTableType int
+
+const (
+	Select DataTableType = iota
+	InputNumber
+	InputString
+	TextArea
+	Static
+)
+
+type DataTableValue struct {
+	Value         string
+	Name          string
+	Type          DataTableType
+	SelectOptions []string
+}
+
+type DataTableRow struct {
+	DeleteEndpoint string
+	PatchEndpoint  string
+	Values         []DataTableValue
+}
+
+type DataTableFooter struct {
+	PostEndpoint string
+	FormID       string
+	Values       []DataTableValue
+}
+
+type DataTable struct {
+	Header                  DataTableHeader
+	Rows                    []DataTableRow
+	Footer                  DataTableFooter
+	Start, StartOffset, End string
+	LastPage                bool
+}
+
+templ DataTableRowView(row DataTableRow) {
+	<tr>
+		for _, cell := range row.Values {
+			<td class="px-1 ">
+				switch cell.Type {
+					case Select:
+						<select
+							name={ cell.Name }
+							hx-trigger="input changed"
+							class="select select-xs select-bordered select-multiple w-full px-1"
+							hx-patch={ string(templ.URL(row.PatchEndpoint)) }
+							hx-swap="none"
+						>
+							for _, option := range cell.SelectOptions {
+								if option == cell.Value {
+									<option selected>{ option }</option>
+								} else {
+									<option>{ option }</option>
+								}
+							}
+						</select>
+					case InputNumber:
+						<input
+							type="number"
+							name={ cell.Name }
+							value={ cell.Value }
+							hx-trigger="input changed delay:500ms"
+							class="input input-xs input-bordered w-full px-1"
+							hx-swap="none"
+							hx-patch={ string(templ.URL(row.PatchEndpoint)) }
+						/>
+					case InputString:
+						<input
+							type="text"
+							name={ cell.Name }
+							value={ cell.Value }
+							hx-trigger="input changed delay:500ms"
+							class="input input-xs input-bordered w-full px-1"
+							hx-patch={ string(templ.URL(row.PatchEndpoint)) }
+							hx-swap="none"
+						/>
+					case TextArea:
+						<textarea
+							name={ cell.Name }
+							wrap="off"
+							hx-trigger="input changed delay:500ms"
+							class="textarea textarea-xs textarea-bordered w-full px-1"
+							hx-patch={ string(templ.URL(row.PatchEndpoint)) }
+							hx-swap="none"
+						>{ cell.Value }</textarea>
+					case Static:
+						{ cell.Value }
+				}
+			</td>
+		}
+		<td>
+			<button
+				class="btn btn-xs"
+				hx-delete={ string(templ.URL(row.DeleteEndpoint)) }
+				hx-target="closest tr"
+				hx-swap="outerHTML"
+			>
+				@ui.SvgClose()
+			</button>
+		</td>
+	</tr>
+}
+
+templ DataTableView(table DataTable) {
+	<table class="table text-center table-xs w-full table-auto overflow-x-auto whitespace-nowrap" id="datatable">
+		<thead>
+			<tr>
+				for _, value := range table.Header.Values {
+					<th>{ value }</th>
+				}
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			for _, row := range table.Rows[:len(table.Rows)-1] {
+				@DataTableRowView(row)
+			}
+			<tr>
+				for _, value := range table.Rows[len(table.Rows)-1].Values {
+					<td class="px-1">
+						switch value.Type {
+							case Select:
+								<select
+									name={ value.Name }
+									form={ table.Footer.FormID }
+									class="select select-xs select-bordered w-full select-multiple px-1"
+								>
+									<option selected disabled hidden></option>
+									for _, option := range value.SelectOptions {
+										<option>{ option }</option>
+									}
+								</select>
+							case InputNumber:
+								<input
+									name={ value.Name }
+									form={ table.Footer.FormID }
+									type="number"
+									class="input select-xs input-bordered w-full px-1"
+								/>
+							case InputString:
+								<input
+									name={ value.Name }
+									form={ table.Footer.FormID }
+									type="text"
+									class="input select-xs input-bordered w-full px-1"
+								/>
+							case TextArea:
+								<textarea
+									name={ value.Name }
+									form={ table.Footer.FormID }
+									wrap="off"
+									hx-trigger="input changed delay:500ms"
+									class="textarea textarea-xs textarea-bordered w-full px-1"
+								></textarea>
+							case Static:
+								{ value.Value }
+						}
+					</td>
+				}
+				<td>
+					<form id={ table.Footer.FormID }>
+						<button
+							class="btn btn-xs"
+							hx-post={ string(templ.URL(table.Footer.PostEndpoint)) }
+							hx-on::after-request="if (event.detail.successful) this.closest('form').reset()"
+							hx-target="closest tr"
+							hx-swap="beforebegin"
+						>
+							@ui.SvgOK()
+						</button>
+					</form>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<div>
+		if table.Start == "1" {
+			{ table.Start }
+		} else {
+			<a class="link" href={ templ.URL("?offset=" + table.StartOffset) }>{ table.Start }</a>
+		}
+		-
+		if table.LastPage {
+			{ table.End }
+		} else {
+			<a class="link" href={ templ.URL("?offset=" + table.End) }>{ table.End }</a>
+		}
+	</div>
+}
+
+type DataTab struct {
+	Title    string
+	Endpoint string
+}
+
+templ DataTabView(tabs [][]DataTab, x, y int) {
+	<div id="dataview" class="w-full">
+		for i, row := range tabs {
+			<div role="tablist" class="tabs tabs-bordered">
+				for j, tab := range row {
+					<a
+						role="tab"
+						hx-boost="true"
+						href={ templ.URL(path.Join("/data", strconv.Itoa(i), strconv.Itoa(j))) }
+						if i == x && j == y {
+							class="tab tab-active text-xs"
+						} else {
+							class="tab text-xs"
+						}
+					>{ tab.Title }</a>
+				}
+			</div>
+		}
+		<div
+			class="flex flex-col items-center"
+			hx-get={ string(templ.URL(tabs[x][y].Endpoint)) }
+			hx-trigger="load"
+			hx-target="this"
+		></div>
+	</div>
+}

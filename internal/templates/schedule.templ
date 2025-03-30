@@ -1,0 +1,119 @@
+package templates
+
+import (
+	"fmt"
+	"github.com/RyRose/uplog/internal/ui"
+)
+
+type ScheduleDataView struct {
+	Date, Weekday string
+	Workout       string
+	Options       []string
+}
+
+templ ScheduleTable(rows []ScheduleDataView, workoutOptions, workoutListOptions []string) {
+	@ScheduleTableOnly(rows)
+	<form
+		class="pt-2 w-full flex flex-row justify-center"
+		action="/view/scheduleappend"
+		hx-target="previous tbody"
+		hx-swap="beforeend"
+	>
+		<select
+			class="select select-bordered select-multiple w-10 grow"
+			name="workout"
+		>
+			<options>
+				<option selected disabled hidden value="">workout</option>
+				for _, option := range workoutOptions {
+					<option value={ option }>{ option }</option>
+				}
+			</options>
+		</select>
+		<select
+			class="select select-bordered select-multiple w-10 grow"
+			name="workout_list"
+		>
+			<options>
+				<option selected disabled hidden value="">workout list</option>
+				for _, option := range workoutListOptions {
+					<option value={ option }>{ option }</option>
+				}
+			</options>
+		</select>
+		<button
+			class="btn basis-0"
+			hx-on::after-request="if (event.detail.successful) this.closest('form').reset()"
+			hx-post="/view/scheduleappend"
+		>
+			@ui.SvgOK()
+		</button>
+	</form>
+}
+
+templ ScheduleTableOnly(rows []ScheduleDataView) {
+	<table
+		class="text-center table table-xs w-full"
+		hx-target="closest tr"
+		hx-swap="outerHTML"
+	>
+		<thead>
+			<tr>
+				<th>Date</th>
+				<th>Workout</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody class="sortable" hx-post="/view/scheduletablerows" hx-target="this" hx-trigger="end" hx-include="this" hx-swap="innerHTML">
+			@ScheduleTableRows(rows)
+		</tbody>
+	</table>
+}
+
+templ ScheduleTableRows(rows []ScheduleDataView) {
+	for _, row := range rows {
+		@ScheduleTableRow(row)
+	}
+}
+
+templ ScheduleTableRow(row ScheduleDataView) {
+	<tr>
+		<td class="w-32">
+			<input type="hidden" name="date" value={ row.Date }/>
+			if row.Weekday == "" {
+				{ row.Date }
+			} else {
+				{ fmt.Sprintf("%s (%s)", row.Date, row.Weekday) }
+			}
+		</td>
+		<td>
+			<select
+				class="select select-bordered select-multiple select-sm w-full pr-2"
+				name="workout"
+				hx-trigger="input changed"
+				hx-patch={ fmt.Sprintf("/view/schedule/%s", row.Date) }
+				hx-swap="none"
+			>
+				if row.Workout == "" {
+					<option selected disabled hidden></option>
+				}
+				for _, option := range row.Options {
+					if row.Workout == option {
+						<option selected value={ option }>{ option }</option>
+					} else {
+						<option value={ option }>{ option }</option>
+					}
+				}
+			</select>
+		</td>
+		<td>
+			<button
+				class="btn btn-square btn-outline btn-sm"
+				hx-target="closest table"
+				hx-delete={ fmt.Sprintf("/view/schedule/%s", row.Date) }
+			>
+				@ui.SvgClose()
+			</button>
+		</td>
+	</tr>
+}

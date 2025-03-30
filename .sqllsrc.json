@@ -1,0 +1,5 @@
+{
+  "name": "workoutapp",
+  "adapter": "sqlite3",
+  "filename": "./tmp/data.db"
+}
