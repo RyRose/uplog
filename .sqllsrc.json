@@ -1,5 +1,5 @@
 {
-  "name": "workoutapp",
+  "name": "uplog",
   "adapter": "sqlite3",
   "filename": "./tmp/data.db"
 }

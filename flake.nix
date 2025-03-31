@@ -2,7 +2,7 @@
   description = "Flake for setting up development of uplog";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     templ.url = "github:a-h/templ";
     flake-parts.url = "github:hercules-ci/flake-parts";
   };
@@ -17,6 +17,7 @@
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [
         "x86_64-linux"
+        "x86_64-darwin"
       ];
       perSystem =
         { pkgs, system, ... }:

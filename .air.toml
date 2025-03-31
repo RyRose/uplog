@@ -10,7 +10,7 @@ tmp_dir = "tmp"
 # Add additional arguments when running binary (bin/full_bin).
 args_bin = []
 # Binary file yields from `cmd`.
-bin = "./tmp/workoutapp"
+bin = "./tmp/uplog"
 # Just plain old shell command. You could use `make` as well.
 cmd = "make build"
 # It's not necessary to trigger build each time file changes if it's too frequent.
@@ -71,7 +71,7 @@ watcher = "cyan"
 main_only = false
 # Show log time
 time = false
-# silence all logs produced by air 
+# silence all logs produced by air
 silent = false
 
 [misc]
