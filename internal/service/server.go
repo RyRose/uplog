@@ -51,9 +51,9 @@ func alertMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func NewServer(ctx context.Context, db, readonlyDB *sql.DB, calendarSrv *calendar.Service) http.Handler {
+func NewServer(ctx context.Context, db, roDB *sql.DB, calendarSrv *calendar.Service) http.Handler {
 	mux := http.NewServeMux()
-	addRoutes(ctx, mux, db, readonlyDB, calendarSrv)
+	addRoutes(ctx, mux, db, roDB, calendarSrv)
 
 	var handler http.Handler = mux
 

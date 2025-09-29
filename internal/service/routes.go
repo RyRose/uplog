@@ -17,6 +17,7 @@ import (
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	httpSwagger "github.com/swaggo/http-swagger/v2"
 )
 
 // TODO: Parameterize today's date for testing support.
@@ -167,6 +168,12 @@ func addRoutes(
 
 	// Prometheus metrics.
 	mux.Handle("/metrics", promhttp.Handler())
+
+	// Swagger docs.
+	// TODO: Only enable swagger docs in "dev" mode.
+	// TODO: Make swagger URL configurable and use better default fqdn based on hostname when serving locally.
+	mux.Handle("GET /docs/", http.FileServer(http.Dir(".")))
+	mux.Handle("GET /swagger/", httpSwagger.Handler(httpSwagger.URL("http://localhost:8080/docs/swagger.json")))
 
 	// Vendor and non-vendor static assets.
 	mux.Handle("GET /web/static/", http.FileServer(http.Dir(".")))

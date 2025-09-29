@@ -110,6 +110,8 @@ EOF
 
 # Copy web assets and mark them as owned by new user.
 COPY --chown=appuser:appgroup --from=build-stage ${SRCDIR}/web ${SRCDIR}/web
+COPY --chown=appuser:appgroup docs/swagger.json ${SRCDIR}/docs/swagger.json
+COPY --chown=appuser:appgroup docs/swagger.yaml ${SRCDIR}/docs/swagger.yaml
 
 # Copy statically-linked go binary and mark as owned by new user.
 COPY --chown=appuser:appgroup --from=build-stage ${BINPATH} ${BINPATH}
