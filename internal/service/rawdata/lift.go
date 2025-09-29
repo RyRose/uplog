@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 )
@@ -39,17 +40,17 @@ func HandleGetLiftView(roDB *sql.DB) http.HandlerFunc {
 			var rows []templates.DataTableRow
 			for _, lift := range lifts {
 				rows = append(rows, templates.DataTableRow{
-					PatchEndpoint:  urlPathJoin("/view/data/lift", lift.ID),
-					DeleteEndpoint: urlPathJoin("/view/data/lift", lift.ID),
+					PatchEndpoint:  util.UrlPathJoin("/view/data/lift", lift.ID),
+					DeleteEndpoint: util.UrlPathJoin("/view/data/lift", lift.ID),
 					Values: []templates.DataTableValue{
 						{Name: "id", Value: lift.ID, Type: templates.InputString},
 						{Name: "link", Value: lift.Link, Type: templates.InputString},
 						{Name: "default_side_weight",
-							Value: zero(lift.DefaultSideWeight),
+							Value: util.Zero(lift.DefaultSideWeight),
 							Type:  templates.Select, SelectOptions: append(sideWeightOpts, "")},
-						{Name: "notes", Value: zero(lift.Notes), Type: templates.InputString},
+						{Name: "notes", Value: util.Zero(lift.Notes), Type: templates.InputString},
 						{Name: "lift_group",
-							Value: zero(lift.LiftGroup),
+							Value: util.Zero(lift.LiftGroup),
 							Type:  templates.Select, SelectOptions: append(liftGroups, "")},
 					},
 				})
@@ -97,7 +98,7 @@ func HandlePatchLiftView(wDB *sql.DB) http.HandlerFunc {
 				convert: func(id, value string) (*workoutdb.RawUpdateLiftDefaultSideWeightParams, error) {
 					return &workoutdb.RawUpdateLiftDefaultSideWeightParams{
 						ID:                id,
-						DefaultSideWeight: deZero(value),
+						DefaultSideWeight: util.DeZero(value),
 					}, nil
 				},
 			},
@@ -106,7 +107,7 @@ func HandlePatchLiftView(wDB *sql.DB) http.HandlerFunc {
 				convert: func(id, value string) (*workoutdb.RawUpdateLiftNotesParams, error) {
 					return &workoutdb.RawUpdateLiftNotesParams{
 						ID:    id,
-						Notes: deZero(value),
+						Notes: util.DeZero(value),
 					}, nil
 				},
 			},
@@ -115,7 +116,7 @@ func HandlePatchLiftView(wDB *sql.DB) http.HandlerFunc {
 				convert: func(id, value string) (*workoutdb.RawUpdateLiftLiftGroupParams, error) {
 					return &workoutdb.RawUpdateLiftLiftGroupParams{
 						ID:        id,
-						LiftGroup: deZero(value),
+						LiftGroup: util.DeZero(value),
 					}, nil
 				},
 			},
@@ -132,9 +133,9 @@ func HandlePostLiftView(roDB, wDB *sql.DB) http.HandlerFunc {
 			return &workoutdb.RawInsertLiftParams{
 				ID:                values.Get("id"),
 				Link:              values.Get("link"),
-				DefaultSideWeight: deZero(values.Get("default_side_weight")),
-				Notes:             deZero(values.Get("notes")),
-				LiftGroup:         deZero(values.Get("lift_group")),
+				DefaultSideWeight: util.DeZero(values.Get("default_side_weight")),
+				Notes:             util.DeZero(values.Get("notes")),
+				LiftGroup:         util.DeZero(values.Get("lift_group")),
 			}, nil
 		},
 		func(ctx context.Context, q *workoutdb.Queries, lift workoutdb.Lift) (*templates.DataTableRow, error) {
@@ -147,17 +148,17 @@ func HandlePostLiftView(roDB, wDB *sql.DB) http.HandlerFunc {
 				return nil, fmt.Errorf("failed to list side weights: %w", err)
 			}
 			return &templates.DataTableRow{
-				PatchEndpoint:  urlPathJoin("/view/data/lift", lift.ID),
-				DeleteEndpoint: urlPathJoin("/view/data/lift", lift.ID),
+				PatchEndpoint:  util.UrlPathJoin("/view/data/lift", lift.ID),
+				DeleteEndpoint: util.UrlPathJoin("/view/data/lift", lift.ID),
 				Values: []templates.DataTableValue{
 					{Name: "id", Value: lift.ID, Type: templates.InputString},
 					{Name: "link", Value: lift.Link, Type: templates.InputString},
 					{Name: "default_side_weight",
-						Value: zero(lift.DefaultSideWeight),
+						Value: util.Zero(lift.DefaultSideWeight),
 						Type:  templates.Select, SelectOptions: append(sideWeightOpts, "")},
-					{Name: "notes", Value: zero(lift.Notes), Type: templates.InputString},
+					{Name: "notes", Value: util.Zero(lift.Notes), Type: templates.InputString},
 					{Name: "lift_group",
-						Value: zero(lift.LiftGroup),
+						Value: util.Zero(lift.LiftGroup),
 						Type:  templates.Select, SelectOptions: append(liftGroups, "")},
 				},
 			}, nil

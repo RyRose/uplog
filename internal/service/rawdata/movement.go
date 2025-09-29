@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 )
@@ -28,8 +29,8 @@ func HandleGetMovementView(roDB *sql.DB) http.HandlerFunc {
 			var rows []templates.DataTableRow
 			for _, movement := range movements {
 				rows = append(rows, templates.DataTableRow{
-					PatchEndpoint:  urlPathJoin("/view/data/movement", movement.ID),
-					DeleteEndpoint: urlPathJoin("/view/data/movement", movement.ID),
+					PatchEndpoint:  util.UrlPathJoin("/view/data/movement", movement.ID),
+					DeleteEndpoint: util.UrlPathJoin("/view/data/movement", movement.ID),
 					Values: []templates.DataTableValue{
 						{Name: "id", Value: movement.ID, Type: templates.InputString},
 						{Name: "alias", Value: movement.Alias, Type: templates.InputString},
@@ -86,8 +87,8 @@ func HandlePostMovementView(roDB, wDB *sql.DB) http.HandlerFunc {
 		},
 		func(ctx context.Context, q *workoutdb.Queries, movement workoutdb.Movement) (*templates.DataTableRow, error) {
 			return &templates.DataTableRow{
-				PatchEndpoint:  urlPathJoin("/view/data/movement", movement.ID),
-				DeleteEndpoint: urlPathJoin("/view/data/movement", movement.ID),
+				PatchEndpoint:  util.UrlPathJoin("/view/data/movement", movement.ID),
+				DeleteEndpoint: util.UrlPathJoin("/view/data/movement", movement.ID),
 				Values: []templates.DataTableValue{
 					{Name: "id", Value: movement.ID, Type: templates.InputString},
 					{Name: "alias", Value: movement.Alias, Type: templates.InputString},

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 )
@@ -35,8 +36,8 @@ func HandleGetRoutineView(roDB *sql.DB) http.HandlerFunc {
 			var rows []templates.DataTableRow
 			for _, item := range items {
 				rows = append(rows, templates.DataTableRow{
-					PatchEndpoint:  urlPathJoin("/view/data/routine", item.ID),
-					DeleteEndpoint: urlPathJoin("/view/data/routine", item.ID),
+					PatchEndpoint:  util.UrlPathJoin("/view/data/routine", item.ID),
+					DeleteEndpoint: util.UrlPathJoin("/view/data/routine", item.ID),
 					Values: []templates.DataTableValue{
 						{Name: "id", Value: item.ID, Type: templates.InputString},
 						{Name: "steps", Value: item.Steps, Type: templates.InputString},
@@ -110,8 +111,8 @@ func HandlePostRoutineView(roDB, wDB *sql.DB) http.HandlerFunc {
 			}
 
 			return &templates.DataTableRow{
-				PatchEndpoint:  urlPathJoin("/view/data/routine", item.ID),
-				DeleteEndpoint: urlPathJoin("/view/data/routine", item.ID),
+				PatchEndpoint:  util.UrlPathJoin("/view/data/routine", item.ID),
+				DeleteEndpoint: util.UrlPathJoin("/view/data/routine", item.ID),
 				Values: []templates.DataTableValue{
 					{Name: "id", Value: item.ID, Type: templates.InputString},
 					{Name: "steps", Value: item.Steps, Type: templates.InputString},

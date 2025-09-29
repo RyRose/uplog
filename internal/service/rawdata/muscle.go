@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 )
@@ -28,12 +29,12 @@ func HandleGetMuscleView(roDB *sql.DB) http.HandlerFunc {
 			var rows []templates.DataTableRow
 			for _, item := range items {
 				rows = append(rows, templates.DataTableRow{
-					PatchEndpoint:  urlPathJoin("/view/data/muscle", item.ID),
-					DeleteEndpoint: urlPathJoin("/view/data/muscle", item.ID),
+					PatchEndpoint:  util.UrlPathJoin("/view/data/muscle", item.ID),
+					DeleteEndpoint: util.UrlPathJoin("/view/data/muscle", item.ID),
 					Values: []templates.DataTableValue{
 						{Name: "id", Value: item.ID, Type: templates.InputString},
 						{Name: "link", Value: item.Link, Type: templates.InputString},
-						{Name: "message", Value: zero(item.Message), Type: templates.InputString},
+						{Name: "message", Value: util.Zero(item.Message), Type: templates.InputString},
 					},
 				})
 			}
@@ -76,7 +77,7 @@ func HandlePatchMuscleView(wDB *sql.DB) http.HandlerFunc {
 				convert: func(id, value string) (*workoutdb.RawUpdateMuscleMessageParams, error) {
 					return &workoutdb.RawUpdateMuscleMessageParams{
 						ID:      id,
-						Message: deZero(value),
+						Message: util.DeZero(value),
 					}, nil
 				},
 			},
@@ -93,17 +94,17 @@ func HandlePostMuscleView(roDB, wDB *sql.DB) http.HandlerFunc {
 			return &workoutdb.RawInsertMuscleParams{
 				ID:      values.Get("id"),
 				Link:    values.Get("link"),
-				Message: deZero(values.Get("message")),
+				Message: util.DeZero(values.Get("message")),
 			}, nil
 		},
 		func(ctx context.Context, q *workoutdb.Queries, movement workoutdb.Muscle) (*templates.DataTableRow, error) {
 			return &templates.DataTableRow{
-				PatchEndpoint:  urlPathJoin("/view/data/muscle", movement.ID),
-				DeleteEndpoint: urlPathJoin("/view/data/muscle", movement.ID),
+				PatchEndpoint:  util.UrlPathJoin("/view/data/muscle", movement.ID),
+				DeleteEndpoint: util.UrlPathJoin("/view/data/muscle", movement.ID),
 				Values: []templates.DataTableValue{
 					{Name: "id", Value: movement.ID, Type: templates.InputString},
 					{Name: "link", Value: movement.Link, Type: templates.InputString},
-					{Name: "message", Value: zero(movement.Message), Type: templates.InputString},
+					{Name: "message", Value: util.Zero(movement.Message), Type: templates.InputString},
 				},
 			}, nil
 		},

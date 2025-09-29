@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"strconv"
 
+	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 )
@@ -40,8 +41,8 @@ func HandleGetProgressView(roDB *sql.DB) http.HandlerFunc {
 			for _, item := range items {
 				sw, _ := item.SideWeight.(string)
 				rows = append(rows, templates.DataTableRow{
-					PatchEndpoint:  urlPathJoin("/view/data/progress", fmt.Sprint(item.ID)),
-					DeleteEndpoint: urlPathJoin("/view/data/progress", fmt.Sprint(item.ID)),
+					PatchEndpoint:  util.UrlPathJoin("/view/data/progress", fmt.Sprint(item.ID)),
+					DeleteEndpoint: util.UrlPathJoin("/view/data/progress", fmt.Sprint(item.ID)),
 					Values: []templates.DataTableValue{
 						{Name: "id", Type: templates.Static, Value: fmt.Sprint(item.ID)},
 						{Name: "lift", Type: templates.Select, Value: item.Lift, SelectOptions: lifts},
@@ -191,7 +192,7 @@ func HandlePostProgressView(roDB, wDB *sql.DB) http.HandlerFunc {
 				Weight:     weight,
 				Sets:       sets,
 				Reps:       reps,
-				SideWeight: deZero(values.Get("side_weight")),
+				SideWeight: util.DeZero(values.Get("side_weight")),
 			}, nil
 		},
 		func(ctx context.Context, q *workoutdb.Queries, item workoutdb.Progress) (*templates.DataTableRow, error) {
@@ -206,8 +207,8 @@ func HandlePostProgressView(roDB, wDB *sql.DB) http.HandlerFunc {
 
 			sw, _ := item.SideWeight.(string)
 			return &templates.DataTableRow{
-				PatchEndpoint:  urlPathJoin("/view/data/progress", fmt.Sprint(item.ID)),
-				DeleteEndpoint: urlPathJoin("/view/data/progress", fmt.Sprint(item.ID)),
+				PatchEndpoint:  util.UrlPathJoin("/view/data/progress", fmt.Sprint(item.ID)),
+				DeleteEndpoint: util.UrlPathJoin("/view/data/progress", fmt.Sprint(item.ID)),
 				Values: []templates.DataTableValue{
 					{Name: "id", Type: templates.Static, Value: fmt.Sprint(item.ID)},
 					{Name: "lift", Type: templates.Select, Value: item.Lift, SelectOptions: lifts},

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 )
@@ -42,8 +43,8 @@ func HandleGetLiftMuscleView(roDB *sql.DB) http.HandlerFunc {
 			var rows []templates.DataTableRow
 			for _, item := range items {
 				rows = append(rows, templates.DataTableRow{
-					PatchEndpoint:  urlPathJoin("/view/data/lift_muscle_mapping", item.Lift, item.Muscle, item.Movement),
-					DeleteEndpoint: urlPathJoin("/view/data/lift_muscle_mapping", item.Lift, item.Muscle, item.Movement),
+					PatchEndpoint:  util.UrlPathJoin("/view/data/lift_muscle_mapping", item.Lift, item.Muscle, item.Movement),
+					DeleteEndpoint: util.UrlPathJoin("/view/data/lift_muscle_mapping", item.Lift, item.Muscle, item.Movement),
 					Values: []templates.DataTableValue{
 						{Name: "lift", Type: templates.Select, Value: item.Lift, SelectOptions: lifts},
 						{Name: "muscle", Type: templates.Select, Value: item.Muscle, SelectOptions: muscles},
@@ -131,8 +132,8 @@ func HandlePostLiftMuscleView(roDB, wDB *sql.DB) http.HandlerFunc {
 			}
 
 			return &templates.DataTableRow{
-				PatchEndpoint:  urlPathJoin("/view/data/lift_muscle_mapping", item.Lift, item.Muscle, item.Movement),
-				DeleteEndpoint: urlPathJoin("/view/data/lift_muscle_mapping", item.Lift, item.Muscle, item.Movement),
+				PatchEndpoint:  util.UrlPathJoin("/view/data/lift_muscle_mapping", item.Lift, item.Muscle, item.Movement),
+				DeleteEndpoint: util.UrlPathJoin("/view/data/lift_muscle_mapping", item.Lift, item.Muscle, item.Movement),
 				Values: []templates.DataTableValue{
 					{Name: "lift", Type: templates.Select, Value: item.Lift, SelectOptions: lifts},
 					{Name: "muscle", Type: templates.Select, Value: item.Muscle, SelectOptions: muscles},

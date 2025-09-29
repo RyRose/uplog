@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 )
@@ -34,8 +35,8 @@ func HandleGetSubworkoutView(roDB *sql.DB) http.HandlerFunc {
 			var rows []templates.DataTableRow
 			for _, item := range items {
 				rows = append(rows, templates.DataTableRow{
-					PatchEndpoint:  urlPathJoin("/view/data/subworkout", item.Subworkout, item.Superworkout),
-					DeleteEndpoint: urlPathJoin("/view/data/subworkout", item.Subworkout, item.Superworkout),
+					PatchEndpoint:  util.UrlPathJoin("/view/data/subworkout", item.Subworkout, item.Superworkout),
+					DeleteEndpoint: util.UrlPathJoin("/view/data/subworkout", item.Subworkout, item.Superworkout),
 					Values: []templates.DataTableValue{
 						{Name: "subworkout", Type: templates.Select, Value: item.Subworkout, SelectOptions: workouts},
 						{Name: "superworkout", Type: templates.Select, Value: item.Superworkout, SelectOptions: workouts},
@@ -99,8 +100,8 @@ func HandlePostSubworkoutView(roDB, wDB *sql.DB) http.HandlerFunc {
 			}
 
 			return &templates.DataTableRow{
-				PatchEndpoint:  urlPathJoin("/view/data/subworkout", item.Subworkout, item.Superworkout),
-				DeleteEndpoint: urlPathJoin("/view/data/subworkout", item.Subworkout, item.Superworkout),
+				PatchEndpoint:  util.UrlPathJoin("/view/data/subworkout", item.Subworkout, item.Superworkout),
+				DeleteEndpoint: util.UrlPathJoin("/view/data/subworkout", item.Subworkout, item.Superworkout),
 				Values: []templates.DataTableValue{
 					{Name: "subworkout", Type: templates.Select, Value: item.Subworkout, SelectOptions: workouts},
 					{Name: "superworkout", Type: templates.Select, Value: item.Superworkout, SelectOptions: workouts},

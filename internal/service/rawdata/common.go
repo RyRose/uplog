@@ -7,51 +7,12 @@ import (
 	"log/slog"
 	"net/http"
 	"net/url"
-	"path"
 	"strconv"
 
+	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
-	"golang.org/x/exp/constraints"
 )
-
-func urlPathJoin(base string, parts ...string) string {
-	p := []string{base}
-	for _, part := range parts {
-		p = append(p, url.PathEscape(part))
-	}
-	return path.Join(p...)
-}
-
-func minimum[T constraints.Ordered](a, b T) T {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-func maximum[T constraints.Ordered](a, b T) T {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-func zero[T any](v *T) T {
-	if v == nil {
-		var zero T
-		return zero
-	}
-	return *v
-}
-
-func deZero[T comparable](v T) *T {
-	var zero T
-	if v == zero {
-		return nil
-	}
-	return &v
-}
 
 func handleGetDataTableView[dataType any, limitParams any](
 	roDB *sql.DB,
@@ -94,7 +55,7 @@ func handleGetDataTableView[dataType any, limitParams any](
 			return
 		}
 		var viewLimit int64
-		viewLimit = minimum(limit, int64(len(rows)-1))
+		viewLimit = util.Minimum(limit, int64(len(rows)-1))
 		tbl := templates.DataTable{
 			Header: templates.DataTableHeader{
 				Values: metadata.headers,
@@ -104,8 +65,8 @@ func handleGetDataTableView[dataType any, limitParams any](
 				PostEndpoint: metadata.post,
 				FormID:       "datatableform",
 			},
-			Start:       fmt.Sprint(maximum(offset, 0) + 1),
-			StartOffset: fmt.Sprint(maximum(offset-limit, 0)),
+			Start:       fmt.Sprint(util.Maximum(offset, 0) + 1),
+			StartOffset: fmt.Sprint(util.Maximum(offset-limit, 0)),
 			End:         fmt.Sprint(offset + viewLimit),
 			LastPage:    viewLimit != limit,
 		}

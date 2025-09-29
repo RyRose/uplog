@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"strconv"
 
+	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 )
@@ -30,8 +31,8 @@ func HandleGetSideWeightView(roDB *sql.DB) http.HandlerFunc {
 			var rows []templates.DataTableRow
 			for _, item := range items {
 				rows = append(rows, templates.DataTableRow{
-					PatchEndpoint:  urlPathJoin("/view/data/side_weight", item.ID),
-					DeleteEndpoint: urlPathJoin("/view/data/side_weight", item.ID),
+					PatchEndpoint:  util.UrlPathJoin("/view/data/side_weight", item.ID),
+					DeleteEndpoint: util.UrlPathJoin("/view/data/side_weight", item.ID),
 					Values: []templates.DataTableValue{
 						{Name: "id", Type: templates.InputString, Value: item.ID},
 						{Name: "multiplier", Type: templates.InputNumber, Value: fmt.Sprint(item.Multiplier)},
@@ -128,8 +129,8 @@ func HandlePostSideWeightView(roDB, wDB *sql.DB) http.HandlerFunc {
 		},
 		func(_ context.Context, _ *workoutdb.Queries, item workoutdb.SideWeight) (*templates.DataTableRow, error) {
 			return &templates.DataTableRow{
-				PatchEndpoint:  urlPathJoin("/view/data/side_weight", item.ID),
-				DeleteEndpoint: urlPathJoin("/view/data/side_weight", item.ID),
+				PatchEndpoint:  util.UrlPathJoin("/view/data/side_weight", item.ID),
+				DeleteEndpoint: util.UrlPathJoin("/view/data/side_weight", item.ID),
 				Values: []templates.DataTableValue{
 					{Name: "id", Type: templates.InputString, Value: item.ID},
 					{Name: "multiplier", Type: templates.InputNumber, Value: fmt.Sprint(item.Multiplier)},

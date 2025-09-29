@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"strconv"
 
+	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 )
@@ -36,8 +37,8 @@ func HandleGetScheduleListView(roDB *sql.DB) http.HandlerFunc {
 			var rows []templates.DataTableRow
 			for _, item := range items {
 				rows = append(rows, templates.DataTableRow{
-					PatchEndpoint:  urlPathJoin("/view/data/schedule_list", item.ID),
-					DeleteEndpoint: urlPathJoin("/view/data/schedule_list", item.ID),
+					PatchEndpoint:  util.UrlPathJoin("/view/data/schedule_list", item.ID),
+					DeleteEndpoint: util.UrlPathJoin("/view/data/schedule_list", item.ID),
 					Values: []templates.DataTableValue{
 						{Name: "id", Value: item.ID, Type: templates.InputString},
 						{Name: "day", Value: fmt.Sprint(item.Day), Type: templates.InputNumber},
@@ -119,8 +120,8 @@ func HandlePostScheduleListView(roDB, wDB *sql.DB) http.HandlerFunc {
 			}
 
 			return &templates.DataTableRow{
-				PatchEndpoint:  urlPathJoin("/view/data/schedule_list", item.ID),
-				DeleteEndpoint: urlPathJoin("/view/data/schedule_list", item.ID),
+				PatchEndpoint:  util.UrlPathJoin("/view/data/schedule_list", item.ID),
+				DeleteEndpoint: util.UrlPathJoin("/view/data/schedule_list", item.ID),
 				Values: []templates.DataTableValue{
 					{Name: "id", Value: item.ID, Type: templates.InputString},
 					{Name: "day", Value: fmt.Sprint(item.Day), Type: templates.InputString},

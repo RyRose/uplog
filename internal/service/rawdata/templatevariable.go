@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 )
@@ -28,8 +29,8 @@ func HandleGetTemplateVariableView(roDB *sql.DB) http.HandlerFunc {
 			var rows []templates.DataTableRow
 			for _, item := range items {
 				rows = append(rows, templates.DataTableRow{
-					PatchEndpoint:  urlPathJoin("/view/data/template_variable", item.ID),
-					DeleteEndpoint: urlPathJoin("/view/data/template_variable", item.ID),
+					PatchEndpoint:  util.UrlPathJoin("/view/data/template_variable", item.ID),
+					DeleteEndpoint: util.UrlPathJoin("/view/data/template_variable", item.ID),
 					Values: []templates.DataTableValue{
 						{Name: "id", Type: templates.InputString, Value: item.ID},
 						{Name: "value", Type: templates.TextArea, Value: item.Value},
@@ -86,8 +87,8 @@ func HandlePostTemplateVariableView(roDB, wDB *sql.DB) http.HandlerFunc {
 		},
 		func(_ context.Context, _ *workoutdb.Queries, item workoutdb.TemplateVariable) (*templates.DataTableRow, error) {
 			return &templates.DataTableRow{
-				PatchEndpoint:  urlPathJoin("/view/data/template_variable", item.ID),
-				DeleteEndpoint: urlPathJoin("/view/data/template_variable", item.ID),
+				PatchEndpoint:  util.UrlPathJoin("/view/data/template_variable", item.ID),
+				DeleteEndpoint: util.UrlPathJoin("/view/data/template_variable", item.ID),
 				Values: []templates.DataTableValue{
 					{Name: "id", Type: templates.InputString, Value: item.ID},
 					{Name: "value", Type: templates.TextArea, Value: item.Value},

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 )
@@ -35,8 +36,8 @@ func HandleGetScheduleView(roDB *sql.DB) http.HandlerFunc {
 			for _, item := range items {
 				workout, _ := item.Workout.(string)
 				rows = append(rows, templates.DataTableRow{
-					PatchEndpoint:  urlPathJoin("/view/data/schedule", item.Date),
-					DeleteEndpoint: urlPathJoin("/view/data/schedule", item.Date),
+					PatchEndpoint:  util.UrlPathJoin("/view/data/schedule", item.Date),
+					DeleteEndpoint: util.UrlPathJoin("/view/data/schedule", item.Date),
 					Values: []templates.DataTableValue{
 						{Name: "date", Type: templates.InputString, Value: item.Date},
 						{Name: "workout", Type: templates.Select, Value: workout, SelectOptions: workouts},
@@ -72,7 +73,7 @@ func HandlePatchScheduleView(wDB *sql.DB) http.HandlerFunc {
 				convert: func(id, value string) (*workoutdb.RawUpdateScheduleWorkoutParams, error) {
 					return &workoutdb.RawUpdateScheduleWorkoutParams{
 						Date:    id,
-						Workout: deZero(value),
+						Workout: util.DeZero(value),
 					}, nil
 				},
 			},
@@ -88,7 +89,7 @@ func HandlePostScheduleView(roDB, wDB *sql.DB) http.HandlerFunc {
 		func(_ context.Context, values url.Values) (*workoutdb.RawInsertScheduleParams, error) {
 			return &workoutdb.RawInsertScheduleParams{
 				Date:    values.Get("date"),
-				Workout: deZero(values.Get("workout")),
+				Workout: util.DeZero(values.Get("workout")),
 			}, nil
 		},
 		func(ctx context.Context, q *workoutdb.Queries, item workoutdb.Schedule) (*templates.DataTableRow, error) {
@@ -99,8 +100,8 @@ func HandlePostScheduleView(roDB, wDB *sql.DB) http.HandlerFunc {
 
 			workout, _ := item.Workout.(string)
 			return &templates.DataTableRow{
-				PatchEndpoint:  urlPathJoin("/view/data/schedule", item.Date),
-				DeleteEndpoint: urlPathJoin("/view/data/schedule", item.Date),
+				PatchEndpoint:  util.UrlPathJoin("/view/data/schedule", item.Date),
+				DeleteEndpoint: util.UrlPathJoin("/view/data/schedule", item.Date),
 				Values: []templates.DataTableValue{
 					{Name: "date", Type: templates.InputString, Value: item.Date},
 					{Name: "workout", Type: templates.Select, Value: workout, SelectOptions: append(workouts, "")},

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 )
@@ -38,8 +39,8 @@ func HandleGetRoutineWorkoutView(roDB *sql.DB) http.HandlerFunc {
 			var rows []templates.DataTableRow
 			for _, item := range items {
 				rows = append(rows, templates.DataTableRow{
-					PatchEndpoint:  urlPathJoin("/view/data/routine_workout_mapping", item.Routine, item.Workout),
-					DeleteEndpoint: urlPathJoin("/view/data/routine_workout_mapping", item.Routine, item.Workout),
+					PatchEndpoint:  util.UrlPathJoin("/view/data/routine_workout_mapping", item.Routine, item.Workout),
+					DeleteEndpoint: util.UrlPathJoin("/view/data/routine_workout_mapping", item.Routine, item.Workout),
 					Values: []templates.DataTableValue{
 						{Name: "routine", Type: templates.Select, Value: item.Routine, SelectOptions: routines},
 						{Name: "workout", Type: templates.Select, Value: item.Workout, SelectOptions: workouts},
@@ -107,8 +108,8 @@ func HandlePostRoutineWorkoutView(roDB, wDB *sql.DB) http.HandlerFunc {
 			}
 
 			return &templates.DataTableRow{
-				PatchEndpoint:  urlPathJoin("/view/data/routine_workout_mapping", item.Routine, item.Workout),
-				DeleteEndpoint: urlPathJoin("/view/data/routine_workout_mapping", item.Routine, item.Workout),
+				PatchEndpoint:  util.UrlPathJoin("/view/data/routine_workout_mapping", item.Routine, item.Workout),
+				DeleteEndpoint: util.UrlPathJoin("/view/data/routine_workout_mapping", item.Routine, item.Workout),
 				Values: []templates.DataTableValue{
 					{Name: "routine", Type: templates.Select, Value: item.Routine, SelectOptions: routines},
 					{Name: "workout", Type: templates.Select, Value: item.Workout, SelectOptions: workouts},

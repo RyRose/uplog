@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 )
@@ -28,8 +29,8 @@ func HandleGetLiftGroupView(roDB *sql.DB) http.HandlerFunc {
 			var rows []templates.DataTableRow
 			for _, liftGroup := range liftGroups {
 				rows = append(rows, templates.DataTableRow{
-					PatchEndpoint:  urlPathJoin("/view/data/lift_group", liftGroup),
-					DeleteEndpoint: urlPathJoin("/view/data/lift_group", liftGroup),
+					PatchEndpoint:  util.UrlPathJoin("/view/data/lift_group", liftGroup),
+					DeleteEndpoint: util.UrlPathJoin("/view/data/lift_group", liftGroup),
 					Values: []templates.DataTableValue{
 						{Name: "id", Value: liftGroup, Type: templates.InputString},
 					},
@@ -73,8 +74,8 @@ func HandlePostLiftGroupView(roDB, wDB *sql.DB) http.HandlerFunc {
 		},
 		func(ctx context.Context, q *workoutdb.Queries, liftGroup string) (*templates.DataTableRow, error) {
 			return &templates.DataTableRow{
-				PatchEndpoint:  urlPathJoin("/view/data/lift_group", liftGroup),
-				DeleteEndpoint: urlPathJoin("/view/data/lift_group", liftGroup),
+				PatchEndpoint:  util.UrlPathJoin("/view/data/lift_group", liftGroup),
+				DeleteEndpoint: util.UrlPathJoin("/view/data/lift_group", liftGroup),
 				Values: []templates.DataTableValue{
 					{Name: "id", Value: liftGroup, Type: templates.InputString},
 				},
