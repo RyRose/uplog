@@ -29,10 +29,11 @@
             ];
             packages = with pkgs; [
               go
-              tailwindcss
-              sqlc
-              nodejs
+              go-swag
               go-tools
+              nodejs
+              sqlc
+              tailwindcss
             ];
           };
         };

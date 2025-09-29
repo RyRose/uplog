@@ -13,3 +13,5 @@ node_modules/
 
 # Generated sqlc files.
 internal/sqlc/workoutdb/
+
+.direnv/

@@ -47,3 +47,12 @@ nix:
 .PHONY: deps
 deps:
 	npm install
+
+.PHONY: format
+format:
+	swag fmt
+
+.PHONY: docs
+docs:
+	swag init
+
