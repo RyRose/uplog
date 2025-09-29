@@ -8,17 +8,18 @@ import (
 	"net/url"
 	"strconv"
 
+	"github.com/RyRose/uplog/internal/service/rawdata/base"
 	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 )
 
 func HandleGetProgressView(roDB *sql.DB) http.HandlerFunc {
-	return handleGetDataTableView(
+	return base.HandleGetDataTableView(
 		roDB,
-		tableViewMetadata{
-			headers: []string{"ID", "Lift", "Date", "Weight", "Sets", "Reps", "SW"},
-			post:    "/view/data/progress",
+		base.TableViewMetadata{
+			Headers: []string{"ID", "Lift", "Date", "Weight", "Sets", "Reps", "SW"},
+			Post:    "/view/data/progress",
 		},
 		(*workoutdb.Queries).RawSelectProgressPage,
 		func(limit, offset int64) workoutdb.RawSelectProgressPageParams {
@@ -71,12 +72,12 @@ func HandleGetProgressView(roDB *sql.DB) http.HandlerFunc {
 }
 
 func HandlePatchProgressView(wDB *sql.DB) http.HandlerFunc {
-	return handlePatchTableRowViewID(
+	return base.HandlePatchTableRowViewID(
 		wDB,
-		map[string]patcherID{
-			"lift": &patchIDParams[workoutdb.RawUpdateProgressLiftParams]{
-				query: (*workoutdb.Queries).RawUpdateProgressLift,
-				convert: func(id, value string) (*workoutdb.RawUpdateProgressLiftParams, error) {
+		map[string]base.PatcherID{
+			"lift": &base.PatchIDParams[workoutdb.RawUpdateProgressLiftParams]{
+				Query: (*workoutdb.Queries).RawUpdateProgressLift,
+				Convert: func(id, value string) (*workoutdb.RawUpdateProgressLiftParams, error) {
 					idN, err := strconv.ParseInt(id, 10, 64)
 					if err != nil {
 						return nil, fmt.Errorf("failed to parse id: %w", err)
@@ -87,9 +88,9 @@ func HandlePatchProgressView(wDB *sql.DB) http.HandlerFunc {
 					}, nil
 				},
 			},
-			"date": &patchIDParams[workoutdb.RawUpdateProgressDateParams]{
-				query: (*workoutdb.Queries).RawUpdateProgressDate,
-				convert: func(id, value string) (*workoutdb.RawUpdateProgressDateParams, error) {
+			"date": &base.PatchIDParams[workoutdb.RawUpdateProgressDateParams]{
+				Query: (*workoutdb.Queries).RawUpdateProgressDate,
+				Convert: func(id, value string) (*workoutdb.RawUpdateProgressDateParams, error) {
 					idN, err := strconv.ParseInt(id, 10, 64)
 					if err != nil {
 						return nil, fmt.Errorf("failed to parse id: %w", err)
@@ -100,9 +101,9 @@ func HandlePatchProgressView(wDB *sql.DB) http.HandlerFunc {
 					}, nil
 				},
 			},
-			"weight": &patchIDParams[workoutdb.RawUpdateProgressWeightParams]{
-				query: (*workoutdb.Queries).RawUpdateProgressWeight,
-				convert: func(id, value string) (*workoutdb.RawUpdateProgressWeightParams, error) {
+			"weight": &base.PatchIDParams[workoutdb.RawUpdateProgressWeightParams]{
+				Query: (*workoutdb.Queries).RawUpdateProgressWeight,
+				Convert: func(id, value string) (*workoutdb.RawUpdateProgressWeightParams, error) {
 					idN, err := strconv.ParseInt(id, 10, 64)
 					if err != nil {
 						return nil, fmt.Errorf("failed to parse id: %w", err)
@@ -117,9 +118,9 @@ func HandlePatchProgressView(wDB *sql.DB) http.HandlerFunc {
 					}, nil
 				},
 			},
-			"sets": &patchIDParams[workoutdb.RawUpdateProgressSetsParams]{
-				query: (*workoutdb.Queries).RawUpdateProgressSets,
-				convert: func(id, value string) (*workoutdb.RawUpdateProgressSetsParams, error) {
+			"sets": &base.PatchIDParams[workoutdb.RawUpdateProgressSetsParams]{
+				Query: (*workoutdb.Queries).RawUpdateProgressSets,
+				Convert: func(id, value string) (*workoutdb.RawUpdateProgressSetsParams, error) {
 					idN, err := strconv.ParseInt(id, 10, 64)
 					if err != nil {
 						return nil, fmt.Errorf("failed to parse id: %w", err)
@@ -134,9 +135,9 @@ func HandlePatchProgressView(wDB *sql.DB) http.HandlerFunc {
 					}, nil
 				},
 			},
-			"reps": &patchIDParams[workoutdb.RawUpdateProgressRepsParams]{
-				query: (*workoutdb.Queries).RawUpdateProgressReps,
-				convert: func(id, value string) (*workoutdb.RawUpdateProgressRepsParams, error) {
+			"reps": &base.PatchIDParams[workoutdb.RawUpdateProgressRepsParams]{
+				Query: (*workoutdb.Queries).RawUpdateProgressReps,
+				Convert: func(id, value string) (*workoutdb.RawUpdateProgressRepsParams, error) {
 					idN, err := strconv.ParseInt(id, 10, 64)
 					if err != nil {
 						return nil, fmt.Errorf("failed to parse id: %w", err)
@@ -151,9 +152,9 @@ func HandlePatchProgressView(wDB *sql.DB) http.HandlerFunc {
 					}, nil
 				},
 			},
-			"side_weight": &patchIDParams[workoutdb.RawUpdateProgressSideWeightParams]{
-				query: (*workoutdb.Queries).RawUpdateProgressSideWeight,
-				convert: func(id, value string) (*workoutdb.RawUpdateProgressSideWeightParams, error) {
+			"side_weight": &base.PatchIDParams[workoutdb.RawUpdateProgressSideWeightParams]{
+				Query: (*workoutdb.Queries).RawUpdateProgressSideWeight,
+				Convert: func(id, value string) (*workoutdb.RawUpdateProgressSideWeightParams, error) {
 					idN, err := strconv.ParseInt(id, 10, 64)
 					if err != nil {
 						return nil, fmt.Errorf("failed to parse id: %w", err)
@@ -169,7 +170,7 @@ func HandlePatchProgressView(wDB *sql.DB) http.HandlerFunc {
 }
 
 func HandlePostProgressView(roDB, wDB *sql.DB) http.HandlerFunc {
-	return handlePostDataTableView(
+	return base.HandlePostDataTableView(
 		roDB,
 		wDB,
 		(*workoutdb.Queries).RawInsertProgress,

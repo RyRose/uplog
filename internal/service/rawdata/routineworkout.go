@@ -7,17 +7,18 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/RyRose/uplog/internal/service/rawdata/base"
 	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 )
 
 func HandleGetRoutineWorkoutView(roDB *sql.DB) http.HandlerFunc {
-	return handleGetDataTableView(
+	return base.HandleGetDataTableView(
 		roDB,
-		tableViewMetadata{
-			headers: []string{"Routine", "Workout"},
-			post:    "/view/data/routine_workout_mapping",
+		base.TableViewMetadata{
+			Headers: []string{"Routine", "Workout"},
+			Post:    "/view/data/routine_workout_mapping",
 		},
 		(*workoutdb.Queries).RawSelectRoutineWorkoutPage,
 		func(limit, offset int64) workoutdb.RawSelectRoutineWorkoutPageParams {
@@ -59,12 +60,12 @@ func HandleGetRoutineWorkoutView(roDB *sql.DB) http.HandlerFunc {
 }
 
 func HandlePatchRoutineWorkoutView(wDB *sql.DB) http.HandlerFunc {
-	return handlePatchTableRowViewRequest(
+	return base.HandlePatchTableRowViewRequest(
 		wDB,
-		map[string]patcherReq{
-			"routine": &patchReqParams[workoutdb.RawUpdateRoutineWorkoutMappingRoutineParams]{
-				query: (*workoutdb.Queries).RawUpdateRoutineWorkoutMappingRoutine,
-				convert: func(r *http.Request, value string) (*workoutdb.RawUpdateRoutineWorkoutMappingRoutineParams, error) {
+		map[string]base.PatcherReq{
+			"routine": &base.PatchReqParams[workoutdb.RawUpdateRoutineWorkoutMappingRoutineParams]{
+				Query: (*workoutdb.Queries).RawUpdateRoutineWorkoutMappingRoutine,
+				Convert: func(r *http.Request, value string) (*workoutdb.RawUpdateRoutineWorkoutMappingRoutineParams, error) {
 					return &workoutdb.RawUpdateRoutineWorkoutMappingRoutineParams{
 						Out:     value,
 						In:      r.PathValue("routine"),
@@ -72,9 +73,9 @@ func HandlePatchRoutineWorkoutView(wDB *sql.DB) http.HandlerFunc {
 					}, nil
 				},
 			},
-			"workout": &patchReqParams[workoutdb.RawUpdateRoutineWorkoutMappingWorkoutParams]{
-				query: (*workoutdb.Queries).RawUpdateRoutineWorkoutMappingWorkout,
-				convert: func(r *http.Request, value string) (*workoutdb.RawUpdateRoutineWorkoutMappingWorkoutParams, error) {
+			"workout": &base.PatchReqParams[workoutdb.RawUpdateRoutineWorkoutMappingWorkoutParams]{
+				Query: (*workoutdb.Queries).RawUpdateRoutineWorkoutMappingWorkout,
+				Convert: func(r *http.Request, value string) (*workoutdb.RawUpdateRoutineWorkoutMappingWorkoutParams, error) {
 					return &workoutdb.RawUpdateRoutineWorkoutMappingWorkoutParams{
 						Out:     value,
 						In:      r.PathValue("workout"),
@@ -87,7 +88,7 @@ func HandlePatchRoutineWorkoutView(wDB *sql.DB) http.HandlerFunc {
 }
 
 func HandlePostRoutineWorkoutView(roDB, wDB *sql.DB) http.HandlerFunc {
-	return handlePostDataTableView(
+	return base.HandlePostDataTableView(
 		roDB,
 		wDB,
 		(*workoutdb.Queries).RawInsertRoutineWorkout,

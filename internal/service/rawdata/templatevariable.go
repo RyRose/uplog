@@ -6,17 +6,18 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/RyRose/uplog/internal/service/rawdata/base"
 	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 )
 
 func HandleGetTemplateVariableView(roDB *sql.DB) http.HandlerFunc {
-	return handleGetDataTableView(
+	return base.HandleGetDataTableView(
 		roDB,
-		tableViewMetadata{
-			headers: []string{"ID", "Value"},
-			post:    "/view/data/template_variable",
+		base.TableViewMetadata{
+			Headers: []string{"ID", "Value"},
+			Post:    "/view/data/template_variable",
 		},
 		(*workoutdb.Queries).RawSelectTemplateVariablePage,
 		func(limit, offset int64) workoutdb.RawSelectTemplateVariablePageParams {
@@ -49,21 +50,21 @@ func HandleGetTemplateVariableView(roDB *sql.DB) http.HandlerFunc {
 }
 
 func HandlePatchTemplateVariableView(wDB *sql.DB) http.HandlerFunc {
-	return handlePatchTableRowViewID(
+	return base.HandlePatchTableRowViewID(
 		wDB,
-		map[string]patcherID{
-			"id": &patchIDParams[workoutdb.RawUpdateTemplateVariableIdParams]{
-				query: (*workoutdb.Queries).RawUpdateTemplateVariableId,
-				convert: func(id, value string) (*workoutdb.RawUpdateTemplateVariableIdParams, error) {
+		map[string]base.PatcherID{
+			"id": &base.PatchIDParams[workoutdb.RawUpdateTemplateVariableIdParams]{
+				Query: (*workoutdb.Queries).RawUpdateTemplateVariableId,
+				Convert: func(id, value string) (*workoutdb.RawUpdateTemplateVariableIdParams, error) {
 					return &workoutdb.RawUpdateTemplateVariableIdParams{
 						In:  id,
 						Out: value,
 					}, nil
 				},
 			},
-			"value": &patchIDParams[workoutdb.RawUpdateTemplateVariableValueParams]{
-				query: (*workoutdb.Queries).RawUpdateTemplateVariableValue,
-				convert: func(id, value string) (*workoutdb.RawUpdateTemplateVariableValueParams, error) {
+			"value": &base.PatchIDParams[workoutdb.RawUpdateTemplateVariableValueParams]{
+				Query: (*workoutdb.Queries).RawUpdateTemplateVariableValue,
+				Convert: func(id, value string) (*workoutdb.RawUpdateTemplateVariableValueParams, error) {
 					return &workoutdb.RawUpdateTemplateVariableValueParams{
 						ID:    id,
 						Value: value,
@@ -75,7 +76,7 @@ func HandlePatchTemplateVariableView(wDB *sql.DB) http.HandlerFunc {
 }
 
 func HandlePostTemplateVariableView(roDB, wDB *sql.DB) http.HandlerFunc {
-	return handlePostDataTableView(
+	return base.HandlePostDataTableView(
 		roDB,
 		wDB,
 		(*workoutdb.Queries).RawInsertTemplateVariable,

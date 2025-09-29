@@ -7,17 +7,18 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/RyRose/uplog/internal/service/rawdata/base"
 	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 )
 
 func HandleGetLiftView(roDB *sql.DB) http.HandlerFunc {
-	return handleGetDataTableView(
+	return base.HandleGetDataTableView(
 		roDB,
-		tableViewMetadata{
-			headers: []string{"ID", "Link", "Side", "Notes", "Group"},
-			post:    "/view/data/lift",
+		base.TableViewMetadata{
+			Headers: []string{"ID", "Link", "Side", "Notes", "Group"},
+			Post:    "/view/data/lift",
 		},
 		(*workoutdb.Queries).RawSelectLiftPage,
 		func(limit, offset int64) workoutdb.RawSelectLiftPageParams {
@@ -72,48 +73,48 @@ func HandleGetLiftView(roDB *sql.DB) http.HandlerFunc {
 }
 
 func HandlePatchLiftView(wDB *sql.DB) http.HandlerFunc {
-	return handlePatchTableRowViewID(
+	return base.HandlePatchTableRowViewID(
 		wDB,
-		map[string]patcherID{
-			"id": &patchIDParams[workoutdb.RawUpdateLiftIdParams]{
-				query: (*workoutdb.Queries).RawUpdateLiftId,
-				convert: func(id, value string) (*workoutdb.RawUpdateLiftIdParams, error) {
+		map[string]base.PatcherID{
+			"id": &base.PatchIDParams[workoutdb.RawUpdateLiftIdParams]{
+				Query: (*workoutdb.Queries).RawUpdateLiftId,
+				Convert: func(id, value string) (*workoutdb.RawUpdateLiftIdParams, error) {
 					return &workoutdb.RawUpdateLiftIdParams{
 						In:  id,
 						Out: value,
 					}, nil
 				},
 			},
-			"link": &patchIDParams[workoutdb.RawUpdateLiftLinkParams]{
-				query: (*workoutdb.Queries).RawUpdateLiftLink,
-				convert: func(id, value string) (*workoutdb.RawUpdateLiftLinkParams, error) {
+			"link": &base.PatchIDParams[workoutdb.RawUpdateLiftLinkParams]{
+				Query: (*workoutdb.Queries).RawUpdateLiftLink,
+				Convert: func(id, value string) (*workoutdb.RawUpdateLiftLinkParams, error) {
 					return &workoutdb.RawUpdateLiftLinkParams{
 						ID:   id,
 						Link: value,
 					}, nil
 				},
 			},
-			"default_side_weight": &patchIDParams[workoutdb.RawUpdateLiftDefaultSideWeightParams]{
-				query: (*workoutdb.Queries).RawUpdateLiftDefaultSideWeight,
-				convert: func(id, value string) (*workoutdb.RawUpdateLiftDefaultSideWeightParams, error) {
+			"default_side_weight": &base.PatchIDParams[workoutdb.RawUpdateLiftDefaultSideWeightParams]{
+				Query: (*workoutdb.Queries).RawUpdateLiftDefaultSideWeight,
+				Convert: func(id, value string) (*workoutdb.RawUpdateLiftDefaultSideWeightParams, error) {
 					return &workoutdb.RawUpdateLiftDefaultSideWeightParams{
 						ID:                id,
 						DefaultSideWeight: util.DeZero(value),
 					}, nil
 				},
 			},
-			"notes": &patchIDParams[workoutdb.RawUpdateLiftNotesParams]{
-				query: (*workoutdb.Queries).RawUpdateLiftNotes,
-				convert: func(id, value string) (*workoutdb.RawUpdateLiftNotesParams, error) {
+			"notes": &base.PatchIDParams[workoutdb.RawUpdateLiftNotesParams]{
+				Query: (*workoutdb.Queries).RawUpdateLiftNotes,
+				Convert: func(id, value string) (*workoutdb.RawUpdateLiftNotesParams, error) {
 					return &workoutdb.RawUpdateLiftNotesParams{
 						ID:    id,
 						Notes: util.DeZero(value),
 					}, nil
 				},
 			},
-			"lift_group": &patchIDParams[workoutdb.RawUpdateLiftLiftGroupParams]{
-				query: (*workoutdb.Queries).RawUpdateLiftLiftGroup,
-				convert: func(id, value string) (*workoutdb.RawUpdateLiftLiftGroupParams, error) {
+			"lift_group": &base.PatchIDParams[workoutdb.RawUpdateLiftLiftGroupParams]{
+				Query: (*workoutdb.Queries).RawUpdateLiftLiftGroup,
+				Convert: func(id, value string) (*workoutdb.RawUpdateLiftLiftGroupParams, error) {
 					return &workoutdb.RawUpdateLiftLiftGroupParams{
 						ID:        id,
 						LiftGroup: util.DeZero(value),
@@ -125,7 +126,7 @@ func HandlePatchLiftView(wDB *sql.DB) http.HandlerFunc {
 }
 
 func HandlePostLiftView(roDB, wDB *sql.DB) http.HandlerFunc {
-	return handlePostDataTableView(
+	return base.HandlePostDataTableView(
 		roDB,
 		wDB,
 		(*workoutdb.Queries).RawInsertLift,

@@ -6,17 +6,18 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/RyRose/uplog/internal/service/rawdata/base"
 	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 )
 
 func HandleGetWorkoutView(roDB *sql.DB) http.HandlerFunc {
-	return handleGetDataTableView(
+	return base.HandleGetDataTableView(
 		roDB,
-		tableViewMetadata{
-			headers: []string{"ID", "Template"},
-			post:    "/view/data/workout",
+		base.TableViewMetadata{
+			Headers: []string{"ID", "Template"},
+			Post:    "/view/data/workout",
 		},
 		(*workoutdb.Queries).RawSelectWorkoutPage,
 		func(limit, offset int64) workoutdb.RawSelectWorkoutPageParams {
@@ -49,21 +50,21 @@ func HandleGetWorkoutView(roDB *sql.DB) http.HandlerFunc {
 }
 
 func HandlePatchWorkoutView(wDB *sql.DB) http.HandlerFunc {
-	return handlePatchTableRowViewID(
+	return base.HandlePatchTableRowViewID(
 		wDB,
-		map[string]patcherID{
-			"id": &patchIDParams[workoutdb.RawUpdateWorkoutIdParams]{
-				query: (*workoutdb.Queries).RawUpdateWorkoutId,
-				convert: func(id, value string) (*workoutdb.RawUpdateWorkoutIdParams, error) {
+		map[string]base.PatcherID{
+			"id": &base.PatchIDParams[workoutdb.RawUpdateWorkoutIdParams]{
+				Query: (*workoutdb.Queries).RawUpdateWorkoutId,
+				Convert: func(id, value string) (*workoutdb.RawUpdateWorkoutIdParams, error) {
 					return &workoutdb.RawUpdateWorkoutIdParams{
 						In:  id,
 						Out: value,
 					}, nil
 				},
 			},
-			"template": &patchIDParams[workoutdb.RawUpdateWorkoutTemplateParams]{
-				query: (*workoutdb.Queries).RawUpdateWorkoutTemplate,
-				convert: func(id, value string) (*workoutdb.RawUpdateWorkoutTemplateParams, error) {
+			"template": &base.PatchIDParams[workoutdb.RawUpdateWorkoutTemplateParams]{
+				Query: (*workoutdb.Queries).RawUpdateWorkoutTemplate,
+				Convert: func(id, value string) (*workoutdb.RawUpdateWorkoutTemplateParams, error) {
 					return &workoutdb.RawUpdateWorkoutTemplateParams{
 						ID:       id,
 						Template: value,
@@ -75,7 +76,7 @@ func HandlePatchWorkoutView(wDB *sql.DB) http.HandlerFunc {
 }
 
 func HandlePostWorkoutView(roDB, wDB *sql.DB) http.HandlerFunc {
-	return handlePostDataTableView(
+	return base.HandlePostDataTableView(
 		roDB,
 		wDB,
 		(*workoutdb.Queries).RawInsertWorkout,

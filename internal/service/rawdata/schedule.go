@@ -7,17 +7,18 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/RyRose/uplog/internal/service/rawdata/base"
 	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 )
 
 func HandleGetScheduleView(roDB *sql.DB) http.HandlerFunc {
-	return handleGetDataTableView(
+	return base.HandleGetDataTableView(
 		roDB,
-		tableViewMetadata{
-			headers: []string{"Date", "Workout"},
-			post:    "/view/data/schedule",
+		base.TableViewMetadata{
+			Headers: []string{"Date", "Workout"},
+			Post:    "/view/data/schedule",
 		},
 		(*workoutdb.Queries).RawSelectSchedulePage,
 		func(limit, offset int64) workoutdb.RawSelectSchedulePageParams {
@@ -56,21 +57,21 @@ func HandleGetScheduleView(roDB *sql.DB) http.HandlerFunc {
 }
 
 func HandlePatchScheduleView(wDB *sql.DB) http.HandlerFunc {
-	return handlePatchTableRowViewID(
+	return base.HandlePatchTableRowViewID(
 		wDB,
-		map[string]patcherID{
-			"date": &patchIDParams[workoutdb.RawUpdateScheduleDateParams]{
-				query: (*workoutdb.Queries).RawUpdateScheduleDate,
-				convert: func(date, value string) (*workoutdb.RawUpdateScheduleDateParams, error) {
+		map[string]base.PatcherID{
+			"date": &base.PatchIDParams[workoutdb.RawUpdateScheduleDateParams]{
+				Query: (*workoutdb.Queries).RawUpdateScheduleDate,
+				Convert: func(date, value string) (*workoutdb.RawUpdateScheduleDateParams, error) {
 					return &workoutdb.RawUpdateScheduleDateParams{
 						In:  date,
 						Out: value,
 					}, nil
 				},
 			},
-			"workout": &patchIDParams[workoutdb.RawUpdateScheduleWorkoutParams]{
-				query: (*workoutdb.Queries).RawUpdateScheduleWorkout,
-				convert: func(id, value string) (*workoutdb.RawUpdateScheduleWorkoutParams, error) {
+			"workout": &base.PatchIDParams[workoutdb.RawUpdateScheduleWorkoutParams]{
+				Query: (*workoutdb.Queries).RawUpdateScheduleWorkout,
+				Convert: func(id, value string) (*workoutdb.RawUpdateScheduleWorkoutParams, error) {
 					return &workoutdb.RawUpdateScheduleWorkoutParams{
 						Date:    id,
 						Workout: util.DeZero(value),
@@ -82,7 +83,7 @@ func HandlePatchScheduleView(wDB *sql.DB) http.HandlerFunc {
 }
 
 func HandlePostScheduleView(roDB, wDB *sql.DB) http.HandlerFunc {
-	return handlePostDataTableView(
+	return base.HandlePostDataTableView(
 		roDB,
 		wDB,
 		(*workoutdb.Queries).RawInsertSchedule,

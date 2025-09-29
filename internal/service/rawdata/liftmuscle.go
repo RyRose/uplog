@@ -7,17 +7,18 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/RyRose/uplog/internal/service/rawdata/base"
 	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 )
 
 func HandleGetLiftMuscleView(roDB *sql.DB) http.HandlerFunc {
-	return handleGetDataTableView(
+	return base.HandleGetDataTableView(
 		roDB,
-		tableViewMetadata{
-			headers: []string{"Lift", "Muscle", "Movement"},
-			post:    "/view/data/lift_muscle_mapping",
+		base.TableViewMetadata{
+			Headers: []string{"Lift", "Muscle", "Movement"},
+			Post:    "/view/data/lift_muscle_mapping",
 		},
 		(*workoutdb.Queries).RawSelectLiftMusclePage,
 		func(limit, offset int64) workoutdb.RawSelectLiftMusclePageParams {
@@ -65,12 +66,12 @@ func HandleGetLiftMuscleView(roDB *sql.DB) http.HandlerFunc {
 }
 
 func HandlePatchLiftMuscleView(wDB *sql.DB) http.HandlerFunc {
-	return handlePatchTableRowViewRequest(
+	return base.HandlePatchTableRowViewRequest(
 		wDB,
-		map[string]patcherReq{
-			"lift": &patchReqParams[workoutdb.RawUpdateLiftMuscleMappingLiftParams]{
-				query: (*workoutdb.Queries).RawUpdateLiftMuscleMappingLift,
-				convert: func(r *http.Request, value string) (*workoutdb.RawUpdateLiftMuscleMappingLiftParams, error) {
+		map[string]base.PatcherReq{
+			"lift": &base.PatchReqParams[workoutdb.RawUpdateLiftMuscleMappingLiftParams]{
+				Query: (*workoutdb.Queries).RawUpdateLiftMuscleMappingLift,
+				Convert: func(r *http.Request, value string) (*workoutdb.RawUpdateLiftMuscleMappingLiftParams, error) {
 					return &workoutdb.RawUpdateLiftMuscleMappingLiftParams{
 						Out:      value,
 						In:       r.PathValue("lift"),
@@ -79,9 +80,9 @@ func HandlePatchLiftMuscleView(wDB *sql.DB) http.HandlerFunc {
 					}, nil
 				},
 			},
-			"muscle": &patchReqParams[workoutdb.RawUpdateLiftMuscleMappingMuscleParams]{
-				query: (*workoutdb.Queries).RawUpdateLiftMuscleMappingMuscle,
-				convert: func(r *http.Request, value string) (*workoutdb.RawUpdateLiftMuscleMappingMuscleParams, error) {
+			"muscle": &base.PatchReqParams[workoutdb.RawUpdateLiftMuscleMappingMuscleParams]{
+				Query: (*workoutdb.Queries).RawUpdateLiftMuscleMappingMuscle,
+				Convert: func(r *http.Request, value string) (*workoutdb.RawUpdateLiftMuscleMappingMuscleParams, error) {
 					return &workoutdb.RawUpdateLiftMuscleMappingMuscleParams{
 						Out:      value,
 						In:       r.PathValue("muscle"),
@@ -90,9 +91,9 @@ func HandlePatchLiftMuscleView(wDB *sql.DB) http.HandlerFunc {
 					}, nil
 				},
 			},
-			"movement": &patchReqParams[workoutdb.RawUpdateLiftMuscleMappingMovementParams]{
-				query: (*workoutdb.Queries).RawUpdateLiftMuscleMappingMovement,
-				convert: func(r *http.Request, value string) (*workoutdb.RawUpdateLiftMuscleMappingMovementParams, error) {
+			"movement": &base.PatchReqParams[workoutdb.RawUpdateLiftMuscleMappingMovementParams]{
+				Query: (*workoutdb.Queries).RawUpdateLiftMuscleMappingMovement,
+				Convert: func(r *http.Request, value string) (*workoutdb.RawUpdateLiftMuscleMappingMovementParams, error) {
 					return &workoutdb.RawUpdateLiftMuscleMappingMovementParams{
 						Out:    value,
 						In:     r.PathValue("movement"),
@@ -106,7 +107,7 @@ func HandlePatchLiftMuscleView(wDB *sql.DB) http.HandlerFunc {
 }
 
 func HandlePostLiftMuscleView(roDB, wDB *sql.DB) http.HandlerFunc {
-	return handlePostDataTableView(
+	return base.HandlePostDataTableView(
 		roDB,
 		wDB,
 		(*workoutdb.Queries).RawInsertLiftMuscle,

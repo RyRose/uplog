@@ -7,17 +7,18 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/RyRose/uplog/internal/service/rawdata/base"
 	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 )
 
 func HandleGetSubworkoutView(roDB *sql.DB) http.HandlerFunc {
-	return handleGetDataTableView(
+	return base.HandleGetDataTableView(
 		roDB,
-		tableViewMetadata{
-			headers: []string{"Subworkout", "Superworkout"},
-			post:    "/view/data/subworkout",
+		base.TableViewMetadata{
+			Headers: []string{"Subworkout", "Superworkout"},
+			Post:    "/view/data/subworkout",
 		},
 		(*workoutdb.Queries).RawSelectSubworkoutPage,
 		func(limit, offset int64) workoutdb.RawSelectSubworkoutPageParams {
@@ -55,12 +56,12 @@ func HandleGetSubworkoutView(roDB *sql.DB) http.HandlerFunc {
 }
 
 func HandlePatchSubworkoutView(wDB *sql.DB) http.HandlerFunc {
-	return handlePatchTableRowViewRequest(
+	return base.HandlePatchTableRowViewRequest(
 		wDB,
-		map[string]patcherReq{
-			"subworkout": &patchReqParams[workoutdb.RawUpdateSubworkoutSubworkoutParams]{
-				query: (*workoutdb.Queries).RawUpdateSubworkoutSubworkout,
-				convert: func(r *http.Request, value string) (*workoutdb.RawUpdateSubworkoutSubworkoutParams, error) {
+		map[string]base.PatcherReq{
+			"subworkout": &base.PatchReqParams[workoutdb.RawUpdateSubworkoutSubworkoutParams]{
+				Query: (*workoutdb.Queries).RawUpdateSubworkoutSubworkout,
+				Convert: func(r *http.Request, value string) (*workoutdb.RawUpdateSubworkoutSubworkoutParams, error) {
 					return &workoutdb.RawUpdateSubworkoutSubworkoutParams{
 						Out:          value,
 						In:           r.PathValue("subworkout"),
@@ -68,9 +69,9 @@ func HandlePatchSubworkoutView(wDB *sql.DB) http.HandlerFunc {
 					}, nil
 				},
 			},
-			"superworkout": &patchReqParams[workoutdb.RawUpdateSubworkoutSuperworkoutParams]{
-				query: (*workoutdb.Queries).RawUpdateSubworkoutSuperworkout,
-				convert: func(r *http.Request, value string) (*workoutdb.RawUpdateSubworkoutSuperworkoutParams, error) {
+			"superworkout": &base.PatchReqParams[workoutdb.RawUpdateSubworkoutSuperworkoutParams]{
+				Query: (*workoutdb.Queries).RawUpdateSubworkoutSuperworkout,
+				Convert: func(r *http.Request, value string) (*workoutdb.RawUpdateSubworkoutSuperworkoutParams, error) {
 					return &workoutdb.RawUpdateSubworkoutSuperworkoutParams{
 						Out:        value,
 						In:         r.PathValue("superworkout"),
@@ -83,7 +84,7 @@ func HandlePatchSubworkoutView(wDB *sql.DB) http.HandlerFunc {
 }
 
 func HandlePostSubworkoutView(roDB, wDB *sql.DB) http.HandlerFunc {
-	return handlePostDataTableView(
+	return base.HandlePostDataTableView(
 		roDB,
 		wDB,
 		(*workoutdb.Queries).RawInsertSubworkout,

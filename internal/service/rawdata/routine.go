@@ -7,17 +7,18 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/RyRose/uplog/internal/service/rawdata/base"
 	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 )
 
 func HandleGetRoutineView(roDB *sql.DB) http.HandlerFunc {
-	return handleGetDataTableView(
+	return base.HandleGetDataTableView(
 		roDB,
-		tableViewMetadata{
-			headers: []string{"ID", "Steps", "Lift"},
-			post:    "/view/data/routine",
+		base.TableViewMetadata{
+			Headers: []string{"ID", "Steps", "Lift"},
+			Post:    "/view/data/routine",
 		},
 		(*workoutdb.Queries).RawSelectRoutinePage,
 		func(limit, offset int64) workoutdb.RawSelectRoutinePageParams {
@@ -58,30 +59,30 @@ func HandleGetRoutineView(roDB *sql.DB) http.HandlerFunc {
 }
 
 func HandlePatchRoutineView(wDB *sql.DB) http.HandlerFunc {
-	return handlePatchTableRowViewID(
+	return base.HandlePatchTableRowViewID(
 		wDB,
-		map[string]patcherID{
-			"id": &patchIDParams[workoutdb.RawUpdateRoutineIdParams]{
-				query: (*workoutdb.Queries).RawUpdateRoutineId,
-				convert: func(id, value string) (*workoutdb.RawUpdateRoutineIdParams, error) {
+		map[string]base.PatcherID{
+			"id": &base.PatchIDParams[workoutdb.RawUpdateRoutineIdParams]{
+				Query: (*workoutdb.Queries).RawUpdateRoutineId,
+				Convert: func(id, value string) (*workoutdb.RawUpdateRoutineIdParams, error) {
 					return &workoutdb.RawUpdateRoutineIdParams{
 						In:  id,
 						Out: value,
 					}, nil
 				},
 			},
-			"steps": &patchIDParams[workoutdb.RawUpdateRoutineStepsParams]{
-				query: (*workoutdb.Queries).RawUpdateRoutineSteps,
-				convert: func(id, value string) (*workoutdb.RawUpdateRoutineStepsParams, error) {
+			"steps": &base.PatchIDParams[workoutdb.RawUpdateRoutineStepsParams]{
+				Query: (*workoutdb.Queries).RawUpdateRoutineSteps,
+				Convert: func(id, value string) (*workoutdb.RawUpdateRoutineStepsParams, error) {
 					return &workoutdb.RawUpdateRoutineStepsParams{
 						ID:    id,
 						Steps: value,
 					}, nil
 				},
 			},
-			"lift": &patchIDParams[workoutdb.RawUpdateRoutineLiftParams]{
-				query: (*workoutdb.Queries).RawUpdateRoutineLift,
-				convert: func(id, value string) (*workoutdb.RawUpdateRoutineLiftParams, error) {
+			"lift": &base.PatchIDParams[workoutdb.RawUpdateRoutineLiftParams]{
+				Query: (*workoutdb.Queries).RawUpdateRoutineLift,
+				Convert: func(id, value string) (*workoutdb.RawUpdateRoutineLiftParams, error) {
 					return &workoutdb.RawUpdateRoutineLiftParams{
 						ID:   id,
 						Lift: value,
@@ -93,7 +94,7 @@ func HandlePatchRoutineView(wDB *sql.DB) http.HandlerFunc {
 }
 
 func HandlePostRoutineView(roDB, wDB *sql.DB) http.HandlerFunc {
-	return handlePostDataTableView(
+	return base.HandlePostDataTableView(
 		roDB,
 		wDB,
 		(*workoutdb.Queries).RawInsertRoutine,

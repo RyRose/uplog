@@ -6,17 +6,18 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/RyRose/uplog/internal/service/rawdata/base"
 	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 )
 
 func HandleGetMuscleView(roDB *sql.DB) http.HandlerFunc {
-	return handleGetDataTableView(
+	return base.HandleGetDataTableView(
 		roDB,
-		tableViewMetadata{
-			headers: []string{"ID", "Link", "Message"},
-			post:    "/view/data/muscle",
+		base.TableViewMetadata{
+			Headers: []string{"ID", "Link", "Message"},
+			Post:    "/view/data/muscle",
 		},
 		(*workoutdb.Queries).RawSelectMusclePage,
 		func(limit, offset int64) workoutdb.RawSelectMusclePageParams {
@@ -51,30 +52,30 @@ func HandleGetMuscleView(roDB *sql.DB) http.HandlerFunc {
 }
 
 func HandlePatchMuscleView(wDB *sql.DB) http.HandlerFunc {
-	return handlePatchTableRowViewID(
+	return base.HandlePatchTableRowViewID(
 		wDB,
-		map[string]patcherID{
-			"id": &patchIDParams[workoutdb.RawUpdateMuscleIdParams]{
-				query: (*workoutdb.Queries).RawUpdateMuscleId,
-				convert: func(id, value string) (*workoutdb.RawUpdateMuscleIdParams, error) {
+		map[string]base.PatcherID{
+			"id": &base.PatchIDParams[workoutdb.RawUpdateMuscleIdParams]{
+				Query: (*workoutdb.Queries).RawUpdateMuscleId,
+				Convert: func(id, value string) (*workoutdb.RawUpdateMuscleIdParams, error) {
 					return &workoutdb.RawUpdateMuscleIdParams{
 						In:  id,
 						Out: value,
 					}, nil
 				},
 			},
-			"link": &patchIDParams[workoutdb.RawUpdateMuscleLinkParams]{
-				query: (*workoutdb.Queries).RawUpdateMuscleLink,
-				convert: func(id, value string) (*workoutdb.RawUpdateMuscleLinkParams, error) {
+			"link": &base.PatchIDParams[workoutdb.RawUpdateMuscleLinkParams]{
+				Query: (*workoutdb.Queries).RawUpdateMuscleLink,
+				Convert: func(id, value string) (*workoutdb.RawUpdateMuscleLinkParams, error) {
 					return &workoutdb.RawUpdateMuscleLinkParams{
 						ID:   id,
 						Link: value,
 					}, nil
 				},
 			},
-			"message": &patchIDParams[workoutdb.RawUpdateMuscleMessageParams]{
-				query: (*workoutdb.Queries).RawUpdateMuscleMessage,
-				convert: func(id, value string) (*workoutdb.RawUpdateMuscleMessageParams, error) {
+			"message": &base.PatchIDParams[workoutdb.RawUpdateMuscleMessageParams]{
+				Query: (*workoutdb.Queries).RawUpdateMuscleMessage,
+				Convert: func(id, value string) (*workoutdb.RawUpdateMuscleMessageParams, error) {
 					return &workoutdb.RawUpdateMuscleMessageParams{
 						ID:      id,
 						Message: util.DeZero(value),
@@ -86,7 +87,7 @@ func HandlePatchMuscleView(wDB *sql.DB) http.HandlerFunc {
 }
 
 func HandlePostMuscleView(roDB, wDB *sql.DB) http.HandlerFunc {
-	return handlePostDataTableView(
+	return base.HandlePostDataTableView(
 		roDB,
 		wDB,
 		(*workoutdb.Queries).RawInsertMuscle,

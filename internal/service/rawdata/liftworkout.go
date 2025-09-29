@@ -7,17 +7,18 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/RyRose/uplog/internal/service/rawdata/base"
 	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 )
 
 func HandleGetLiftWorkoutView(roDB *sql.DB) http.HandlerFunc {
-	return handleGetDataTableView(
+	return base.HandleGetDataTableView(
 		roDB,
-		tableViewMetadata{
-			headers: []string{"Lift", "Workout"},
-			post:    "/view/data/lift_workout_mapping",
+		base.TableViewMetadata{
+			Headers: []string{"Lift", "Workout"},
+			Post:    "/view/data/lift_workout_mapping",
 		},
 		(*workoutdb.Queries).RawSelectLiftWorkoutPage,
 		func(limit, offset int64) workoutdb.RawSelectLiftWorkoutPageParams {
@@ -59,12 +60,12 @@ func HandleGetLiftWorkoutView(roDB *sql.DB) http.HandlerFunc {
 }
 
 func HandlePatchLiftWorkoutView(wDB *sql.DB) http.HandlerFunc {
-	return handlePatchTableRowViewRequest(
+	return base.HandlePatchTableRowViewRequest(
 		wDB,
-		map[string]patcherReq{
-			"lift": &patchReqParams[workoutdb.RawUpdateLiftWorkoutMappingLiftParams]{
-				query: (*workoutdb.Queries).RawUpdateLiftWorkoutMappingLift,
-				convert: func(r *http.Request, value string) (*workoutdb.RawUpdateLiftWorkoutMappingLiftParams, error) {
+		map[string]base.PatcherReq{
+			"lift": &base.PatchReqParams[workoutdb.RawUpdateLiftWorkoutMappingLiftParams]{
+				Query: (*workoutdb.Queries).RawUpdateLiftWorkoutMappingLift,
+				Convert: func(r *http.Request, value string) (*workoutdb.RawUpdateLiftWorkoutMappingLiftParams, error) {
 					return &workoutdb.RawUpdateLiftWorkoutMappingLiftParams{
 						Out:     value,
 						In:      r.PathValue("lift"),
@@ -72,9 +73,9 @@ func HandlePatchLiftWorkoutView(wDB *sql.DB) http.HandlerFunc {
 					}, nil
 				},
 			},
-			"workout": &patchReqParams[workoutdb.RawUpdateLiftWorkoutMappingWorkoutParams]{
-				query: (*workoutdb.Queries).RawUpdateLiftWorkoutMappingWorkout,
-				convert: func(r *http.Request, value string) (*workoutdb.RawUpdateLiftWorkoutMappingWorkoutParams, error) {
+			"workout": &base.PatchReqParams[workoutdb.RawUpdateLiftWorkoutMappingWorkoutParams]{
+				Query: (*workoutdb.Queries).RawUpdateLiftWorkoutMappingWorkout,
+				Convert: func(r *http.Request, value string) (*workoutdb.RawUpdateLiftWorkoutMappingWorkoutParams, error) {
 					return &workoutdb.RawUpdateLiftWorkoutMappingWorkoutParams{
 						Out:  value,
 						In:   r.PathValue("workout"),
@@ -87,7 +88,7 @@ func HandlePatchLiftWorkoutView(wDB *sql.DB) http.HandlerFunc {
 }
 
 func HandlePostLiftWorkoutView(roDB, wDB *sql.DB) http.HandlerFunc {
-	return handlePostDataTableView(
+	return base.HandlePostDataTableView(
 		roDB,
 		wDB,
 		(*workoutdb.Queries).RawInsertLiftWorkout,

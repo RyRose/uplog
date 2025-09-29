@@ -8,17 +8,18 @@ import (
 	"net/url"
 	"strconv"
 
+	"github.com/RyRose/uplog/internal/service/rawdata/base"
 	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 )
 
 func HandleGetSideWeightView(roDB *sql.DB) http.HandlerFunc {
-	return handleGetDataTableView(
+	return base.HandleGetDataTableView(
 		roDB,
-		tableViewMetadata{
-			headers: []string{"ID", "Mult", "Addend", "Format"},
-			post:    "/view/data/side_weight",
+		base.TableViewMetadata{
+			Headers: []string{"ID", "Mult", "Addend", "Format"},
+			Post:    "/view/data/side_weight",
 		},
 		(*workoutdb.Queries).RawSelectSideWeightPage,
 		func(limit, offset int64) workoutdb.RawSelectSideWeightPageParams {
@@ -55,21 +56,21 @@ func HandleGetSideWeightView(roDB *sql.DB) http.HandlerFunc {
 }
 
 func HandlePatchSideWeightView(wDB *sql.DB) http.HandlerFunc {
-	return handlePatchTableRowViewID(
+	return base.HandlePatchTableRowViewID(
 		wDB,
-		map[string]patcherID{
-			"id": &patchIDParams[workoutdb.RawUpdateSideWeightIdParams]{
-				query: (*workoutdb.Queries).RawUpdateSideWeightId,
-				convert: func(id, value string) (*workoutdb.RawUpdateSideWeightIdParams, error) {
+		map[string]base.PatcherID{
+			"id": &base.PatchIDParams[workoutdb.RawUpdateSideWeightIdParams]{
+				Query: (*workoutdb.Queries).RawUpdateSideWeightId,
+				Convert: func(id, value string) (*workoutdb.RawUpdateSideWeightIdParams, error) {
 					return &workoutdb.RawUpdateSideWeightIdParams{
 						In:  id,
 						Out: value,
 					}, nil
 				},
 			},
-			"multiplier": &patchIDParams[workoutdb.RawUpdateSideWeightMultiplierParams]{
-				query: (*workoutdb.Queries).RawUpdateSideWeightMultiplier,
-				convert: func(id, value string) (*workoutdb.RawUpdateSideWeightMultiplierParams, error) {
+			"multiplier": &base.PatchIDParams[workoutdb.RawUpdateSideWeightMultiplierParams]{
+				Query: (*workoutdb.Queries).RawUpdateSideWeightMultiplier,
+				Convert: func(id, value string) (*workoutdb.RawUpdateSideWeightMultiplierParams, error) {
 					v, err := strconv.ParseFloat(value, 64)
 					if err != nil {
 						return nil, fmt.Errorf("failed to parse multiplier: %w", err)
@@ -80,9 +81,9 @@ func HandlePatchSideWeightView(wDB *sql.DB) http.HandlerFunc {
 					}, nil
 				},
 			},
-			"addend": &patchIDParams[workoutdb.RawUpdateSideWeightAddendParams]{
-				query: (*workoutdb.Queries).RawUpdateSideWeightAddend,
-				convert: func(id, value string) (*workoutdb.RawUpdateSideWeightAddendParams, error) {
+			"addend": &base.PatchIDParams[workoutdb.RawUpdateSideWeightAddendParams]{
+				Query: (*workoutdb.Queries).RawUpdateSideWeightAddend,
+				Convert: func(id, value string) (*workoutdb.RawUpdateSideWeightAddendParams, error) {
 					v, err := strconv.ParseFloat(value, 64)
 					if err != nil {
 						return nil, fmt.Errorf("failed to parse addend: %w", err)
@@ -93,9 +94,9 @@ func HandlePatchSideWeightView(wDB *sql.DB) http.HandlerFunc {
 					}, nil
 				},
 			},
-			"format": &patchIDParams[workoutdb.RawUpdateSideWeightFormatParams]{
-				query: (*workoutdb.Queries).RawUpdateSideWeightFormat,
-				convert: func(id, value string) (*workoutdb.RawUpdateSideWeightFormatParams, error) {
+			"format": &base.PatchIDParams[workoutdb.RawUpdateSideWeightFormatParams]{
+				Query: (*workoutdb.Queries).RawUpdateSideWeightFormat,
+				Convert: func(id, value string) (*workoutdb.RawUpdateSideWeightFormatParams, error) {
 					return &workoutdb.RawUpdateSideWeightFormatParams{
 						ID:     id,
 						Format: value,
@@ -107,7 +108,7 @@ func HandlePatchSideWeightView(wDB *sql.DB) http.HandlerFunc {
 }
 
 func HandlePostSideWeightView(roDB, wDB *sql.DB) http.HandlerFunc {
-	return handlePostDataTableView(
+	return base.HandlePostDataTableView(
 		roDB,
 		wDB,
 		(*workoutdb.Queries).RawInsertSideWeight,

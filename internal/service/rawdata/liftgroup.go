@@ -6,17 +6,18 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/RyRose/uplog/internal/service/rawdata/base"
 	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 )
 
 func HandleGetLiftGroupView(roDB *sql.DB) http.HandlerFunc {
-	return handleGetDataTableView(
+	return base.HandleGetDataTableView(
 		roDB,
-		tableViewMetadata{
-			headers: []string{"ID"},
-			post:    "/view/data/lift_group",
+		base.TableViewMetadata{
+			Headers: []string{"ID"},
+			Post:    "/view/data/lift_group",
 		},
 		(*workoutdb.Queries).RawSelectLiftGroupPage,
 		func(limit, offset int64) workoutdb.RawSelectLiftGroupPageParams {
@@ -47,12 +48,12 @@ func HandleGetLiftGroupView(roDB *sql.DB) http.HandlerFunc {
 }
 
 func HandlePatchLiftGroupView(wDB *sql.DB) http.HandlerFunc {
-	return handlePatchTableRowViewID(
+	return base.HandlePatchTableRowViewID(
 		wDB,
-		map[string]patcherID{
-			"id": &patchIDParams[workoutdb.RawUpdateLiftGroupIdParams]{
-				query: (*workoutdb.Queries).RawUpdateLiftGroupId,
-				convert: func(id, value string) (*workoutdb.RawUpdateLiftGroupIdParams, error) {
+		map[string]base.PatcherID{
+			"id": &base.PatchIDParams[workoutdb.RawUpdateLiftGroupIdParams]{
+				Query: (*workoutdb.Queries).RawUpdateLiftGroupId,
+				Convert: func(id, value string) (*workoutdb.RawUpdateLiftGroupIdParams, error) {
 					return &workoutdb.RawUpdateLiftGroupIdParams{
 						In:  id,
 						Out: value,
@@ -64,7 +65,7 @@ func HandlePatchLiftGroupView(wDB *sql.DB) http.HandlerFunc {
 }
 
 func HandlePostLiftGroupView(roDB, wDB *sql.DB) http.HandlerFunc {
-	return handlePostDataTableView(
+	return base.HandlePostDataTableView(
 		roDB,
 		wDB,
 		(*workoutdb.Queries).RawInsertLiftGroup,

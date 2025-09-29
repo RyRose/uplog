@@ -8,17 +8,18 @@ import (
 	"net/url"
 	"strconv"
 
+	"github.com/RyRose/uplog/internal/service/rawdata/base"
 	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 )
 
 func HandleGetScheduleListView(roDB *sql.DB) http.HandlerFunc {
-	return handleGetDataTableView(
+	return base.HandleGetDataTableView(
 		roDB,
-		tableViewMetadata{
-			headers: []string{"ID", "Day", "Workout"},
-			post:    "/view/data/schedule_list",
+		base.TableViewMetadata{
+			Headers: []string{"ID", "Day", "Workout"},
+			Post:    "/view/data/schedule_list",
 		},
 		(*workoutdb.Queries).RawSelectScheduleListPage,
 		func(limit, offset int64) workoutdb.RawSelectScheduleListPageParams {
@@ -59,21 +60,21 @@ func HandleGetScheduleListView(roDB *sql.DB) http.HandlerFunc {
 }
 
 func HandlePatchScheduleListView(wDB *sql.DB) http.HandlerFunc {
-	return handlePatchTableRowViewID(
+	return base.HandlePatchTableRowViewID(
 		wDB,
-		map[string]patcherID{
-			"id": &patchIDParams[workoutdb.RawUpdateScheduleListIdParams]{
-				query: (*workoutdb.Queries).RawUpdateScheduleListId,
-				convert: func(id, value string) (*workoutdb.RawUpdateScheduleListIdParams, error) {
+		map[string]base.PatcherID{
+			"id": &base.PatchIDParams[workoutdb.RawUpdateScheduleListIdParams]{
+				Query: (*workoutdb.Queries).RawUpdateScheduleListId,
+				Convert: func(id, value string) (*workoutdb.RawUpdateScheduleListIdParams, error) {
 					return &workoutdb.RawUpdateScheduleListIdParams{
 						In:  id,
 						Out: value,
 					}, nil
 				},
 			},
-			"day": &patchIDParams[workoutdb.RawUpdateScheduleListDayParams]{
-				query: (*workoutdb.Queries).RawUpdateScheduleListDay,
-				convert: func(id, value string) (*workoutdb.RawUpdateScheduleListDayParams, error) {
+			"day": &base.PatchIDParams[workoutdb.RawUpdateScheduleListDayParams]{
+				Query: (*workoutdb.Queries).RawUpdateScheduleListDay,
+				Convert: func(id, value string) (*workoutdb.RawUpdateScheduleListDayParams, error) {
 					v, err := strconv.ParseInt(value, 10, 64)
 					if err != nil {
 						return nil, fmt.Errorf("failed to parse day: %w", err)
@@ -84,9 +85,9 @@ func HandlePatchScheduleListView(wDB *sql.DB) http.HandlerFunc {
 					}, nil
 				},
 			},
-			"workout": &patchIDParams[workoutdb.RawUpdateScheduleListWorkoutParams]{
-				query: (*workoutdb.Queries).RawUpdateScheduleListWorkout,
-				convert: func(id, value string) (*workoutdb.RawUpdateScheduleListWorkoutParams, error) {
+			"workout": &base.PatchIDParams[workoutdb.RawUpdateScheduleListWorkoutParams]{
+				Query: (*workoutdb.Queries).RawUpdateScheduleListWorkout,
+				Convert: func(id, value string) (*workoutdb.RawUpdateScheduleListWorkoutParams, error) {
 					return &workoutdb.RawUpdateScheduleListWorkoutParams{
 						ID:      id,
 						Workout: value,
@@ -98,7 +99,7 @@ func HandlePatchScheduleListView(wDB *sql.DB) http.HandlerFunc {
 }
 
 func HandlePostScheduleListView(roDB, wDB *sql.DB) http.HandlerFunc {
-	return handlePostDataTableView(
+	return base.HandlePostDataTableView(
 		roDB,
 		wDB,
 		(*workoutdb.Queries).RawInsertScheduleList,

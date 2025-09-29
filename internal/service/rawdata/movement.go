@@ -6,17 +6,18 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/RyRose/uplog/internal/service/rawdata/base"
 	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 )
 
 func HandleGetMovementView(roDB *sql.DB) http.HandlerFunc {
-	return handleGetDataTableView(
+	return base.HandleGetDataTableView(
 		roDB,
-		tableViewMetadata{
-			headers: []string{"ID", "Alias"},
-			post:    "/view/data/movement",
+		base.TableViewMetadata{
+			Headers: []string{"ID", "Alias"},
+			Post:    "/view/data/movement",
 		},
 		(*workoutdb.Queries).RawSelectMovementPage,
 		func(limit, offset int64) workoutdb.RawSelectMovementPageParams {
@@ -49,21 +50,21 @@ func HandleGetMovementView(roDB *sql.DB) http.HandlerFunc {
 }
 
 func HandlePatchMovementView(wDB *sql.DB) http.HandlerFunc {
-	return handlePatchTableRowViewID(
+	return base.HandlePatchTableRowViewID(
 		wDB,
-		map[string]patcherID{
-			"id": &patchIDParams[workoutdb.RawUpdateMovementIdParams]{
-				query: (*workoutdb.Queries).RawUpdateMovementId,
-				convert: func(id, value string) (*workoutdb.RawUpdateMovementIdParams, error) {
+		map[string]base.PatcherID{
+			"id": &base.PatchIDParams[workoutdb.RawUpdateMovementIdParams]{
+				Query: (*workoutdb.Queries).RawUpdateMovementId,
+				Convert: func(id, value string) (*workoutdb.RawUpdateMovementIdParams, error) {
 					return &workoutdb.RawUpdateMovementIdParams{
 						In:  id,
 						Out: value,
 					}, nil
 				},
 			},
-			"alias": &patchIDParams[workoutdb.RawUpdateMovementAliasParams]{
-				query: (*workoutdb.Queries).RawUpdateMovementAlias,
-				convert: func(id, value string) (*workoutdb.RawUpdateMovementAliasParams, error) {
+			"alias": &base.PatchIDParams[workoutdb.RawUpdateMovementAliasParams]{
+				Query: (*workoutdb.Queries).RawUpdateMovementAlias,
+				Convert: func(id, value string) (*workoutdb.RawUpdateMovementAliasParams, error) {
 					return &workoutdb.RawUpdateMovementAliasParams{
 						ID:    id,
 						Alias: value,
@@ -75,7 +76,7 @@ func HandlePatchMovementView(wDB *sql.DB) http.HandlerFunc {
 }
 
 func HandlePostMovementView(roDB, wDB *sql.DB) http.HandlerFunc {
-	return handlePostDataTableView(
+	return base.HandlePostDataTableView(
 		roDB,
 		wDB,
 		(*workoutdb.Queries).RawInsertMovement,
