@@ -1,4 +1,4 @@
-package service
+package schedule
 
 import (
 	"database/sql"
@@ -11,6 +11,10 @@ import (
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 )
+
+func todaysDate() time.Time {
+	return time.Now()
+}
 
 func scheduleView(s workoutdb.Schedule, workoutOptions []string) templates.ScheduleDataView {
 	var weekday string
@@ -36,7 +40,7 @@ func scheduleViews(s []workoutdb.Schedule, workoutOptions []string) []templates.
 	return out
 }
 
-func handleGetScheduleTable(roDB *sql.DB) http.HandlerFunc {
+func HandleGetScheduleTable(roDB *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		queries := workoutdb.New(roDB)
@@ -65,7 +69,7 @@ func handleGetScheduleTable(roDB *sql.DB) http.HandlerFunc {
 	}
 }
 
-func handlePostScheduleTableRows(wDB *sql.DB, calendarService *calendar.Service) http.HandlerFunc {
+func HandlePostScheduleTableRows(wDB *sql.DB, calendarService *calendar.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		queries := workoutdb.New(wDB)
@@ -155,7 +159,7 @@ func handlePostScheduleTableRows(wDB *sql.DB, calendarService *calendar.Service)
 	}
 }
 
-func handleDeleteSchedule(wDB *sql.DB, calendarService *calendar.Service) http.HandlerFunc {
+func HandleDeleteSchedule(wDB *sql.DB, calendarService *calendar.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		queries := workoutdb.New(wDB)
@@ -218,7 +222,7 @@ func handleDeleteSchedule(wDB *sql.DB, calendarService *calendar.Service) http.H
 	}
 }
 
-func handlePatchScheduleTableRow(wDB *sql.DB, calendarService *calendar.Service) http.HandlerFunc {
+func HandlePatchScheduleTableRow(wDB *sql.DB, calendarService *calendar.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		queries := workoutdb.New(wDB)
@@ -254,7 +258,7 @@ func handlePatchScheduleTableRow(wDB *sql.DB, calendarService *calendar.Service)
 	}
 }
 
-func handlePostScheduleTableRow(wDB *sql.DB, calendarService *calendar.Service) http.HandlerFunc {
+func HandlePostScheduleTableRow(wDB *sql.DB, calendarService *calendar.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		queries := workoutdb.New(wDB)
@@ -343,27 +347,6 @@ func handlePostScheduleTableRow(wDB *sql.DB, calendarService *calendar.Service) 
 			}
 			templates.ScheduleTableRow(scheduleView(schedule, allWorkouts)).Render(ctx, w)
 			date = date.Add(24 * time.Hour)
-		}
-	}
-}
-
-func handleGetCalendarAuthURL(calendarService *calendar.Service) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if !calendarService.Initializable() || calendarService.Initialized() {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-
-		ctx := r.Context()
-		url, err := calendarService.AuthCodeURL()
-		if err != nil {
-			http.Error(w, "failed to get auth code url", http.StatusInternalServerError)
-			slog.ErrorContext(ctx, "failed to get auth code url", "error", err)
-			return
-		}
-		if err := templates.AuthorizationURL(url).Render(ctx, w); err != nil {
-			http.Error(w, "failed to write response", http.StatusInternalServerError)
-			slog.ErrorContext(ctx, "failed to write response", "error", err)
 		}
 	}
 }

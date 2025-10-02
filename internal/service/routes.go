@@ -10,10 +10,13 @@ import (
 	"net/url"
 	"path"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/RyRose/uplog/internal/calendar"
+	"github.com/RyRose/uplog/internal/service/index"
 	"github.com/RyRose/uplog/internal/service/rawdata"
+	"github.com/RyRose/uplog/internal/service/schedule"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -23,6 +26,41 @@ import (
 // TODO: Parameterize today's date for testing support.
 func todaysDate() time.Time {
 	return time.Now()
+}
+
+type errorResponseWriter struct {
+	http.ResponseWriter
+	requestCtx context.Context
+	statusCode int
+}
+
+func (w *errorResponseWriter) Write(b []byte) (int, error) {
+	if w.statusCode < 400 {
+		return w.ResponseWriter.Write(b)
+	}
+
+	w.ResponseWriter.WriteHeader(http.StatusUnprocessableEntity)
+	var s strings.Builder
+	_, err := fmt.Fprint(&s, w.statusCode, ": ")
+	if err != nil {
+		return 0, fmt.Errorf("failed to write status code: %w", err)
+	}
+	n, _ := s.Write(b)
+	return n, templates.Alert(s.String()).Render(w.requestCtx, w.ResponseWriter)
+}
+
+func (w *errorResponseWriter) WriteHeader(statusCode int) {
+	w.statusCode = statusCode
+
+	if statusCode < 400 {
+		w.ResponseWriter.WriteHeader(statusCode)
+	}
+}
+
+func alertMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		next.ServeHTTP(&errorResponseWriter{ResponseWriter: w, requestCtx: r.Context()}, r)
+	})
 }
 
 func handleGetDataTabView() http.HandlerFunc {
@@ -160,7 +198,28 @@ func handleRawPost[dataType, retType any](
 	}
 }
 
-func addRoutes(
+func handleGetCalendarAuthURL(calendarService *calendar.Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if !calendarService.Initializable() || calendarService.Initialized() {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		ctx := r.Context()
+		url, err := calendarService.AuthCodeURL()
+		if err != nil {
+			http.Error(w, "failed to get auth code url", http.StatusInternalServerError)
+			slog.ErrorContext(ctx, "failed to get auth code url", "error", err)
+			return
+		}
+		if err := templates.AuthorizationURL(url).Render(ctx, w); err != nil {
+			http.Error(w, "failed to write response", http.StatusInternalServerError)
+			slog.ErrorContext(ctx, "failed to write response", "error", err)
+		}
+	}
+}
+
+func AddRoutes(
 	_ context.Context,
 	mux *http.ServeMux,
 	wDB, roDB *sql.DB,
@@ -205,32 +264,32 @@ func addRoutes(
 	mux.HandleFunc("GET /data/{tabX}/{tabY}", handleIndexPage("data", ts, calendarService))
 
 	// Main view.
-	mux.Handle("GET /view/tabs/main", alertMiddleware(handleMainTab(roDB)))
+	mux.Handle("GET /view/tabs/main", alertMiddleware(index.HandleMainTab(roDB)))
 	mux.Handle("GET /view/calendarauthurl", alertMiddleware(handleGetCalendarAuthURL(calendarService)))
-	mux.Handle("GET /view/liftgroups", alertMiddleware(handleGetLiftGroupListView(roDB)))
+	mux.Handle("GET /view/liftgroups", alertMiddleware(index.HandleGetLiftGroupListView(roDB)))
 
 	// Progress table
-	mux.Handle("GET /view/progresstable", alertMiddleware(handleGetProgressTable(roDB)))
-	mux.Handle("DELETE /view/progresstablerow/{id}", alertMiddleware(handleDeleteProgress(wDB)))
-	mux.Handle("POST /view/progresstablerow", alertMiddleware(handleCreateProgress(wDB)))
+	mux.Handle("GET /view/progresstable", alertMiddleware(index.HandleGetProgressTable(roDB)))
+	mux.Handle("DELETE /view/progresstablerow/{id}", alertMiddleware(index.HandleDeleteProgress(wDB)))
+	mux.Handle("POST /view/progresstablerow", alertMiddleware(index.HandleCreateProgress(wDB)))
 
 	// Routine table.
-	mux.Handle("GET /view/routinetable", alertMiddleware(handleGetRoutineTable(roDB)))
+	mux.Handle("GET /view/routinetable", alertMiddleware(index.HandleGetRoutineTable(roDB)))
 
 	// Progress form.
-	mux.Handle("GET /view/liftselect", alertMiddleware(handleGetLiftSelect(roDB)))
-	mux.Handle("GET /view/sideweightselect", alertMiddleware(handleGetSideWeightSelect(roDB)))
-	mux.Handle("GET /view/progressform", alertMiddleware(handleGetProgressForm()))
-	mux.Handle("POST /view/progressform", alertMiddleware(handleCreateProgressForm(roDB)))
+	mux.Handle("GET /view/liftselect", alertMiddleware(index.HandleGetLiftSelect(roDB)))
+	mux.Handle("GET /view/sideweightselect", alertMiddleware(index.HandleGetSideWeightSelect(roDB)))
+	mux.Handle("GET /view/progressform", alertMiddleware(index.HandleGetProgressForm()))
+	mux.Handle("POST /view/progressform", alertMiddleware(index.HandleCreateProgressForm(roDB)))
 
 	// Schedule view.
-	mux.Handle("GET /view/tabs/schedule", alertMiddleware(handleGetScheduleTable(roDB)))
+	mux.Handle("GET /view/tabs/schedule", alertMiddleware(schedule.HandleGetScheduleTable(roDB)))
 
 	// Schedule table.
-	mux.Handle("DELETE /view/schedule/{date}", alertMiddleware(handleDeleteSchedule(wDB, calendarService)))
-	mux.Handle("PATCH /view/schedule/{date}", alertMiddleware(handlePatchScheduleTableRow(wDB, calendarService)))
-	mux.Handle("POST /view/scheduleappend", alertMiddleware(handlePostScheduleTableRow(wDB, calendarService)))
-	mux.Handle("POST /view/scheduletablerows", alertMiddleware(handlePostScheduleTableRows(wDB, calendarService)))
+	mux.Handle("DELETE /view/schedule/{date}", alertMiddleware(schedule.HandleDeleteSchedule(wDB, calendarService)))
+	mux.Handle("PATCH /view/schedule/{date}", alertMiddleware(schedule.HandlePatchScheduleTableRow(wDB, calendarService)))
+	mux.Handle("POST /view/scheduleappend", alertMiddleware(schedule.HandlePostScheduleTableRow(wDB, calendarService)))
+	mux.Handle("POST /view/scheduletablerows", alertMiddleware(schedule.HandlePostScheduleTableRows(wDB, calendarService)))
 
 	// Data view
 	mux.Handle("GET /view/tabs/data/{$}", alertMiddleware(handleGetDataTabView()))

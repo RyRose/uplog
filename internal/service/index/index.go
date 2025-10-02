@@ -1,4 +1,4 @@
-package service
+package index
 
 import (
 	"database/sql"
@@ -15,7 +15,11 @@ import (
 	"github.com/RyRose/uplog/internal/templates"
 )
 
-func handleMainTab(roDB *sql.DB) http.HandlerFunc {
+func todaysDate() time.Time {
+	return time.Now()
+}
+
+func HandleMainTab(roDB *sql.DB) http.HandlerFunc {
 	roundToNearest := func(num, unit float64) float64 {
 		return math.Round(num/unit) * unit
 	}
@@ -133,7 +137,7 @@ func handleMainTab(roDB *sql.DB) http.HandlerFunc {
 	}
 }
 
-func handleGetLiftGroupListView(roDB *sql.DB) http.HandlerFunc {
+func HandleGetLiftGroupListView(roDB *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		date := todaysDate()
@@ -150,7 +154,7 @@ func handleGetLiftGroupListView(roDB *sql.DB) http.HandlerFunc {
 	}
 }
 
-func handleGetProgressTable(roDB *sql.DB) http.HandlerFunc {
+func HandleGetProgressTable(roDB *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		date := todaysDate()
@@ -168,7 +172,7 @@ func handleGetProgressTable(roDB *sql.DB) http.HandlerFunc {
 	}
 }
 
-func handleDeleteProgress(wDB *sql.DB) http.HandlerFunc {
+func HandleDeleteProgress(wDB *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		idStr := r.PathValue("id")
@@ -193,7 +197,7 @@ func handleDeleteProgress(wDB *sql.DB) http.HandlerFunc {
 	}
 }
 
-func handleCreateProgress(wDB *sql.DB) http.HandlerFunc {
+func HandleCreateProgress(wDB *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		queries := workoutdb.New(wDB)
@@ -236,7 +240,7 @@ func handleCreateProgress(wDB *sql.DB) http.HandlerFunc {
 	}
 }
 
-func handleGetRoutineTable(roDB *sql.DB) http.HandlerFunc {
+func HandleGetRoutineTable(roDB *sql.DB) http.HandlerFunc {
 	roundToNearest := func(num, unit float64) float64 {
 		return math.Round(num/unit) * unit
 	}
@@ -331,7 +335,7 @@ func handleGetRoutineTable(roDB *sql.DB) http.HandlerFunc {
 	}
 }
 
-func handleGetLiftSelect(roDB *sql.DB) http.HandlerFunc {
+func HandleGetLiftSelect(roDB *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		queries := workoutdb.New(roDB)
@@ -375,7 +379,7 @@ func handleGetLiftSelect(roDB *sql.DB) http.HandlerFunc {
 	}
 }
 
-func handleGetSideWeightSelect(roDB *sql.DB) http.HandlerFunc {
+func HandleGetSideWeightSelect(roDB *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		queries := workoutdb.New(roDB)
@@ -410,13 +414,13 @@ func handleGetSideWeightSelect(roDB *sql.DB) http.HandlerFunc {
 	}
 }
 
-func handleGetProgressForm() http.HandlerFunc {
+func HandleGetProgressForm() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		templates.ProgressForm(templates.ProgressFormData{}).Render(r.Context(), w)
 	}
 }
 
-func handleCreateProgressForm(roDB *sql.DB) http.HandlerFunc {
+func HandleCreateProgressForm(roDB *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		queries := workoutdb.New(roDB)
