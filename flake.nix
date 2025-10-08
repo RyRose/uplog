@@ -34,6 +34,7 @@
               nodejs
               sqlc
               tailwindcss
+              goose
             ];
           };
         };

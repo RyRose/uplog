@@ -21,7 +21,9 @@ CREATE TABLE progress (
     sets INTEGER NOT NULL CHECK (sets >= 0),
     -- The number of reps per set that were performed.
     reps INTEGER NOT NULL CHECK (reps >= 0),
-    -- The formula to apply to `weight` to get the full weight.
+    -- The formula to apply to `weight` to get the full weight. If empty,
+    -- it should be assumed that this is "x1" and thus `weight` is the full
+    -- weight.
     side_weight TEXT NULL,
     FOREIGN KEY (lift) REFERENCES lift (id),
     FOREIGN KEY (side_weight) REFERENCES side_weight (id)
