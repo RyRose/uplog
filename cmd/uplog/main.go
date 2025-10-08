@@ -126,6 +126,12 @@ func run(ctx context.Context) error {
 		slog.SetLogLoggerLevel(slog.LevelDebug)
 	}
 
+	if os.Getenv("VERSION") != "" {
+		slog.InfoContext(ctx, "uplog version", "version", os.Getenv("VERSION"))
+	} else {
+		slog.WarnContext(ctx, "no uplog version set")
+	}
+
 	dbPath := envOrDefault("DATABASE_PATH", "./tmp/db/data.db")
 	db, rdb, err := setupDatabases(ctx, dbPath)
 	if err != nil {

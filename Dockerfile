@@ -30,7 +30,7 @@ RUN ["templ", "generate"]
 # Generate sqlc #
 #################
 
-FROM sqlc/sqlc:1.27.0 as generate-sqlc-stage
+FROM sqlc/sqlc:1.27.0 AS generate-sqlc-stage
 ARG SRCDIR
 
 # Copy all source files (templ-generated and non-generated).
@@ -58,16 +58,16 @@ RUN npx tailwindcss -i web/app/input.css -o web/static/css/output.css --minify
 # Build #
 #########
 
-FROM golang:1.23 as build-stage
+FROM golang:1.23 AS build-stage
 ARG BINDIR
 ARG SRCDIR
 
 # Cache go build to be faster.
-ENV GOCACHE /cache/go
-ENV GOMODCACHE /cache/gomod
+ENV GOCACHE=/cache/go
+ENV GOMODCACHE=/cache/gomod
 
 # Enable cgo for sqlite.
-ENV CGO_ENABLED 1
+ENV CGO_ENABLED=1
 
 # Copy all source files (generated and non-generated).
 COPY --from=generate-tailwind-stage ${SRCDIR} ${SRCDIR}
@@ -116,8 +116,13 @@ COPY --chown=appuser:appgroup docs/swagger.yaml ${SRCDIR}/docs/swagger.yaml
 # Copy statically-linked go binary and mark as owned by new user.
 COPY --chown=appuser:appgroup --from=build-stage ${BINPATH} ${BINPATH}
 
-ENV PORT 8080
-ENV DATABASE_PATH /data/workout.db
+ENV PORT=8080
+ENV DATABASE_PATH=/data/workout.db
+
+# Application version (set by build system).
+ARG VERSION=unknown
+ENV VERSION=${VERSION}
+
 USER appuser:appgroup
 WORKDIR ${SRCDIR}
 CMD ["uplog"]
