@@ -12,12 +12,14 @@ import (
 	"github.com/RyRose/uplog/internal/templates"
 )
 
-func HandlePostDataTableView[dataType, paramType any](
+// HandlePostDataTableView is a generic handler for posting data to a data table view.
+// insertQ - function to insert data into the database.
+func HandlePostDataTableView[modelType, paramType any](
 	roDB *sql.DB,
 	wDB *sql.DB,
-	insertQ func(*workoutdb.Queries, context.Context, paramType) (dataType, error),
+	insertQ func(*workoutdb.Queries, context.Context, paramType) (modelType, error),
 	convertParams func(context.Context, url.Values) (*paramType, error),
-	toRow func(context.Context, *workoutdb.Queries, dataType) (*templates.DataTableRow, error),
+	toRow func(context.Context, *workoutdb.Queries, modelType) (*templates.DataTableRow, error),
 ) http.HandlerFunc {
 	roQ := workoutdb.New(roDB)
 	wQ := workoutdb.New(wDB)

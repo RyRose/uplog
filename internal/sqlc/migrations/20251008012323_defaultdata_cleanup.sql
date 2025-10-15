@@ -1,8 +1,8 @@
 -- +goose Up
 -- +goose StatementBegin
-INSERT OR REPLACE INTO template_variable VALUES('PUSH','TODO');
-INSERT OR REPLACE INTO template_variable VALUES('PULL','TODO');
-INSERT OR REPLACE INTO template_variable VALUES('CORE','TODO');
+INSERT OR REPLACE INTO template_variable VALUES ('PUSH', 'TODO');
+INSERT OR REPLACE INTO template_variable VALUES ('PULL', 'TODO');
+INSERT OR REPLACE INTO template_variable VALUES ('CORE', 'TODO');
 -- +goose StatementEnd
 
 -- +goose Down
@@ -12,3 +12,4 @@ INSERT OR REPLACE INTO template_variable VALUES('CORE','TODO');
 
 -- +goose StatementEnd
 
+-- sqlfluff:dialect:sqlite

@@ -959,3 +959,5 @@ INSERT OR REPLACE INTO lift_group VALUES('~max');
 -- irreversible, good luck!
 
 -- +goose StatementEnd
+
+-- sqlfluff:dialect:sqlite

@@ -3,11 +3,9 @@ package service
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"log/slog"
 	"net/http"
-	"net/url"
 	"path"
 	"strconv"
 	"strings"
@@ -115,6 +113,7 @@ func handleGetDataTabView() http.HandlerFunc {
 func handleIndexPage(tab, cssQuery string, calendarSrv *calendar.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
+		// TODO: Handle SSO login on dedicated page instead of homepage.
 		code := r.URL.Query().Get("code")
 		if code != "" {
 			// FIXME: Include error in the html response.
@@ -129,71 +128,6 @@ func handleIndexPage(tab, cssQuery string, calendarSrv *calendar.Service) http.H
 		if err != nil {
 			http.Error(w, "failed to write response", http.StatusInternalServerError)
 			slog.ErrorContext(ctx, "failed to write response", "error", err)
-		}
-	}
-}
-
-func handleRawPost[dataType, retType any](
-	db *sql.DB,
-	insert func(*workoutdb.Queries, context.Context, dataType) (retType, error)) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
-		decoder := json.NewDecoder(r.Body)
-
-		urlquery, err := url.ParseQuery(r.URL.RawQuery)
-		if err != nil {
-			slog.ErrorContext(ctx, "failed to parse url query", "error", err)
-			http.Error(w, fmt.Sprintf("failed to parse url query: %v", err), http.StatusBadRequest)
-		}
-
-		var allData []dataType
-		if urlquery.Has("bulk") {
-			if err := decoder.Decode(&allData); err != nil {
-				slog.ErrorContext(ctx, "failed to decode bulk request", "error", err)
-				http.Error(w,
-					fmt.Sprintf("failed to decode bulk request: %v", err), http.StatusBadRequest)
-				return
-			}
-		} else {
-			var data dataType
-			if err := decoder.Decode(&data); err != nil {
-				slog.ErrorContext(ctx, "failed to decode request", "error", err)
-				http.Error(w,
-					fmt.Sprintf("failed to decode request: %v", err), http.StatusBadRequest)
-				return
-			}
-			allData = append(allData, data)
-		}
-
-		queries := workoutdb.New(db)
-		tx, err := db.BeginTx(ctx, nil)
-		if err != nil {
-			slog.ErrorContext(ctx, "failed to start transaction", "error", err)
-			http.Error(w, fmt.Sprintf("failed to start transaction: %v", err), http.StatusBadRequest)
-			return
-		}
-		defer tx.Rollback()
-		queries = queries.WithTx(tx)
-
-		for i, data := range allData {
-			if _, err := insert(queries, ctx, data); err != nil {
-				if urlquery.Has("continue") {
-					slog.WarnContext(
-						ctx, "failed to insert request",
-						"index", i, "error", err, "data", data)
-					continue
-				}
-				slog.ErrorContext(
-					ctx, "failed to insert request", "index", i, "error", err, "data", data)
-				http.Error(w,
-					fmt.Sprintf("failed to insert request %d: %v", i, err), http.StatusBadRequest)
-				return
-			}
-		}
-		if err := tx.Commit(); err != nil {
-			slog.ErrorContext(ctx, "failed to commit request", "error", err)
-			http.Error(w, fmt.Sprintf("failed to commit request: %v", err), http.StatusBadRequest)
-			return
 		}
 	}
 }
@@ -237,22 +171,6 @@ func AddRoutes(
 	// Vendor and non-vendor static assets.
 	mux.Handle("GET /web/static/", http.FileServer(http.Dir(".")))
 	mux.Handle("GET /web/vendor/", http.FileServer(http.Dir(".")))
-
-	// Raw single and bulk insert endpoints.
-	mux.HandleFunc("POST /api/v1/raw/lift", handleRawPost(wDB, (*workoutdb.Queries).RawInsertLift))
-	mux.HandleFunc("POST /api/v1/raw/lift_muscle", handleRawPost(wDB, (*workoutdb.Queries).RawInsertLiftMuscle))
-	mux.HandleFunc("POST /api/v1/raw/lift_workout", handleRawPost(wDB, (*workoutdb.Queries).RawInsertLiftWorkout))
-	mux.HandleFunc("POST /api/v1/raw/movement", handleRawPost(wDB, (*workoutdb.Queries).RawInsertMovement))
-	mux.HandleFunc("POST /api/v1/raw/muscle", handleRawPost(wDB, (*workoutdb.Queries).RawInsertMuscle))
-	mux.HandleFunc("POST /api/v1/raw/progress", handleRawPost(wDB, (*workoutdb.Queries).RawInsertProgress))
-	mux.HandleFunc("POST /api/v1/raw/routine", handleRawPost(wDB, (*workoutdb.Queries).RawInsertRoutine))
-	mux.HandleFunc("POST /api/v1/raw/routine_workout", handleRawPost(wDB, (*workoutdb.Queries).RawInsertRoutineWorkout))
-	mux.HandleFunc("POST /api/v1/raw/schedule", handleRawPost(wDB, (*workoutdb.Queries).RawInsertSchedule))
-	mux.HandleFunc("POST /api/v1/raw/schedule_list", handleRawPost(wDB, (*workoutdb.Queries).RawInsertScheduleList))
-	mux.HandleFunc("POST /api/v1/raw/side_weight", handleRawPost(wDB, (*workoutdb.Queries).RawInsertSideWeight))
-	mux.HandleFunc("POST /api/v1/raw/subworkout", handleRawPost(wDB, (*workoutdb.Queries).RawInsertSubworkout))
-	mux.HandleFunc("POST /api/v1/raw/template_variable", handleRawPost(wDB, (*workoutdb.Queries).RawInsertTemplateVariable))
-	mux.HandleFunc("POST /api/v1/raw/workout", handleRawPost(wDB, (*workoutdb.Queries).RawInsertWorkout))
 
 	ts := fmt.Sprint(todaysDate().Unix())
 
