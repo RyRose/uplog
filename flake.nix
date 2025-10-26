@@ -31,10 +31,11 @@
               go
               go-swag
               go-tools
+              goose
               nodejs
               sqlc
+              stylua
               tailwindcss
-              goose
             ];
           };
         };

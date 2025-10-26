@@ -51,10 +51,10 @@ func ToUpperCamelCase(s string) string {
 	if len(s) == 0 {
 		return s
 	}
-	
+
 	var result []rune
 	capitalizeNext := true
-	
+
 	for _, r := range s {
 		if r == '_' {
 			capitalizeNext = true
@@ -67,7 +67,7 @@ func ToUpperCamelCase(s string) string {
 			}
 		}
 	}
-	
+
 	return string(result)
 }
 
@@ -131,12 +131,12 @@ func GenerateLuaType(v any) (string, error) {
 	lines := []string{fmt.Sprintf("---@class %s", t.Name())}
 	for i := 0; i < t.NumField(); i++ {
 		f := t.Field(i)
-		
+
 		// Skip unexported (lowercase) fields as they are hidden from Lua
 		if len(f.Name) > 0 && !unicode.IsUpper(rune(f.Name[0])) {
 			continue
 		}
-		
+
 		luaTypeData, err := luaType(f.Type)
 		if err != nil {
 			return "", fmt.Errorf("lines so far:\n%s\nfield %s: %w", strings.Join(lines, "\n"), f.Name, err)

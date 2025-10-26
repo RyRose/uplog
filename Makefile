@@ -50,6 +50,8 @@ deps:
 
 .PHONY: format
 format:
+	go fmt ./...
+	stylua ./config
 	swag fmt
 
 .PHONY: docs
@@ -61,5 +63,5 @@ types:
 	go run ./cmd/generatetypes > ./config/typedefinitions.lua
 
 .PHONY: ci
-ci: tidy build test
+ci: tidy format build test
 
