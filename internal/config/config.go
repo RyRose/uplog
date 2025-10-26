@@ -50,5 +50,5 @@ func GenerateLuaTypesFile() (string, error) {
 		}
 		lines = append(lines, s)
 	}
-	return strings.Join(lines, "\n\n"), nil
+	return strings.Join(lines, "\n\n") + "\n", nil
 }

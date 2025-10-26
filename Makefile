@@ -63,5 +63,5 @@ types:
 	go run ./cmd/generatetypes > ./config/typedefinitions.lua
 
 .PHONY: ci
-ci: tidy format build test
+ci: tidy build format test
 
