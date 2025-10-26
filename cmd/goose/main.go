@@ -1,4 +1,4 @@
-// This is custom goose binary with sqlite3 support only.
+// goose is a custom migration tool for Uplog.
 package main
 
 import (
@@ -9,19 +9,12 @@ import (
 	"net/url"
 	"os"
 
+	"github.com/RyRose/uplog/internal/config"
 	"github.com/RyRose/uplog/internal/sqlc"
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pressly/goose/v3"
 )
-
-func envOrDefault(key, def string) string {
-	value := os.Getenv(key)
-	if value == "" {
-		value = def
-	}
-	return value
-}
 
 func run(ctx context.Context, args []string) error {
 	command := args[0]
@@ -30,8 +23,12 @@ func run(ctx context.Context, args []string) error {
 		arguments = append(arguments, args[1:]...)
 	}
 
-	dbPath := envOrDefault("DATABASE_PATH", "./tmp/db/data.db")
-	dsn := fmt.Sprintf("file:%s?mode=rwc&_journal_mode=WAL&_txlock=immediate", url.QueryEscape(dbPath))
+	cfg, err := config.Load(ctx, "./config/main.lua")
+	if err != nil {
+		return fmt.Errorf("failed to load config: %w", err)
+	}
+
+	dsn := fmt.Sprintf("file:%s?mode=rwc&_journal_mode=WAL&_txlock=immediate", url.QueryEscape(cfg.DatabasePath))
 	db, err := sql.Open("sqlite3", dsn)
 	if err != nil {
 		return fmt.Errorf("failed to open %v: %w", dsn, err)

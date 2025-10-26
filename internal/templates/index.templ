@@ -66,36 +66,35 @@ templ IndexPage(cssQuery, navEndpoint string) {
 				}'
 			/>
 			<script type="text/javascript">
-				htmx.onLoad(function(content) {
+				htmx.onLoad(function (content) {
 					var sortables = content.querySelectorAll(".sortable");
 					for (var i = 0; i < sortables.length; i++) {
-					  var sortable = sortables[i];
-					  var sortableInstance = new Sortable(sortable, {
-						  animation: 150,
-						  ghostClass: 'blue-background-class',
+						var sortable = sortables[i];
+						var sortableInstance = new Sortable(sortable, {
+							animation: 150,
+							ghostClass: "blue-background-class",
 
-						  delay: 100, // time in milliseconds to define when the sorting should start
-						  delayOnTouchOnly: true, // only delay if user is using touch
+							delay: 100, // time in milliseconds to define when the sorting should start
+							delayOnTouchOnly: true, // only delay if user is using touch
 
+							// Make the `.htmx-indicator` unsortable
+							filter: ".htmx-indicator",
+							onMove: function (evt) {
+								return evt.related.className.indexOf("htmx-indicator") === -1;
+							},
 
-						  // Make the `.htmx-indicator` unsortable
-						  filter: ".htmx-indicator",
-						  onMove: function (evt) {
-							return evt.related.className.indexOf('htmx-indicator') === -1;
-						  },
+							// Disable sorting on the `end` event
+							onEnd: function (evt) {
+								this.option("disabled", true);
+							},
+						});
 
-						  // Disable sorting on the `end` event
-						  onEnd: function (evt) {
-							this.option("disabled", true);
-						  }
-					  });
-
-					  // Re-enable sorting on the `htmx:afterSwap` event
-					  sortable.addEventListener("htmx:afterSwap", function() {
-						sortableInstance.option("disabled", false);
-					  });
+						// Re-enable sorting on the `htmx:afterSwap` event
+						sortable.addEventListener("htmx:afterSwap", function () {
+							sortableInstance.option("disabled", false);
+						});
 					}
-				})
+				});
 			</script>
 		</head>
 		<body class="flex flex-col items-center h-full">
@@ -117,14 +116,6 @@ templ IndexPage(cssQuery, navEndpoint string) {
 								<a href="/data" class="btn btn-ghost btn-xs text-xs">
 									Data
 								</a>
-							</li>
-							<li>
-								<div
-									hx-get="/view/calendarauthurl"
-									hx-trigger="load"
-									hx-target="this"
-									hx-swap="outerHTML"
-								></div>
 							</li>
 						</ul>
 					</div>

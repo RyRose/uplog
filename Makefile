@@ -2,7 +2,7 @@
 all: build
 
 .PHONY: build
-build:
+build: types
 	tailwindcss -i web/app/input.css -o web/static/css/output.css
 	sqlc generate
 	templ generate
@@ -10,7 +10,7 @@ build:
 
 .PHONY: run
 run: build
-	PORT=8080 tmp/uplog
+	tmp/uplog
 
 .PHONY: gstatus
 gstatus:
@@ -55,4 +55,11 @@ format:
 .PHONY: docs
 docs:
 	swag init
+
+.PHONY: types
+types:
+	go run ./cmd/generatetypes > ./config/typedefinitions.lua
+
+.PHONY: ci
+ci: tidy build test
 

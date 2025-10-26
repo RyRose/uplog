@@ -26,6 +26,7 @@ func HandleDeleteTableRowViewID(
 		w.WriteHeader(http.StatusOK)
 	}
 }
+
 func HandleDeleteTableRowViewRequest[idType any](
 	wDB *sql.DB,
 	deleteQ func(*workoutdb.Queries, context.Context, idType) error,

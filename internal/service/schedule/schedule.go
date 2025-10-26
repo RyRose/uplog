@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/RyRose/uplog/internal/calendar"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 )
@@ -69,7 +68,7 @@ func HandleGetScheduleTable(roDB *sql.DB) http.HandlerFunc {
 	}
 }
 
-func HandlePostScheduleTableRows(wDB *sql.DB, calendarService *calendar.Service) http.HandlerFunc {
+func HandlePostScheduleTableRows(wDB *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		queries := workoutdb.New(wDB)
@@ -128,13 +127,6 @@ func HandlePostScheduleTableRows(wDB *sql.DB, calendarService *calendar.Service)
 				Date:    newDate,
 				Workout: workouts[i],
 			})
-			if err := calendarService.Sync(ctx, calendar.Event{
-				Summary:     workouts[i],
-				ISO8601Date: newDate,
-				Description: "https://workout.ryanrose.me",
-			}); err != nil {
-				slog.WarnContext(ctx, "failed to sync event", "workout", workouts[i], "date", date, "newDate", newDate, "error", err)
-			}
 		}
 
 		if err := tx.Commit(); err != nil {
@@ -159,7 +151,7 @@ func HandlePostScheduleTableRows(wDB *sql.DB, calendarService *calendar.Service)
 	}
 }
 
-func HandleDeleteSchedule(wDB *sql.DB, calendarService *calendar.Service) http.HandlerFunc {
+func HandleDeleteSchedule(wDB *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		queries := workoutdb.New(wDB)
@@ -167,7 +159,6 @@ func HandleDeleteSchedule(wDB *sql.DB, calendarService *calendar.Service) http.H
 		dateParam := r.PathValue("date")
 
 		// TODO: Wrap queries in a transaction.
-
 		if err := queries.DeleteSchedule(ctx, dateParam); err != nil {
 			slog.ErrorContext(ctx, "failed to delete schedule", "error", err)
 			http.Error(w, "failed to delete schedule", http.StatusInternalServerError)
@@ -180,9 +171,7 @@ func HandleDeleteSchedule(wDB *sql.DB, calendarService *calendar.Service) http.H
 			return
 		}
 
-		lastScheduleDate := dateParam
 		for _, s := range schedule {
-			lastScheduleDate = s.Date
 			date, _ := time.Parse(time.DateOnly, s.Date)
 			toDate := date.Add(-24 * time.Hour).Format(time.DateOnly)
 			_, err := queries.UpdateScheduleDate(ctx, workoutdb.UpdateScheduleDateParams{
@@ -194,16 +183,6 @@ func HandleDeleteSchedule(wDB *sql.DB, calendarService *calendar.Service) http.H
 				http.Error(w, "failed to update schedule date", http.StatusInternalServerError)
 				return
 			}
-			if err := calendarService.Sync(ctx, calendar.Event{
-				Summary:     s.Workout.(string),
-				ISO8601Date: toDate,
-				Description: "https://workout.ryanrose.me",
-			}); err != nil {
-				slog.WarnContext(ctx, "failed to sync event", "event", s, "error", err)
-			}
-		}
-		if err := calendarService.Sync(ctx, calendar.Event{ISO8601Date: lastScheduleDate}); err != nil {
-			slog.WarnContext(ctx, "failed to sync event", "date", dateParam, "error", err)
 		}
 
 		schedule, err = queries.ListCurrentSchedule(ctx, todaysDate().Format(time.DateOnly))
@@ -222,7 +201,7 @@ func HandleDeleteSchedule(wDB *sql.DB, calendarService *calendar.Service) http.H
 	}
 }
 
-func HandlePatchScheduleTableRow(wDB *sql.DB, calendarService *calendar.Service) http.HandlerFunc {
+func HandlePatchScheduleTableRow(wDB *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		queries := workoutdb.New(wDB)
@@ -240,14 +219,6 @@ func HandlePatchScheduleTableRow(wDB *sql.DB, calendarService *calendar.Service)
 			return
 		}
 
-		if err := calendarService.Sync(ctx, calendar.Event{
-			Summary:     schedule.Workout.(string),
-			ISO8601Date: schedule.Date,
-			Description: "https://workout.ryanrose.me",
-		}); err != nil {
-			slog.WarnContext(ctx, "failed to sync event", "event", schedule, "error", err)
-		}
-
 		workouts, err := queries.ListAllIndividualWorkouts(ctx)
 		if err != nil {
 			slog.ErrorContext(ctx, "failed to list all individual workouts", "error", err)
@@ -258,7 +229,7 @@ func HandlePatchScheduleTableRow(wDB *sql.DB, calendarService *calendar.Service)
 	}
 }
 
-func HandlePostScheduleTableRow(wDB *sql.DB, calendarService *calendar.Service) http.HandlerFunc {
+func HandlePostScheduleTableRow(wDB *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		queries := workoutdb.New(wDB)
@@ -306,14 +277,6 @@ func HandlePostScheduleTableRow(wDB *sql.DB, calendarService *calendar.Service) 
 				return
 			}
 
-			if err := calendarService.Sync(ctx, calendar.Event{
-				Summary:     schedule.Workout.(string),
-				ISO8601Date: schedule.Date,
-				Description: "https://workout.ryanrose.me",
-			}); err != nil {
-				slog.WarnContext(ctx, "failed to sync event", "event", schedule, "error", err)
-			}
-
 			templates.ScheduleTableRow(scheduleView(schedule, allWorkouts)).Render(ctx, w)
 			return
 		}
@@ -337,14 +300,6 @@ func HandlePostScheduleTableRow(wDB *sql.DB, calendarService *calendar.Service) 
 				return
 			}
 
-			event := calendar.Event{
-				Summary:     schedule.Workout.(string),
-				ISO8601Date: schedule.Date,
-				Description: "https://workout.ryanrose.me",
-			}
-			if err := calendarService.Sync(ctx, event); err != nil {
-				slog.WarnContext(ctx, "failed to sync events", "event", event, "error", err)
-			}
 			templates.ScheduleTableRow(scheduleView(schedule, allWorkouts)).Render(ctx, w)
 			date = date.Add(24 * time.Hour)
 		}

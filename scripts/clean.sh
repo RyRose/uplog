@@ -9,10 +9,10 @@ go clean
 find . -type f -name "*_templ.go" -exec rm {} \;
 
 # Clear tmp/ files.
-rm -rf ./tmp/
+rm -r ./tmp/
 
 # Clear generated tailwind output file.
-rm -f ./web/static/css/output.css
+rm ./web/static/css/output.css
 
 # Clear generated sqlc files.
 rm -r ./internal/sqlc/workoutdb/

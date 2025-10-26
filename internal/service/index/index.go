@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"math"
 	"net/http"
+	"path"
 	"slices"
 	"strconv"
 	"strings"
@@ -17,6 +18,20 @@ import (
 
 func todaysDate() time.Time {
 	return time.Now()
+}
+
+func HandleIndexPage(tab, cssQuery string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		err := templates.IndexPage(
+			cssQuery,
+			path.Join("/view/tabs", tab, r.PathValue("tabX"), r.PathValue("tabY")),
+		).Render(ctx, w)
+		if err != nil {
+			http.Error(w, "failed to write response", http.StatusInternalServerError)
+			slog.ErrorContext(ctx, "failed to write response", "error", err)
+		}
+	}
 }
 
 func HandleMainTab(roDB *sql.DB) http.HandlerFunc {

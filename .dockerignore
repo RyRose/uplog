@@ -2,6 +2,12 @@
 # Generated templ files.
 *_templ.go
 
+# Test files.
+*_test.go
+
+# Generated type definition files.
+config/typedefinitions.lua
+
 # Generated sqlc files.
 internal/sqlc/workoutdb
 

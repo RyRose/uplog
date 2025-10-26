@@ -2,20 +2,19 @@ package service
 
 import (
 	"context"
-	"database/sql"
 	"log/slog"
 	"net/http"
 
-	"github.com/RyRose/uplog/internal/calendar"
+	"github.com/RyRose/uplog/internal/config"
 	sloghttp "github.com/samber/slog-http"
 	"github.com/slok/go-http-metrics/metrics/prometheus"
 	"github.com/slok/go-http-metrics/middleware"
 	"github.com/slok/go-http-metrics/middleware/std"
 )
 
-func NewServer(ctx context.Context, db, roDB *sql.DB, calendarSrv *calendar.Service) http.Handler {
+func NewServer(ctx context.Context, cfg *config.Data, state *State) http.Handler {
 	mux := http.NewServeMux()
-	AddRoutes(ctx, mux, db, roDB, calendarSrv)
+	AddRoutes(ctx, mux, cfg, state)
 
 	var handler http.Handler = mux
 
@@ -26,6 +25,7 @@ func NewServer(ctx context.Context, db, roDB *sql.DB, calendarSrv *calendar.Serv
 	}
 
 	// Prometheus metrics middleware.
+	// TODO: Replace with otelhttp.
 	handler = std.Handler("", middleware.New(middleware.Config{
 		Recorder: prometheus.NewRecorder(prometheus.Config{}),
 	}), handler)
