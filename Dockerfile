@@ -58,7 +58,7 @@ RUN npx tailwindcss -i web/app/input.css -o web/static/css/output.css --minify
 # Build #
 #########
 
-FROM golang:1.23 AS build-stage
+FROM golang:1.25 AS build-stage
 ARG BINDIR
 ARG SRCDIR
 
