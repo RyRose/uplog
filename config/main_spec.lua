@@ -14,15 +14,19 @@ describe("main", function()
 			end
 			main = require("config.main")
 
-			local expected = {
-				debug = false,
-				version = nil,
-				database_path = "./tmp/db/data.db",
-				port = "8080",
-				swagger_url = "http://localhost:8080/docs/swagger.json",
-			}
+			-- Version will be auto-generated with timestamp, so we need to check it exists
+			assert.is_not_nil(main.version)
+			assert.is_string(main.version)
+			assert.is_truthy(main.version:match("^auto%-"))
 
-			assert.same(expected, main)
+			-- Swagger URL should include version query param
+			local expected_swagger_prefix = "http://localhost:8080/docs/swagger.json?v=auto-"
+			assert.is_truthy(main.swagger_url:sub(1, #expected_swagger_prefix) == expected_swagger_prefix)
+
+			-- Check other fields with exact values
+			assert.equal(false, main.debug)
+			assert.equal("./tmp/db/data.db", main.database_path)
+			assert.equal("8080", main.port)
 		end)
 
 		it("should match expected structure with all env vars set", function()
@@ -44,7 +48,7 @@ describe("main", function()
 				version = "1.0.0",
 				database_path = "/var/db/data.db",
 				port = "3000",
-				swagger_url = "http://localhost:3000/docs/swagger.json",
+				swagger_url = "http://localhost:3000/docs/swagger.json?v=1.0.0",
 			}
 
 			assert.same(expected, main)
