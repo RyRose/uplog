@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/RyRose/uplog/internal/config"
 	"github.com/RyRose/uplog/internal/service/index"
@@ -20,7 +19,7 @@ func AddRoutes(
 	cfg *config.Data,
 	state *State) {
 
-	ts := fmt.Sprint(time.Now().Unix())
+	ts := fmt.Sprint(state.StartTimestamp.Unix())
 	traceMux := &mux.Trace{Mux: rawMux}
 	webMux := &mux.Web{Mux: traceMux}
 	roDB := state.ReadonlyDB
