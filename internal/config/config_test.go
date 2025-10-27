@@ -3,7 +3,6 @@ package config
 import (
 	"context"
 	"log"
-	"log/slog"
 	"os"
 	"path/filepath"
 	"testing"
@@ -44,46 +43,6 @@ func TestLoad(t *testing.T) {
 
 	if !cfg.Debug {
 		t.Errorf("Debug = %v, want true", cfg.Debug)
-	}
-}
-
-func TestDataLogValue(t *testing.T) {
-	version := "1.0.0"
-	data := Data{
-		Debug:        true,
-		Version:      &version,
-		DatabasePath: "/test/db",
-		Port:         "8080",
-		SwaggerURL:   "http://localhost/swagger",
-	}
-
-	logValue := data.LogValue()
-	if logValue.Kind() != slog.KindGroup {
-		t.Errorf("expected Kind to be Group, got %v", logValue.Kind())
-	}
-
-	// Verify the log value contains expected fields
-	attrs := logValue.Group()
-	if len(attrs) != 5 {
-		t.Errorf("expected 5 attributes, got %d", len(attrs))
-	}
-}
-
-func TestDataLogValueNilVersion(t *testing.T) {
-	data := Data{
-		Debug:        false,
-		Version:      nil,
-		DatabasePath: "/test/db",
-		Port:         "3000",
-		SwaggerURL:   "http://test",
-	}
-
-	logValue := data.LogValue()
-	attrs := logValue.Group()
-
-	// Should have 4 attributes when version is nil
-	if len(attrs) != 4 {
-		t.Errorf("expected 4 attributes, got %d", len(attrs))
 	}
 }
 

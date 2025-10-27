@@ -99,7 +99,7 @@ func luaType(t reflect.Type) (*luaTypeData, error) {
 			return nil, err
 		}
 		return &luaTypeData{value: s.String() + "[]"}, nil
-	// TODO: Handle maps are handled as expected in gluamapper.
+	// TODO: Verify maps are handled as expected in gluamapper.
 	case reflect.Map:
 		keyS, err := luaType(t.Key())
 		if err != nil {
