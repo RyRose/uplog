@@ -25,7 +25,6 @@ func TestIntegration_IndexPages(t *testing.T) {
 		endpoint string
 	}{
 		{"main index", "/"},
-		{"schedule index", "/schedule/"},
 		{"data index", "/data/"},
 		{"data with tabs", "/data/lift/movement"},
 	}

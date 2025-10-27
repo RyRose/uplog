@@ -30,15 +30,6 @@ SELECT * FROM lift
 WHERE id = ?
 LIMIT 1;
 
--- name: ListRoutinesForDate :many
-SELECT routine.*
-FROM schedule
-INNER JOIN routine_workout_mapping
-    ON schedule.workout = routine_workout_mapping.workout
-INNER JOIN routine
-    ON (routine_workout_mapping.routine = routine.id)
-WHERE schedule.date = ?;
-
 -- name: ListAllIndividualLifts :many
 SELECT id
 FROM lift;
@@ -63,59 +54,8 @@ FROM routine;
 SELECT id
 FROM lift_group;
 
--- name: ListCurrentSchedule :many
-SELECT *
-FROM schedule
-WHERE date >= ?
-ORDER BY date ASC;
-
--- name: GetSchedule :one
-SELECT * FROM schedule
-WHERE date = ?;
-
 -- name: ListAllIndividualWorkouts :many
 SELECT id FROM workout;
-
--- name: UpdateSchedule :one
-UPDATE schedule
-SET workout = ?, notes = ?
-WHERE date = ?
-RETURNING *;
-
--- name: GetLatestScheduleDate :one
-SELECT date
-FROM schedule
-ORDER BY date DESC
-LIMIT 1;
-
--- name: InsertSchedule :one
-INSERT INTO schedule (date, workout, notes)
-VALUES (?, ?, ?)
-RETURNING *;
-
--- name: DeleteScheduleAfterAndIncludingDate :exec
-DELETE FROM schedule
-WHERE date >= ?;
-
--- name: DeleteSchedule :exec
-DELETE FROM schedule
-WHERE date = ?;
-
--- name: UpdateScheduleDate :one
-UPDATE schedule
-SET date = @to_date
-WHERE date = @from_date
-RETURNING *;
-
--- name: ListAllIndividualScheduleLists :many
-SELECT DISTINCT id
-FROM schedule_list;
-
--- name: ListWorkoutsForScheduleList :many
-SELECT workout
-FROM schedule_list
-WHERE id = ?
-ORDER BY day ASC;
 
 -- name: ListMostRecentProgressForLift :many
 SELECT *
@@ -123,12 +63,6 @@ FROM progress
 WHERE lift = ?
 ORDER BY id DESC
 LIMIT ?;
-
--- name: GetWorkoutForDate :one
-SELECT workout
-FROM schedule
-WHERE date = ?
-LIMIT 1;
 
 -- name: QueryLiftGroupsForDate :many
 SELECT

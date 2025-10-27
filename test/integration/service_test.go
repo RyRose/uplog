@@ -85,26 +85,6 @@ func TestIntegration_Endpoints(t *testing.T) {
 		}
 	})
 
-	t.Run("SchedulePage", func(t *testing.T) {
-		resp := srv.Get(t, "/schedule/")
-		defer resp.Body.Close()
-
-		if resp.StatusCode != http.StatusOK {
-			body, _ := io.ReadAll(resp.Body)
-			t.Fatalf("GET /schedule/: unexpected status code: got %d, want %d, body: %s",
-				resp.StatusCode, http.StatusOK, string(body))
-		}
-
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			t.Fatalf("failed to read response body: %v", err)
-		}
-
-		if len(body) == 0 {
-			t.Fatal("expected non-empty response from schedule page")
-		}
-	})
-
 	t.Run("DataPage", func(t *testing.T) {
 		resp := srv.Get(t, "/data/")
 		defer resp.Body.Close()
@@ -157,7 +137,6 @@ func TestIntegration_Endpoints(t *testing.T) {
 			wantCode int
 		}{
 			{"main tab", "/view/tabs/main", http.StatusOK},
-			{"schedule tab", "/view/tabs/schedule", http.StatusOK},
 			{"data tab", "/view/tabs/data/", http.StatusOK},
 			{"lift groups", "/view/liftgroups", http.StatusOK},
 			{"progress table", "/view/progresstable", http.StatusOK},
@@ -184,11 +163,9 @@ func TestIntegration_Endpoints(t *testing.T) {
 			"/view/data/movement",
 			"/view/data/muscle",
 			"/view/data/routine",
-			"/view/data/schedule_list",
 			"/view/data/side_weight",
 			"/view/data/template_variable",
 			"/view/data/workout",
-			"/view/data/schedule",
 			"/view/data/progress",
 			"/view/data/lift_muscle_mapping",
 			"/view/data/lift_workout_mapping",

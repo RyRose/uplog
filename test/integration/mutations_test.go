@@ -88,20 +88,6 @@ func TestIntegration_RawDataMutations(t *testing.T) {
 			requiresID: true,
 		},
 		{
-			name:     "schedule_list",
-			endpoint: "/view/data/schedule_list",
-			createData: url.Values{
-				"id":  {"test-schedule-list"},
-				"day": {"1"}, // Required field
-			},
-			updateData: url.Values{
-				"id":  {"test-schedule-list"},
-				"day": {"2"},
-			},
-			createID:   "test-schedule-list",
-			requiresID: true,
-		},
-		{
 			name:     "lift_group",
 			endpoint: "/view/data/lift_group",
 			createData: url.Values{
@@ -278,87 +264,6 @@ func TestIntegration_ProgressTableMutations(t *testing.T) {
 			body, _ := io.ReadAll(resp.Body)
 			t.Fatalf("unexpected status code: got %d, want %d, body: %s",
 				resp.StatusCode, http.StatusOK, string(body))
-		}
-	})
-}
-
-// TestIntegration_ScheduleMutations tests schedule-specific mutations.
-func TestIntegration_ScheduleMutations(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping integration test in short mode")
-	}
-
-	srv := testutil.Setup(t)
-	defer srv.Cancel()
-
-	baseURL := "http://localhost:" + srv.GetPort(t)
-
-	t.Run("POST scheduleappend adds schedule entry", func(t *testing.T) {
-		formData := url.Values{}
-		formData.Set("date", "2024-12-30")
-		formData.Set("schedule_list", "ppl") // From default data if exists
-
-		req, err := http.NewRequest("POST", baseURL+"/view/scheduleappend", strings.NewReader(formData.Encode()))
-		if err != nil {
-			t.Fatalf("failed to create request: %v", err)
-		}
-		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
-		client := &http.Client{}
-		resp, err := client.Do(req)
-		if err != nil {
-			t.Fatalf("failed to make request: %v", err)
-		}
-		defer resp.Body.Close()
-
-		// May fail if schedule_list doesn't exist, but should not crash
-		if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusUnprocessableEntity {
-			body, _ := io.ReadAll(resp.Body)
-			t.Logf("scheduleappend returned %d: %s", resp.StatusCode, string(body))
-		}
-	})
-
-	t.Run("PATCH schedule updates entry", func(t *testing.T) {
-		formData := url.Values{}
-		formData.Set("schedule_list", "updated-schedule")
-
-		req, err := http.NewRequest("PATCH", baseURL+"/view/schedule/2024-12-30", strings.NewReader(formData.Encode()))
-		if err != nil {
-			t.Fatalf("failed to create request: %v", err)
-		}
-		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
-		client := &http.Client{}
-		resp, err := client.Do(req)
-		if err != nil {
-			t.Fatalf("failed to make request: %v", err)
-		}
-		defer resp.Body.Close()
-
-		// May return various statuses depending on whether entry exists
-		if resp.StatusCode >= 500 {
-			body, _ := io.ReadAll(resp.Body)
-			t.Fatalf("unexpected server error: got %d, body: %s", resp.StatusCode, string(body))
-		}
-	})
-
-	t.Run("DELETE schedule removes entry", func(t *testing.T) {
-		req, err := http.NewRequest("DELETE", baseURL+"/view/schedule/2024-12-30", nil)
-		if err != nil {
-			t.Fatalf("failed to create request: %v", err)
-		}
-
-		client := &http.Client{}
-		resp, err := client.Do(req)
-		if err != nil {
-			t.Fatalf("failed to make request: %v", err)
-		}
-		defer resp.Body.Close()
-
-		// Should succeed even if entry doesn't exist
-		if resp.StatusCode >= 500 {
-			body, _ := io.ReadAll(resp.Body)
-			t.Fatalf("unexpected server error: got %d, body: %s", resp.StatusCode, string(body))
 		}
 	})
 }

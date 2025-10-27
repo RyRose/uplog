@@ -11,7 +11,6 @@ import (
 	"github.com/RyRose/uplog/internal/service/index"
 	"github.com/RyRose/uplog/internal/service/mux"
 	"github.com/RyRose/uplog/internal/service/rawdata"
-	"github.com/RyRose/uplog/internal/service/schedule"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	httpswagger "github.com/swaggo/http-swagger/v2"
@@ -50,7 +49,6 @@ func AddRoutes(
 	// Index pages.
 	// TODO: Use hash of css for cache busting instead of date.
 	traceMux.HandleFunc("GET /{$}", index.HandleIndexPage("main", ts))
-	traceMux.HandleFunc("GET /schedule/{$}", index.HandleIndexPage("schedule", ts))
 	traceMux.HandleFunc("GET /data/{$}", index.HandleIndexPage("data", ts))
 	traceMux.HandleFunc("GET /data/{tabX}/{tabY}", index.HandleIndexPage("data", ts))
 
@@ -71,15 +69,6 @@ func AddRoutes(
 	webMux.Handle("GET /view/sideweightselect", index.HandleGetSideWeightSelect(roDB))
 	webMux.Handle("GET /view/progressform", index.HandleGetProgressForm())
 	webMux.Handle("POST /view/progressform", index.HandleCreateProgressForm(roDB))
-
-	// Schedule view.
-	webMux.Handle("GET /view/tabs/schedule", schedule.HandleGetScheduleTable(roDB))
-
-	// Schedule table.
-	webMux.Handle("DELETE /view/schedule/{date}", schedule.HandleDeleteSchedule(wDB))
-	webMux.Handle("PATCH /view/schedule/{date}", schedule.HandlePatchScheduleTableRow(wDB))
-	webMux.Handle("POST /view/scheduleappend", schedule.HandlePostScheduleTableRow(wDB))
-	webMux.Handle("POST /view/scheduletablerows", schedule.HandlePostScheduleTableRows(wDB))
 
 	// Data view
 	webMux.Handle("GET /view/tabs/data/{$}", index.HandleGetDataTabView())
@@ -117,14 +106,6 @@ func AddRoutes(
 	webMux.Handle("DELETE /view/data/routine/{id}", rawdata.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteRoutine))
 	webMux.Handle("GET /view/data/routine", rawdata.HandleGetRoutineView(roDB))
 
-	// Schedule list view
-	webMux.Handle("POST /view/data/schedule_list", rawdata.HandlePostScheduleListView(roDB, wDB))
-	webMux.Handle("PATCH /view/data/schedule_list", rawdata.HandlePatchScheduleListView(wDB))
-	webMux.Handle("PATCH /view/data/schedule_list/{id}", rawdata.HandlePatchScheduleListView(wDB))
-	webMux.Handle("DELETE /view/data/schedule_list", rawdata.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteScheduleList))
-	webMux.Handle("DELETE /view/data/schedule_list/{id}", rawdata.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteScheduleList))
-	webMux.Handle("GET /view/data/schedule_list", rawdata.HandleGetScheduleListView(roDB))
-
 	// Side weight view
 	webMux.Handle("POST /view/data/side_weight", rawdata.HandlePostSideWeightView(roDB, wDB))
 	webMux.Handle("PATCH /view/data/side_weight", rawdata.HandlePatchSideWeightView(wDB))
@@ -148,14 +129,6 @@ func AddRoutes(
 	webMux.Handle("DELETE /view/data/workout", rawdata.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteWorkout))
 	webMux.Handle("DELETE /view/data/workout/{id}", rawdata.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteWorkout))
 	webMux.Handle("GET /view/data/workout", rawdata.HandleGetWorkoutView(roDB))
-
-	// Schedule view
-	webMux.Handle("POST /view/data/schedule", rawdata.HandlePostScheduleView(roDB, wDB))
-	webMux.Handle("PATCH /view/data/schedule", rawdata.HandlePatchScheduleView(wDB))
-	webMux.Handle("PATCH /view/data/schedule/{id}", rawdata.HandlePatchScheduleView(wDB))
-	webMux.Handle("DELETE /view/data/schedule", rawdata.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteSchedule))
-	webMux.Handle("DELETE /view/data/schedule/{id}", rawdata.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteSchedule))
-	webMux.Handle("GET /view/data/schedule", rawdata.HandleGetScheduleView(roDB))
 
 	// Progress view
 	webMux.Handle("POST /view/data/progress", rawdata.HandlePostProgressView(roDB, wDB))

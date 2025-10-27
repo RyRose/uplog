@@ -4,12 +4,10 @@ import (
 	"database/sql"
 	"fmt"
 	"log/slog"
-	"math"
 	"net/http"
 	"path"
 	"slices"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
@@ -35,9 +33,6 @@ func HandleIndexPage(tab, cssQuery string) http.HandlerFunc {
 }
 
 func HandleMainTab(roDB *sql.DB) http.HandlerFunc {
-	roundToNearest := func(num, unit float64) float64 {
-		return math.Round(num/unit) * unit
-	}
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		date := todaysDate()
@@ -53,90 +48,6 @@ func HandleMainTab(roDB *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		workout, err := queries.GetWorkoutForDate(ctx, date.Format(time.DateOnly))
-		if err != nil {
-			slog.WarnContext(ctx, "failed to get workout for date", "date", date, "error", err)
-			workout = nil
-		}
-
-		if workout != nil {
-			templates.ProgressTitle(fmt.Sprint(workout)).Render(ctx, w)
-		}
-
-		routines, err := queries.ListRoutinesForDate(ctx, date.Format(time.DateOnly))
-		if err != nil {
-			slog.ErrorContext(ctx, "failed to list routines for date", "date", date, "error", err)
-			http.Error(w, "failed to list routines for date", http.StatusInternalServerError)
-			return
-		}
-
-		var tables []templates.RoutineTable
-		for _, routine := range routines {
-			progress, err := queries.GetLatestProgressForLift(ctx, routine.Lift)
-			if err != nil {
-				slog.ErrorContext(ctx,
-					"failed to get latest progress for lift", "lift", routine.Lift, "error", err)
-				http.Error(w, "failed to get latest progress for lift", http.StatusInternalServerError)
-				return
-			}
-			rows := templates.RoutineTable{SideWeight: progress.SideWeight.ID, Lift: routine.Lift}
-			steps := strings.Split(routine.Steps, ",")
-			for _, step := range steps {
-				repsSetsPercent := strings.Split(step, "@")
-				if len(repsSetsPercent) != 2 {
-					slog.WarnContext(ctx,
-						"length of reps/percent not 2",
-						"repsSetsPercent", repsSetsPercent, "step", step, "steps", steps)
-					continue
-				}
-				repsSets := strings.Split(repsSetsPercent[0], "x")
-				reps := repsSets[0]
-				var sets string
-				if len(repsSets) == 1 {
-					sets = "1"
-				} else {
-					sets = repsSets[1]
-				}
-				pct, err := strconv.Atoi(strings.TrimSuffix(repsSetsPercent[1], "%"))
-				if err != nil {
-					slog.WarnContext(ctx,
-						"pct not an integer",
-						"repsPercent", repsSetsPercent, "step", step, "steps", steps)
-					continue
-				}
-				total := (progress.Progress.Weight*progress.SideWeight.Multiplier +
-					progress.SideWeight.Addend) * float64(pct) / 100.0
-				rows.Rows = append(rows.Rows,
-					templates.RoutineTableRow{
-						Percent: repsSetsPercent[1],
-						Weight: strconv.FormatFloat(
-							roundToNearest(total, 5),
-							'f', 0, 64,
-						),
-						SideWeight: strconv.FormatFloat(
-							roundToNearest(
-								(total-progress.SideWeight.Addend)/progress.SideWeight.Multiplier, 2.5),
-							'f', 1, 64),
-						Reps: reps,
-						Sets: sets,
-					},
-				)
-			}
-			total := (progress.Progress.Weight*progress.SideWeight.Multiplier +
-				progress.SideWeight.Addend)
-			rows.Rows = append(rows.Rows, templates.RoutineTableRow{
-				Percent: "100%",
-				Weight: strconv.FormatFloat(
-					roundToNearest(total, 5),
-					'f', 0, 64,
-				),
-				SideWeight: strconv.FormatFloat(
-					roundToNearest((total-progress.SideWeight.Addend)/progress.SideWeight.Multiplier, 2.5),
-					'f', 1, 64),
-			})
-			tables = append(tables, rows)
-		}
-
 		lgs, err := queries.QueryLiftGroupsForDate(ctx, date.Format(time.DateOnly))
 		if err != nil {
 			http.Error(w, "failed to query lift groups", http.StatusInternalServerError)
@@ -145,7 +56,6 @@ func HandleMainTab(roDB *sql.DB) http.HandlerFunc {
 		}
 
 		templates.MainView(templates.MainViewData{
-			Routines:   tables,
 			Progress:   ps,
 			LiftGroups: lgs,
 		}).Render(ctx, w)
@@ -256,97 +166,9 @@ func HandleCreateProgress(wDB *sql.DB) http.HandlerFunc {
 }
 
 func HandleGetRoutineTable(roDB *sql.DB) http.HandlerFunc {
-	roundToNearest := func(num, unit float64) float64 {
-		return math.Round(num/unit) * unit
-	}
-
 	return func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
-		queries := workoutdb.New(roDB)
-
-		date := todaysDate()
-		workout, err := queries.GetWorkoutForDate(ctx, date.Format(time.DateOnly))
-		if err != nil {
-			slog.WarnContext(ctx, "failed to get workout for date", "date", date, "error", err)
-			workout = nil
-		}
-
-		if workout != nil {
-			templates.ProgressTitle(fmt.Sprint(workout)).Render(ctx, w)
-		}
-
-		routines, err := queries.ListRoutinesForDate(ctx, date.Format(time.DateOnly))
-		if err != nil {
-			slog.ErrorContext(ctx, "failed to list routines for date", "date", date, "error", err)
-			http.Error(w, "failed to list routines for date", http.StatusInternalServerError)
-			return
-		}
-
-		for _, routine := range routines {
-			progress, err := queries.GetLatestProgressForLift(ctx, routine.Lift)
-			if err != nil {
-				slog.ErrorContext(ctx,
-					"failed to get latest progress for lift", "lift", routine.Lift, "error", err)
-				http.Error(w, "failed to get latest progress for lift", http.StatusInternalServerError)
-				return
-			}
-			rows := templates.RoutineTable{SideWeight: progress.SideWeight.ID, Lift: routine.Lift}
-			steps := strings.Split(routine.Steps, ",")
-			for _, step := range steps {
-				repsSetsPercent := strings.Split(step, "@")
-				if len(repsSetsPercent) != 2 {
-					slog.WarnContext(ctx,
-						"length of reps/percent not 2",
-						"repsSetsPercent", repsSetsPercent, "step", step, "steps", steps)
-					continue
-				}
-				repsSets := strings.Split(repsSetsPercent[0], "x")
-				reps := repsSets[0]
-				var sets string
-				if len(repsSets) == 1 {
-					sets = "1"
-				} else {
-					sets = repsSets[1]
-				}
-				pct, err := strconv.Atoi(strings.TrimSuffix(repsSetsPercent[1], "%"))
-				if err != nil {
-					slog.WarnContext(ctx,
-						"pct not an integer",
-						"repsPercent", repsSetsPercent, "step", step, "steps", steps)
-					continue
-				}
-				total := (progress.Progress.Weight*progress.SideWeight.Multiplier +
-					progress.SideWeight.Addend) * float64(pct) / 100.0
-				rows.Rows = append(rows.Rows,
-					templates.RoutineTableRow{
-						Percent: repsSetsPercent[1],
-						Weight: strconv.FormatFloat(
-							roundToNearest(total, 5),
-							'f', 0, 64,
-						),
-						SideWeight: strconv.FormatFloat(
-							roundToNearest(
-								(total-progress.SideWeight.Addend)/progress.SideWeight.Multiplier, 2.5),
-							'f', 1, 64),
-						Reps: reps,
-						Sets: sets,
-					},
-				)
-			}
-			total := (progress.Progress.Weight*progress.SideWeight.Multiplier +
-				progress.SideWeight.Addend)
-			rows.Rows = append(rows.Rows, templates.RoutineTableRow{
-				Percent: "100%",
-				Weight: strconv.FormatFloat(
-					roundToNearest(total, 5),
-					'f', 0, 64,
-				),
-				SideWeight: strconv.FormatFloat(
-					roundToNearest((total-progress.SideWeight.Addend)/progress.SideWeight.Multiplier, 2.5),
-					'f', 1, 64),
-			})
-			templates.RoutineTableView(rows).Render(ctx, w)
-		}
+		// Routine table functionality removed - schedule concept eliminated
+		w.WriteHeader(http.StatusOK)
 	}
 }
 

@@ -18,9 +18,7 @@ func HandleGetDataTabView() http.HandlerFunc {
 			{Title: "Workouts", Endpoint: "/view/data/workout"},
 		},
 		{
-			{Title: "Schedules", Endpoint: "/view/data/schedule_list"},
 			{Title: "Variables", Endpoint: "/view/data/template_variable"},
-			{Title: "Schedule", Endpoint: "/view/data/schedule"},
 			{Title: "Lift Groups", Endpoint: "/view/data/lift_group"},
 		},
 		{

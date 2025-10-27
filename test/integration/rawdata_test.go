@@ -31,10 +31,8 @@ func TestIntegration_RawDataViewStructure(t *testing.T) {
 		{"muscle table", "/view/data/muscle", 2},
 		{"routine table", "/view/data/routine", 3},
 		{"workout table", "/view/data/workout", 1},
-		{"schedule list table", "/view/data/schedule_list", 1},
 		{"side weight table", "/view/data/side_weight", 3},
 		{"template variable table", "/view/data/template_variable", 2},
-		{"schedule table", "/view/data/schedule", 2},
 		{"progress table", "/view/data/progress", 5},
 		{"lift group table", "/view/data/lift_group", 1},
 
