@@ -14,6 +14,17 @@ import (
 	"github.com/RyRose/uplog/internal/templates"
 )
 
+// HandleGetSideWeightView godoc
+//
+//	@Summary		Get side weight data table view
+//	@Description	Renders a paginated table view of side weights
+//	@Tags			rawdata
+//	@Produce		html
+//	@Param			offset	query		integer	false	"Pagination offset"
+//	@Success		200		{string}	string	"HTML content"
+//	@Failure		400		{string}	string	"Bad request"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/view/data/side_weight [get]
 func HandleGetSideWeightView(roDB *sql.DB) http.HandlerFunc {
 	return base.HandleGetDataTableView(
 		roDB,
@@ -55,6 +66,21 @@ func HandleGetSideWeightView(roDB *sql.DB) http.HandlerFunc {
 	)
 }
 
+// HandlePatchSideWeightView godoc
+//
+//	@Summary		Update side weight data
+//	@Description	Updates specific fields of a side weight entry by ID
+//	@Tags			rawdata
+//	@Accept			x-www-form-urlencoded
+//	@Param			id			path		string	true	"Side weight ID"
+//	@Param			id			formData	string	false	"New side weight ID"
+//	@Param			multiplier	formData	number	false	"Multiplier value"
+//	@Param			addend		formData	number	false	"Addend value"
+//	@Param			format		formData	string	false	"Format string"
+//	@Success		200			{string}	string	"OK"
+//	@Failure		400			{string}	string	"Bad request"
+//	@Failure		500			{string}	string	"Internal server error"
+//	@Router			/view/data/side_weight/{id} [patch]
 func HandlePatchSideWeightView(wDB *sql.DB) http.HandlerFunc {
 	return base.HandlePatchTableRowViewID(
 		wDB,
@@ -107,6 +133,21 @@ func HandlePatchSideWeightView(wDB *sql.DB) http.HandlerFunc {
 	)
 }
 
+// HandlePostSideWeightView godoc
+//
+//	@Summary		Create new side weight
+//	@Description	Creates a new side weight entry in the database
+//	@Tags			rawdata
+//	@Accept			x-www-form-urlencoded
+//	@Produce		html
+//	@Param			id			formData	string	true	"Side weight ID"
+//	@Param			multiplier	formData	number	true	"Multiplier value"
+//	@Param			addend		formData	number	true	"Addend value"
+//	@Param			format		formData	string	true	"Format string"
+//	@Success		201			{string}	string	"HTML content"
+//	@Failure		400			{string}	string	"Bad request"
+//	@Failure		500			{string}	string	"Internal server error"
+//	@Router			/view/data/side_weight [post]
 func HandlePostSideWeightView(roDB, wDB *sql.DB) http.HandlerFunc {
 	return base.HandlePostDataTableView(
 		roDB,
@@ -141,4 +182,17 @@ func HandlePostSideWeightView(roDB, wDB *sql.DB) http.HandlerFunc {
 			}, nil
 		},
 	)
+}
+
+// HandleDeleteSideWeightView godoc
+//
+//	@Summary		Delete side weight
+//	@Description	Deletes a side weight entry by ID
+//	@Tags			rawdata
+//	@Param			id	path		string	true	"Side weight ID"
+//	@Success		200	{string}	string	"OK"
+//	@Failure		500	{string}	string	"Internal server error"
+//	@Router			/view/data/side_weight/{id} [delete]
+func HandleDeleteSideWeightView(wDB *sql.DB) http.HandlerFunc {
+	return base.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteSideWeight)
 }

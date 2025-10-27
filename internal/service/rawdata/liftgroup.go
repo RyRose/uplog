@@ -12,6 +12,17 @@ import (
 	"github.com/RyRose/uplog/internal/templates"
 )
 
+// HandleGetLiftGroupView godoc
+//
+//	@Summary		Get lift group data table view
+//	@Description	Renders a paginated table view of lift groups
+//	@Tags			rawdata
+//	@Produce		html
+//	@Param			offset	query		integer	false	"Pagination offset"
+//	@Success		200		{string}	string	"HTML content"
+//	@Failure		400		{string}	string	"Bad request"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/view/data/lift_group [get]
 func HandleGetLiftGroupView(roDB *sql.DB) http.HandlerFunc {
 	return base.HandleGetDataTableView(
 		roDB,
@@ -47,6 +58,18 @@ func HandleGetLiftGroupView(roDB *sql.DB) http.HandlerFunc {
 	)
 }
 
+// HandlePatchLiftGroupView godoc
+//
+//	@Summary		Update lift group data
+//	@Description	Updates the ID of a lift group entry
+//	@Tags			rawdata
+//	@Accept			x-www-form-urlencoded
+//	@Param			id	path		string	true	"Lift group ID"
+//	@Param			id	formData	string	false	"New lift group ID"
+//	@Success		200	{string}	string	"OK"
+//	@Failure		400	{string}	string	"Bad request"
+//	@Failure		500	{string}	string	"Internal server error"
+//	@Router			/view/data/lift_group/{id} [patch]
 func HandlePatchLiftGroupView(wDB *sql.DB) http.HandlerFunc {
 	return base.HandlePatchTableRowViewID(
 		wDB,
@@ -64,6 +87,18 @@ func HandlePatchLiftGroupView(wDB *sql.DB) http.HandlerFunc {
 	)
 }
 
+// HandlePostLiftGroupView godoc
+//
+//	@Summary		Create new lift group
+//	@Description	Creates a new lift group entry in the database
+//	@Tags			rawdata
+//	@Accept			x-www-form-urlencoded
+//	@Produce		html
+//	@Param			id	formData	string	true	"Lift group ID"
+//	@Success		201	{string}	string	"HTML content"
+//	@Failure		400	{string}	string	"Bad request"
+//	@Failure		500	{string}	string	"Internal server error"
+//	@Router			/view/data/lift_group [post]
 func HandlePostLiftGroupView(roDB, wDB *sql.DB) http.HandlerFunc {
 	return base.HandlePostDataTableView(
 		roDB,
@@ -83,4 +118,17 @@ func HandlePostLiftGroupView(roDB, wDB *sql.DB) http.HandlerFunc {
 			}, nil
 		},
 	)
+}
+
+// HandleDeleteLiftGroupView godoc
+//
+//	@Summary		Delete lift group
+//	@Description	Deletes a lift group entry by ID
+//	@Tags			rawdata
+//	@Param			id	path		string	true	"Lift group ID"
+//	@Success		200	{string}	string	"OK"
+//	@Failure		500	{string}	string	"Internal server error"
+//	@Router			/view/data/lift_group/{id} [delete]
+func HandleDeleteLiftGroupView(wDB *sql.DB) http.HandlerFunc {
+	return base.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteLiftGroup)
 }

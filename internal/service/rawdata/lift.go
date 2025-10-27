@@ -13,6 +13,17 @@ import (
 	"github.com/RyRose/uplog/internal/templates"
 )
 
+// HandleGetLiftView godoc
+//
+//	@Summary		Get lift data table view
+//	@Description	Renders a paginated table view of lifts with their details
+//	@Tags			rawdata
+//	@Produce		html
+//	@Param			offset	query		integer	false	"Pagination offset"
+//	@Success		200		{string}	string	"HTML content"
+//	@Failure		400		{string}	string	"Bad request"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/view/data/lift [get]
 func HandleGetLiftView(roDB *sql.DB) http.HandlerFunc {
 	return base.HandleGetDataTableView(
 		roDB,
@@ -72,6 +83,22 @@ func HandleGetLiftView(roDB *sql.DB) http.HandlerFunc {
 	)
 }
 
+// HandlePatchLiftView godoc
+//
+//	@Summary		Update lift data
+//	@Description	Updates specific fields of a lift entry by ID
+//	@Tags			rawdata
+//	@Accept			x-www-form-urlencoded
+//	@Param			id					path		string	true	"Lift ID"
+//	@Param			id					formData	string	false	"New lift ID"
+//	@Param			link				formData	string	false	"Lift link"
+//	@Param			default_side_weight	formData	string	false	"Default side weight"
+//	@Param			notes				formData	string	false	"Notes"
+//	@Param			lift_group			formData	string	false	"Lift group"
+//	@Success		200					{string}	string	"OK"
+//	@Failure		400					{string}	string	"Bad request"
+//	@Failure		500					{string}	string	"Internal server error"
+//	@Router			/view/data/lift/{id} [patch]
 func HandlePatchLiftView(wDB *sql.DB) http.HandlerFunc {
 	return base.HandlePatchTableRowViewID(
 		wDB,
@@ -125,6 +152,22 @@ func HandlePatchLiftView(wDB *sql.DB) http.HandlerFunc {
 	)
 }
 
+// HandlePostLiftView godoc
+//
+//	@Summary		Create new lift
+//	@Description	Creates a new lift entry in the database
+//	@Tags			rawdata
+//	@Accept			x-www-form-urlencoded
+//	@Produce		html
+//	@Param			id					formData	string	true	"Lift ID"
+//	@Param			link				formData	string	true	"Lift link"
+//	@Param			default_side_weight	formData	string	false	"Default side weight"
+//	@Param			notes				formData	string	false	"Notes"
+//	@Param			lift_group			formData	string	false	"Lift group"
+//	@Success		201					{string}	string	"HTML content"
+//	@Failure		400					{string}	string	"Bad request"
+//	@Failure		500					{string}	string	"Internal server error"
+//	@Router			/view/data/lift [post]
 func HandlePostLiftView(roDB, wDB *sql.DB) http.HandlerFunc {
 	return base.HandlePostDataTableView(
 		roDB,
@@ -165,4 +208,17 @@ func HandlePostLiftView(roDB, wDB *sql.DB) http.HandlerFunc {
 			}, nil
 		},
 	)
+}
+
+// HandleDeleteLiftView godoc
+//
+//	@Summary		Delete lift
+//	@Description	Deletes a lift entry by ID
+//	@Tags			rawdata
+//	@Param			id	path		string	true	"Lift ID"
+//	@Success		200	{string}	string	"OK"
+//	@Failure		500	{string}	string	"Internal server error"
+//	@Router			/view/data/lift/{id} [delete]
+func HandleDeleteLiftView(wDB *sql.DB) http.HandlerFunc {
+	return base.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteLift)
 }

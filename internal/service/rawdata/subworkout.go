@@ -13,6 +13,17 @@ import (
 	"github.com/RyRose/uplog/internal/templates"
 )
 
+// HandleGetSubworkoutView godoc
+//
+//	@Summary		Get subworkout data table view
+//	@Description	Renders a paginated table view of subworkout-superworkout relationships
+//	@Tags			rawdata
+//	@Produce		html
+//	@Param			offset	query		integer	false	"Pagination offset"
+//	@Success		200		{string}	string	"HTML content"
+//	@Failure		400		{string}	string	"Bad request"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/view/data/subworkout [get]
 func HandleGetSubworkoutView(roDB *sql.DB) http.HandlerFunc {
 	return base.HandleGetDataTableView(
 		roDB,
@@ -55,6 +66,20 @@ func HandleGetSubworkoutView(roDB *sql.DB) http.HandlerFunc {
 	)
 }
 
+// HandlePatchSubworkoutView godoc
+//
+//	@Summary		Update subworkout data
+//	@Description	Updates specific fields of a subworkout-superworkout relationship
+//	@Tags			rawdata
+//	@Accept			x-www-form-urlencoded
+//	@Param			subworkout		path		string	true	"Subworkout ID"
+//	@Param			superworkout	path		string	true	"Superworkout ID"
+//	@Param			subworkout		formData	string	false	"New subworkout ID"
+//	@Param			superworkout	formData	string	false	"New superworkout ID"
+//	@Success		200				{string}	string	"OK"
+//	@Failure		400				{string}	string	"Bad request"
+//	@Failure		500				{string}	string	"Internal server error"
+//	@Router			/view/data/subworkout/{subworkout}/{superworkout} [patch]
 func HandlePatchSubworkoutView(wDB *sql.DB) http.HandlerFunc {
 	return base.HandlePatchTableRowViewRequest(
 		wDB,
@@ -83,6 +108,19 @@ func HandlePatchSubworkoutView(wDB *sql.DB) http.HandlerFunc {
 	)
 }
 
+// HandlePostSubworkoutView godoc
+//
+//	@Summary		Create new subworkout relationship
+//	@Description	Creates a new subworkout-superworkout relationship in the database
+//	@Tags			rawdata
+//	@Accept			x-www-form-urlencoded
+//	@Produce		html
+//	@Param			subworkout		formData	string	true	"Subworkout ID"
+//	@Param			superworkout	formData	string	true	"Superworkout ID"
+//	@Success		201				{string}	string	"HTML content"
+//	@Failure		400				{string}	string	"Bad request"
+//	@Failure		500				{string}	string	"Internal server error"
+//	@Router			/view/data/subworkout [post]
 func HandlePostSubworkoutView(roDB, wDB *sql.DB) http.HandlerFunc {
 	return base.HandlePostDataTableView(
 		roDB,
@@ -107,6 +145,30 @@ func HandlePostSubworkoutView(roDB, wDB *sql.DB) http.HandlerFunc {
 					{Name: "subworkout", Type: templates.Select, Value: item.Subworkout, SelectOptions: workouts},
 					{Name: "superworkout", Type: templates.Select, Value: item.Superworkout, SelectOptions: workouts},
 				},
+			}, nil
+		},
+	)
+}
+
+// HandleDeleteSubworkoutView godoc
+//
+//	@Summary		Delete subworkout relationship
+//	@Description	Deletes a subworkout-superworkout relationship
+//	@Tags			rawdata
+//	@Param			subworkout		path		string	true	"Subworkout ID"
+//	@Param			superworkout	path		string	true	"Superworkout ID"
+//	@Success		200				{string}	string	"OK"
+//	@Failure		400				{string}	string	"Bad request"
+//	@Failure		500				{string}	string	"Internal server error"
+//	@Router			/view/data/subworkout/{subworkout}/{superworkout} [delete]
+func HandleDeleteSubworkoutView(wDB *sql.DB) http.HandlerFunc {
+	return base.HandleDeleteTableRowViewRequest(
+		wDB,
+		(*workoutdb.Queries).RawDeleteSubworkout,
+		func(r *http.Request) (*workoutdb.RawDeleteSubworkoutParams, error) {
+			return &workoutdb.RawDeleteSubworkoutParams{
+				Subworkout:   r.PathValue("subworkout"),
+				Superworkout: r.PathValue("superworkout"),
 			}, nil
 		},
 	)

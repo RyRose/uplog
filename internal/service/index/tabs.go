@@ -8,6 +8,17 @@ import (
 	"github.com/RyRose/uplog/internal/templates"
 )
 
+// HandleGetDataTabView godoc
+//
+//	@Summary		Get data tab view
+//	@Description	Renders the data tab view with tabbed navigation for different data tables
+//	@Tags			index
+//	@Produce		html
+//	@Param			tabX	path		string	false	"Tab X index"
+//	@Param			tabY	path		string	false	"Tab Y index"
+//	@Success		200		{string}	string	"HTML content"
+//	@Failure		400		{string}	string	"Invalid tab index"
+//	@Router			/view/tabs/data/{tabX}/{tabY} [get]
 func HandleGetDataTabView() http.HandlerFunc {
 	tabs := [][]templates.DataTab{
 		{

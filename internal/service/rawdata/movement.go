@@ -12,6 +12,17 @@ import (
 	"github.com/RyRose/uplog/internal/templates"
 )
 
+// HandleGetMovementView godoc
+//
+//	@Summary		Get movement data table view
+//	@Description	Renders a paginated table view of movements
+//	@Tags			rawdata
+//	@Produce		html
+//	@Param			offset	query		integer	false	"Pagination offset"
+//	@Success		200		{string}	string	"HTML content"
+//	@Failure		400		{string}	string	"Bad request"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/view/data/movement [get]
 func HandleGetMovementView(roDB *sql.DB) http.HandlerFunc {
 	return base.HandleGetDataTableView(
 		roDB,
@@ -49,6 +60,19 @@ func HandleGetMovementView(roDB *sql.DB) http.HandlerFunc {
 	)
 }
 
+// HandlePatchMovementView godoc
+//
+//	@Summary		Update movement data
+//	@Description	Updates specific fields of a movement entry by ID
+//	@Tags			rawdata
+//	@Accept			x-www-form-urlencoded
+//	@Param			id		path		string	true	"Movement ID"
+//	@Param			id		formData	string	false	"New movement ID"
+//	@Param			alias	formData	string	false	"Movement alias"
+//	@Success		200		{string}	string	"OK"
+//	@Failure		400		{string}	string	"Bad request"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/view/data/movement/{id} [patch]
 func HandlePatchMovementView(wDB *sql.DB) http.HandlerFunc {
 	return base.HandlePatchTableRowViewID(
 		wDB,
@@ -75,6 +99,19 @@ func HandlePatchMovementView(wDB *sql.DB) http.HandlerFunc {
 	)
 }
 
+// HandlePostMovementView godoc
+//
+//	@Summary		Create new movement
+//	@Description	Creates a new movement entry in the database
+//	@Tags			rawdata
+//	@Accept			x-www-form-urlencoded
+//	@Produce		html
+//	@Param			id		formData	string	true	"Movement ID"
+//	@Param			alias	formData	string	true	"Movement alias"
+//	@Success		201		{string}	string	"HTML content"
+//	@Failure		400		{string}	string	"Bad request"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/view/data/movement [post]
 func HandlePostMovementView(roDB, wDB *sql.DB) http.HandlerFunc {
 	return base.HandlePostDataTableView(
 		roDB,
@@ -97,4 +134,17 @@ func HandlePostMovementView(roDB, wDB *sql.DB) http.HandlerFunc {
 			}, nil
 		},
 	)
+}
+
+// HandleDeleteMovementView godoc
+//
+//	@Summary		Delete movement
+//	@Description	Deletes a movement entry by ID
+//	@Tags			rawdata
+//	@Param			id	path		string	true	"Movement ID"
+//	@Success		200	{string}	string	"OK"
+//	@Failure		500	{string}	string	"Internal server error"
+//	@Router			/view/data/movement/{id} [delete]
+func HandleDeleteMovementView(wDB *sql.DB) http.HandlerFunc {
+	return base.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteMovement)
 }

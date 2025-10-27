@@ -1,4 +1,1985 @@
+basePath: /
 info:
-  contact: {}
-paths: {}
+  contact:
+    name: RyRose
+    url: https://github.com/RyRose/uplog
+  description: |-
+    A workout tracking and management system with progress logging, routine management, and workout scheduling.
+    This API provides endpoints for managing workouts, exercises, progress tracking, and muscle group mappings.
+  license:
+    name: MIT
+    url: https://github.com/RyRose/uplog/blob/main/LICENSE
+  title: Uplog API
+  version: "1.0"
+paths:
+  /{$}:
+    get:
+      description: Renders the main index page with specified tab and CSS query parameters
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML content
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get index page
+      tags:
+      - index
+  /data/{$}:
+    get:
+      description: Renders the main index page with specified tab and CSS query parameters
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML content
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get index page
+      tags:
+      - index
+  /data/{tabX}/{tabY}:
+    get:
+      description: Renders the main index page with specified tab and CSS query parameters
+      parameters:
+      - description: Tab X parameter
+        in: path
+        name: tabX
+        type: string
+      - description: Tab Y parameter
+        in: path
+        name: tabY
+        type: string
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML content
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get index page
+      tags:
+      - index
+  /view/data/lift:
+    get:
+      description: Renders a paginated table view of lifts with their details
+      parameters:
+      - description: Pagination offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML content
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get lift data table view
+      tags:
+      - rawdata
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Creates a new lift entry in the database
+      parameters:
+      - description: Lift ID
+        in: formData
+        name: id
+        required: true
+        type: string
+      - description: Lift link
+        in: formData
+        name: link
+        required: true
+        type: string
+      - description: Default side weight
+        in: formData
+        name: default_side_weight
+        type: string
+      - description: Notes
+        in: formData
+        name: notes
+        type: string
+      - description: Lift group
+        in: formData
+        name: lift_group
+        type: string
+      produces:
+      - text/html
+      responses:
+        "201":
+          description: HTML content
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Create new lift
+      tags:
+      - rawdata
+  /view/data/lift/{id}:
+    delete:
+      description: Deletes a lift entry by ID
+      parameters:
+      - description: Lift ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Delete lift
+      tags:
+      - rawdata
+    patch:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Updates specific fields of a lift entry by ID
+      parameters:
+      - description: Lift ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: New lift ID
+        in: formData
+        name: id
+        type: string
+      - description: Lift link
+        in: formData
+        name: link
+        type: string
+      - description: Default side weight
+        in: formData
+        name: default_side_weight
+        type: string
+      - description: Notes
+        in: formData
+        name: notes
+        type: string
+      - description: Lift group
+        in: formData
+        name: lift_group
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Update lift data
+      tags:
+      - rawdata
+  /view/data/lift_group:
+    get:
+      description: Renders a paginated table view of lift groups
+      parameters:
+      - description: Pagination offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML content
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get lift group data table view
+      tags:
+      - rawdata
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Creates a new lift group entry in the database
+      parameters:
+      - description: Lift group ID
+        in: formData
+        name: id
+        required: true
+        type: string
+      produces:
+      - text/html
+      responses:
+        "201":
+          description: HTML content
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Create new lift group
+      tags:
+      - rawdata
+  /view/data/lift_group/{id}:
+    delete:
+      description: Deletes a lift group entry by ID
+      parameters:
+      - description: Lift group ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Delete lift group
+      tags:
+      - rawdata
+    patch:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Updates the ID of a lift group entry
+      parameters:
+      - description: Lift group ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: New lift group ID
+        in: formData
+        name: id
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Update lift group data
+      tags:
+      - rawdata
+  /view/data/lift_muscle_mapping:
+    get:
+      description: Renders a paginated table view of lift-muscle-movement mappings
+      parameters:
+      - description: Pagination offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML content
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get lift muscle mapping data table view
+      tags:
+      - rawdata
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Creates a new lift-muscle-movement mapping in the database
+      parameters:
+      - description: Lift ID
+        in: formData
+        name: lift
+        required: true
+        type: string
+      - description: Muscle ID
+        in: formData
+        name: muscle
+        required: true
+        type: string
+      - description: Movement ID
+        in: formData
+        name: movement
+        required: true
+        type: string
+      produces:
+      - text/html
+      responses:
+        "201":
+          description: HTML content
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Create new lift muscle mapping
+      tags:
+      - rawdata
+  /view/data/lift_muscle_mapping/{lift}/{muscle}/{movement}:
+    delete:
+      description: Deletes a lift-muscle-movement mapping
+      parameters:
+      - description: Lift ID
+        in: path
+        name: lift
+        required: true
+        type: string
+      - description: Muscle ID
+        in: path
+        name: muscle
+        required: true
+        type: string
+      - description: Movement ID
+        in: path
+        name: movement
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Delete lift muscle mapping
+      tags:
+      - rawdata
+    patch:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Updates specific fields of a lift-muscle-movement mapping
+      parameters:
+      - description: Lift ID
+        in: path
+        name: lift
+        required: true
+        type: string
+      - description: Muscle ID
+        in: path
+        name: muscle
+        required: true
+        type: string
+      - description: Movement ID
+        in: path
+        name: movement
+        required: true
+        type: string
+      - description: New lift ID
+        in: formData
+        name: lift
+        type: string
+      - description: New muscle ID
+        in: formData
+        name: muscle
+        type: string
+      - description: New movement ID
+        in: formData
+        name: movement
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Update lift muscle mapping data
+      tags:
+      - rawdata
+  /view/data/lift_workout_mapping:
+    get:
+      description: Renders a paginated table view of lift-workout mappings
+      parameters:
+      - description: Pagination offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML content
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get lift workout mapping data table view
+      tags:
+      - rawdata
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Creates a new lift-workout mapping in the database
+      parameters:
+      - description: Lift ID
+        in: formData
+        name: lift
+        required: true
+        type: string
+      - description: Workout ID
+        in: formData
+        name: workout
+        required: true
+        type: string
+      produces:
+      - text/html
+      responses:
+        "201":
+          description: HTML content
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Create new lift workout mapping
+      tags:
+      - rawdata
+  /view/data/lift_workout_mapping/{lift}/{workout}:
+    delete:
+      description: Deletes a lift-workout mapping
+      parameters:
+      - description: Lift ID
+        in: path
+        name: lift
+        required: true
+        type: string
+      - description: Workout ID
+        in: path
+        name: workout
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Delete lift workout mapping
+      tags:
+      - rawdata
+    patch:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Updates specific fields of a lift-workout mapping
+      parameters:
+      - description: Lift ID
+        in: path
+        name: lift
+        required: true
+        type: string
+      - description: Workout ID
+        in: path
+        name: workout
+        required: true
+        type: string
+      - description: New lift ID
+        in: formData
+        name: lift
+        type: string
+      - description: New workout ID
+        in: formData
+        name: workout
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Update lift workout mapping data
+      tags:
+      - rawdata
+  /view/data/movement:
+    get:
+      description: Renders a paginated table view of movements
+      parameters:
+      - description: Pagination offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML content
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get movement data table view
+      tags:
+      - rawdata
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Creates a new movement entry in the database
+      parameters:
+      - description: Movement ID
+        in: formData
+        name: id
+        required: true
+        type: string
+      - description: Movement alias
+        in: formData
+        name: alias
+        required: true
+        type: string
+      produces:
+      - text/html
+      responses:
+        "201":
+          description: HTML content
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Create new movement
+      tags:
+      - rawdata
+  /view/data/movement/{id}:
+    delete:
+      description: Deletes a movement entry by ID
+      parameters:
+      - description: Movement ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Delete movement
+      tags:
+      - rawdata
+    patch:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Updates specific fields of a movement entry by ID
+      parameters:
+      - description: Movement ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: New movement ID
+        in: formData
+        name: id
+        type: string
+      - description: Movement alias
+        in: formData
+        name: alias
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Update movement data
+      tags:
+      - rawdata
+  /view/data/muscle:
+    get:
+      description: Renders a paginated table view of muscles
+      parameters:
+      - description: Pagination offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML content
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get muscle data table view
+      tags:
+      - rawdata
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Creates a new muscle entry in the database
+      parameters:
+      - description: Muscle ID
+        in: formData
+        name: id
+        required: true
+        type: string
+      - description: Muscle link
+        in: formData
+        name: link
+        required: true
+        type: string
+      - description: Message
+        in: formData
+        name: message
+        type: string
+      produces:
+      - text/html
+      responses:
+        "201":
+          description: HTML content
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Create new muscle
+      tags:
+      - rawdata
+  /view/data/muscle/{id}:
+    delete:
+      description: Deletes a muscle entry by ID
+      parameters:
+      - description: Muscle ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Delete muscle
+      tags:
+      - rawdata
+    patch:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Updates specific fields of a muscle entry by ID
+      parameters:
+      - description: Muscle ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: New muscle ID
+        in: formData
+        name: id
+        type: string
+      - description: Muscle link
+        in: formData
+        name: link
+        type: string
+      - description: Message
+        in: formData
+        name: message
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Update muscle data
+      tags:
+      - rawdata
+  /view/data/progress:
+    get:
+      description: Renders a paginated table view of progress entries
+      parameters:
+      - description: Pagination offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML content
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get progress data table view
+      tags:
+      - rawdata
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Creates a new progress entry in the database
+      parameters:
+      - description: Lift ID
+        in: formData
+        name: lift
+        required: true
+        type: string
+      - description: Date
+        in: formData
+        name: date
+        required: true
+        type: string
+      - description: Weight
+        in: formData
+        name: weight
+        required: true
+        type: number
+      - description: Number of sets
+        in: formData
+        name: sets
+        required: true
+        type: integer
+      - description: Number of reps
+        in: formData
+        name: reps
+        required: true
+        type: integer
+      - description: Side weight
+        in: formData
+        name: side_weight
+        type: string
+      produces:
+      - text/html
+      responses:
+        "201":
+          description: HTML content
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Create new progress entry
+      tags:
+      - rawdata
+  /view/data/progress/{id}:
+    delete:
+      description: Deletes a progress entry by ID
+      parameters:
+      - description: Progress ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Delete progress entry
+      tags:
+      - rawdata
+    patch:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Updates specific fields of a progress entry by ID
+      parameters:
+      - description: Progress ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Lift ID
+        in: formData
+        name: lift
+        type: string
+      - description: Date
+        in: formData
+        name: date
+        type: string
+      - description: Weight
+        in: formData
+        name: weight
+        type: number
+      - description: Number of sets
+        in: formData
+        name: sets
+        type: integer
+      - description: Number of reps
+        in: formData
+        name: reps
+        type: integer
+      - description: Side weight
+        in: formData
+        name: side_weight
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Update progress data
+      tags:
+      - rawdata
+  /view/data/routine:
+    get:
+      description: Renders a paginated table view of routines
+      parameters:
+      - description: Pagination offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML content
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get routine data table view
+      tags:
+      - rawdata
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Creates a new routine entry in the database
+      parameters:
+      - description: Routine ID
+        in: formData
+        name: id
+        required: true
+        type: string
+      - description: Routine steps
+        in: formData
+        name: steps
+        required: true
+        type: string
+      - description: Lift ID
+        in: formData
+        name: lift
+        required: true
+        type: string
+      produces:
+      - text/html
+      responses:
+        "201":
+          description: HTML content
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Create new routine
+      tags:
+      - rawdata
+  /view/data/routine/{id}:
+    delete:
+      description: Deletes a routine entry by ID
+      parameters:
+      - description: Routine ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Delete routine
+      tags:
+      - rawdata
+    patch:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Updates specific fields of a routine entry by ID
+      parameters:
+      - description: Routine ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: New routine ID
+        in: formData
+        name: id
+        type: string
+      - description: Routine steps
+        in: formData
+        name: steps
+        type: string
+      - description: Lift ID
+        in: formData
+        name: lift
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Update routine data
+      tags:
+      - rawdata
+  /view/data/routine_workout_mapping:
+    get:
+      description: Renders a paginated table view of routine-workout mappings
+      parameters:
+      - description: Pagination offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML content
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get routine workout mapping data table view
+      tags:
+      - rawdata
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Creates a new routine-workout mapping in the database
+      parameters:
+      - description: Routine ID
+        in: formData
+        name: routine
+        required: true
+        type: string
+      - description: Workout ID
+        in: formData
+        name: workout
+        required: true
+        type: string
+      produces:
+      - text/html
+      responses:
+        "201":
+          description: HTML content
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Create new routine workout mapping
+      tags:
+      - rawdata
+  /view/data/routine_workout_mapping/{routine}/{workout}:
+    delete:
+      description: Deletes a routine-workout mapping
+      parameters:
+      - description: Routine ID
+        in: path
+        name: routine
+        required: true
+        type: string
+      - description: Workout ID
+        in: path
+        name: workout
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Delete routine workout mapping
+      tags:
+      - rawdata
+    patch:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Updates specific fields of a routine-workout mapping
+      parameters:
+      - description: Routine ID
+        in: path
+        name: routine
+        required: true
+        type: string
+      - description: Workout ID
+        in: path
+        name: workout
+        required: true
+        type: string
+      - description: New routine ID
+        in: formData
+        name: routine
+        type: string
+      - description: New workout ID
+        in: formData
+        name: workout
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Update routine workout mapping data
+      tags:
+      - rawdata
+  /view/data/side_weight:
+    get:
+      description: Renders a paginated table view of side weights
+      parameters:
+      - description: Pagination offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML content
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get side weight data table view
+      tags:
+      - rawdata
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Creates a new side weight entry in the database
+      parameters:
+      - description: Side weight ID
+        in: formData
+        name: id
+        required: true
+        type: string
+      - description: Multiplier value
+        in: formData
+        name: multiplier
+        required: true
+        type: number
+      - description: Addend value
+        in: formData
+        name: addend
+        required: true
+        type: number
+      - description: Format string
+        in: formData
+        name: format
+        required: true
+        type: string
+      produces:
+      - text/html
+      responses:
+        "201":
+          description: HTML content
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Create new side weight
+      tags:
+      - rawdata
+  /view/data/side_weight/{id}:
+    delete:
+      description: Deletes a side weight entry by ID
+      parameters:
+      - description: Side weight ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Delete side weight
+      tags:
+      - rawdata
+    patch:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Updates specific fields of a side weight entry by ID
+      parameters:
+      - description: Side weight ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: New side weight ID
+        in: formData
+        name: id
+        type: string
+      - description: Multiplier value
+        in: formData
+        name: multiplier
+        type: number
+      - description: Addend value
+        in: formData
+        name: addend
+        type: number
+      - description: Format string
+        in: formData
+        name: format
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Update side weight data
+      tags:
+      - rawdata
+  /view/data/subworkout:
+    get:
+      description: Renders a paginated table view of subworkout-superworkout relationships
+      parameters:
+      - description: Pagination offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML content
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get subworkout data table view
+      tags:
+      - rawdata
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Creates a new subworkout-superworkout relationship in the database
+      parameters:
+      - description: Subworkout ID
+        in: formData
+        name: subworkout
+        required: true
+        type: string
+      - description: Superworkout ID
+        in: formData
+        name: superworkout
+        required: true
+        type: string
+      produces:
+      - text/html
+      responses:
+        "201":
+          description: HTML content
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Create new subworkout relationship
+      tags:
+      - rawdata
+  /view/data/subworkout/{subworkout}/{superworkout}:
+    delete:
+      description: Deletes a subworkout-superworkout relationship
+      parameters:
+      - description: Subworkout ID
+        in: path
+        name: subworkout
+        required: true
+        type: string
+      - description: Superworkout ID
+        in: path
+        name: superworkout
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Delete subworkout relationship
+      tags:
+      - rawdata
+    patch:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Updates specific fields of a subworkout-superworkout relationship
+      parameters:
+      - description: Subworkout ID
+        in: path
+        name: subworkout
+        required: true
+        type: string
+      - description: Superworkout ID
+        in: path
+        name: superworkout
+        required: true
+        type: string
+      - description: New subworkout ID
+        in: formData
+        name: subworkout
+        type: string
+      - description: New superworkout ID
+        in: formData
+        name: superworkout
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Update subworkout data
+      tags:
+      - rawdata
+  /view/data/template_variable:
+    get:
+      description: Renders a paginated table view of template variables
+      parameters:
+      - description: Pagination offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML content
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get template variable data table view
+      tags:
+      - rawdata
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Creates a new template variable entry in the database
+      parameters:
+      - description: Template variable ID
+        in: formData
+        name: id
+        required: true
+        type: string
+      - description: Template variable value
+        in: formData
+        name: value
+        required: true
+        type: string
+      produces:
+      - text/html
+      responses:
+        "201":
+          description: HTML content
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Create new template variable
+      tags:
+      - rawdata
+  /view/data/template_variable/{id}:
+    delete:
+      description: Deletes a template variable entry by ID
+      parameters:
+      - description: Template variable ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Delete template variable
+      tags:
+      - rawdata
+    patch:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Updates specific fields of a template variable entry by ID
+      parameters:
+      - description: Template variable ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: New template variable ID
+        in: formData
+        name: id
+        type: string
+      - description: Template variable value
+        in: formData
+        name: value
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Update template variable data
+      tags:
+      - rawdata
+  /view/data/workout:
+    get:
+      description: Renders a paginated table view of workouts
+      parameters:
+      - description: Pagination offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML content
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get workout data table view
+      tags:
+      - rawdata
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Creates a new workout entry in the database
+      parameters:
+      - description: Workout ID
+        in: formData
+        name: id
+        required: true
+        type: string
+      - description: Workout template
+        in: formData
+        name: template
+        required: true
+        type: string
+      produces:
+      - text/html
+      responses:
+        "201":
+          description: HTML content
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Create new workout
+      tags:
+      - rawdata
+  /view/data/workout/{id}:
+    delete:
+      description: Deletes a workout entry by ID
+      parameters:
+      - description: Workout ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Delete workout
+      tags:
+      - rawdata
+    patch:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Updates specific fields of a workout entry by ID
+      parameters:
+      - description: Workout ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: New workout ID
+        in: formData
+        name: id
+        type: string
+      - description: Workout template
+        in: formData
+        name: template
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Update workout data
+      tags:
+      - rawdata
+  /view/liftgroups:
+    get:
+      description: Renders the list of lift groups for today
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML content
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get lift group list view
+      tags:
+      - index
+  /view/liftselect:
+    get:
+      description: Renders a select dropdown of lifts grouped by lift group
+      parameters:
+      - description: Input name attribute
+        in: query
+        name: name
+        type: string
+      - description: Selected lift ID
+        in: query
+        name: lift
+        type: string
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML content
+          schema:
+            type: string
+      summary: Get lift select dropdown
+      tags:
+      - index
+  /view/progressform:
+    get:
+      description: Renders an empty progress form
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML content
+          schema:
+            type: string
+      summary: Get progress form
+      tags:
+      - index
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Renders a progress form pre-filled with recent progress data for
+        the selected lift
+      parameters:
+      - description: Lift ID
+        in: formData
+        name: lift
+        type: string
+      - description: Side weight
+        in: formData
+        name: side
+        type: string
+      - description: Weight
+        in: formData
+        name: weight
+        type: string
+      - description: Sets
+        in: formData
+        name: sets
+        type: string
+      - description: Reps
+        in: formData
+        name: reps
+        type: string
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML content
+          schema:
+            type: string
+      summary: Create progress form with recent data
+      tags:
+      - index
+  /view/progresstable:
+    get:
+      description: Renders the progress table for today
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML content
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get progress table
+      tags:
+      - index
+  /view/progresstablerow:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Creates a new progress entry for today
+      parameters:
+      - description: Lift ID
+        in: formData
+        name: lift
+        required: true
+        type: string
+      - description: Weight
+        in: formData
+        name: weight
+        required: true
+        type: number
+      - description: Number of sets
+        in: formData
+        name: sets
+        required: true
+        type: integer
+      - description: Number of reps
+        in: formData
+        name: reps
+        required: true
+        type: integer
+      - description: Side weight
+        in: formData
+        name: side
+        type: string
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML content
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Create progress entry
+      tags:
+      - index
+  /view/progresstablerow/{id}:
+    delete:
+      description: Deletes a progress entry by ID
+      parameters:
+      - description: Progress ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Delete progress entry
+      tags:
+      - index
+  /view/routinetable:
+    get:
+      description: Returns empty response as routine table functionality was removed
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Get routine table
+      tags:
+      - index
+  /view/sideweightselect:
+    get:
+      description: Renders a select dropdown of side weights with default selection
+        based on lift
+      parameters:
+      - description: Input name attribute
+        in: query
+        name: name
+        type: string
+      - description: Lift ID to get default side weight
+        in: query
+        name: lift
+        type: string
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML content
+          schema:
+            type: string
+      summary: Get side weight select dropdown
+      tags:
+      - index
+  /view/tabs/data/{tabX}/{tabY}:
+    get:
+      description: Renders the data tab view with tabbed navigation for different
+        data tables
+      parameters:
+      - description: Tab X index
+        in: path
+        name: tabX
+        type: string
+      - description: Tab Y index
+        in: path
+        name: tabY
+        type: string
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML content
+          schema:
+            type: string
+        "400":
+          description: Invalid tab index
+          schema:
+            type: string
+      summary: Get data tab view
+      tags:
+      - index
+  /view/tabs/main:
+    get:
+      description: Renders the main tab view with progress for today and lift groups
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: HTML content
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get main tab view
+      tags:
+      - index
+schemes:
+- http
+- https
 swagger: "2.0"
+tags:
+- description: Main application pages and views
+  name: index
+- description: CRUD operations for raw data entities (lifts, workouts, progress, etc.)
+  name: rawdata

@@ -4,14 +4,12 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/RyRose/uplog/internal/config"
 	"github.com/RyRose/uplog/internal/service/index"
 	"github.com/RyRose/uplog/internal/service/mux"
 	"github.com/RyRose/uplog/internal/service/rawdata"
-	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	httpswagger "github.com/swaggo/http-swagger/v2"
 )
@@ -78,143 +76,94 @@ func AddRoutes(
 	webMux.Handle("POST /view/data/lift", rawdata.HandlePostLiftView(roDB, wDB))
 	webMux.Handle("PATCH /view/data/lift", rawdata.HandlePatchLiftView(wDB))
 	webMux.Handle("PATCH /view/data/lift/{id}", rawdata.HandlePatchLiftView(wDB))
-	webMux.Handle("DELETE /view/data/lift", rawdata.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteLift))
-	webMux.Handle("DELETE /view/data/lift/{id}", rawdata.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteLift))
+	webMux.Handle("DELETE /view/data/lift", rawdata.HandleDeleteLiftView(wDB))
+	webMux.Handle("DELETE /view/data/lift/{id}", rawdata.HandleDeleteLiftView(wDB))
 	webMux.Handle("GET /view/data/lift", rawdata.HandleGetLiftView(roDB))
 
 	// Movement table view
 	webMux.Handle("POST /view/data/movement", rawdata.HandlePostMovementView(roDB, wDB))
 	webMux.Handle("PATCH /view/data/movement", rawdata.HandlePatchMovementView(wDB))
 	webMux.Handle("PATCH /view/data/movement/{id}", rawdata.HandlePatchMovementView(wDB))
-	webMux.Handle("DELETE /view/data/movement", rawdata.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteMovement))
-	webMux.Handle("DELETE /view/data/movement/{id}", rawdata.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteMovement))
+	webMux.Handle("DELETE /view/data/movement", rawdata.HandleDeleteMovementView(wDB))
+	webMux.Handle("DELETE /view/data/movement/{id}", rawdata.HandleDeleteMovementView(wDB))
 	webMux.Handle("GET /view/data/movement", rawdata.HandleGetMovementView(roDB))
 
 	// Muscle table view
 	webMux.Handle("POST /view/data/muscle", rawdata.HandlePostMuscleView(roDB, wDB))
 	webMux.Handle("PATCH /view/data/muscle", rawdata.HandlePatchMuscleView(wDB))
 	webMux.Handle("PATCH /view/data/muscle/{id}", rawdata.HandlePatchMuscleView(wDB))
-	webMux.Handle("DELETE /view/data/muscle", rawdata.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteMuscle))
-	webMux.Handle("DELETE /view/data/muscle/{id}", rawdata.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteMuscle))
+	webMux.Handle("DELETE /view/data/muscle", rawdata.HandleDeleteMuscleView(wDB))
+	webMux.Handle("DELETE /view/data/muscle/{id}", rawdata.HandleDeleteMuscleView(wDB))
 	webMux.Handle("GET /view/data/muscle", rawdata.HandleGetMuscleView(roDB))
 
 	// Routine table view
 	webMux.Handle("POST /view/data/routine", rawdata.HandlePostRoutineView(roDB, wDB))
 	webMux.Handle("PATCH /view/data/routine", rawdata.HandlePatchRoutineView(wDB))
 	webMux.Handle("PATCH /view/data/routine/{id}", rawdata.HandlePatchRoutineView(wDB))
-	webMux.Handle("DELETE /view/data/routine", rawdata.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteRoutine))
-	webMux.Handle("DELETE /view/data/routine/{id}", rawdata.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteRoutine))
+	webMux.Handle("DELETE /view/data/routine", rawdata.HandleDeleteRoutineView(wDB))
+	webMux.Handle("DELETE /view/data/routine/{id}", rawdata.HandleDeleteRoutineView(wDB))
 	webMux.Handle("GET /view/data/routine", rawdata.HandleGetRoutineView(roDB))
 
 	// Side weight view
 	webMux.Handle("POST /view/data/side_weight", rawdata.HandlePostSideWeightView(roDB, wDB))
 	webMux.Handle("PATCH /view/data/side_weight", rawdata.HandlePatchSideWeightView(wDB))
 	webMux.Handle("PATCH /view/data/side_weight/{id}", rawdata.HandlePatchSideWeightView(wDB))
-	webMux.Handle("DELETE /view/data/side_weight", rawdata.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteSideWeight))
-	webMux.Handle("DELETE /view/data/side_weight/{id}", rawdata.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteSideWeight))
+	webMux.Handle("DELETE /view/data/side_weight", rawdata.HandleDeleteSideWeightView(wDB))
+	webMux.Handle("DELETE /view/data/side_weight/{id}", rawdata.HandleDeleteSideWeightView(wDB))
 	webMux.Handle("GET /view/data/side_weight", rawdata.HandleGetSideWeightView(roDB))
 
 	// Template variable view
 	webMux.Handle("POST /view/data/template_variable", rawdata.HandlePostTemplateVariableView(roDB, wDB))
 	webMux.Handle("PATCH /view/data/template_variable", rawdata.HandlePatchTemplateVariableView(wDB))
 	webMux.Handle("PATCH /view/data/template_variable/{id}", rawdata.HandlePatchTemplateVariableView(wDB))
-	webMux.Handle("DELETE /view/data/template_variable", rawdata.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteTemplateVariable))
-	webMux.Handle("DELETE /view/data/template_variable/{id}", rawdata.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteTemplateVariable))
+	webMux.Handle("DELETE /view/data/template_variable", rawdata.HandleDeleteTemplateVariableView(wDB))
+	webMux.Handle("DELETE /view/data/template_variable/{id}", rawdata.HandleDeleteTemplateVariableView(wDB))
 	webMux.Handle("GET /view/data/template_variable", rawdata.HandleGetTemplateVariableView(roDB))
 
 	// Workout view
 	webMux.Handle("POST /view/data/workout", rawdata.HandlePostWorkoutView(roDB, wDB))
 	webMux.Handle("PATCH /view/data/workout", rawdata.HandlePatchWorkoutView(wDB))
 	webMux.Handle("PATCH /view/data/workout/{id}", rawdata.HandlePatchWorkoutView(wDB))
-	webMux.Handle("DELETE /view/data/workout", rawdata.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteWorkout))
-	webMux.Handle("DELETE /view/data/workout/{id}", rawdata.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteWorkout))
+	webMux.Handle("DELETE /view/data/workout", rawdata.HandleDeleteWorkoutView(wDB))
+	webMux.Handle("DELETE /view/data/workout/{id}", rawdata.HandleDeleteWorkoutView(wDB))
 	webMux.Handle("GET /view/data/workout", rawdata.HandleGetWorkoutView(roDB))
 
 	// Progress view
 	webMux.Handle("POST /view/data/progress", rawdata.HandlePostProgressView(roDB, wDB))
 	webMux.Handle("PATCH /view/data/progress", rawdata.HandlePatchProgressView(wDB))
 	webMux.Handle("PATCH /view/data/progress/{id}", rawdata.HandlePatchProgressView(wDB))
-	webMux.Handle("DELETE /view/data/progress/{id}",
-		rawdata.HandleDeleteTableRowViewRequest(
-			wDB, (*workoutdb.Queries).RawDeleteProgress,
-			func(r *http.Request) (*int64, error) {
-				id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
-				if err != nil {
-					return nil, fmt.Errorf("failed to parse id: %w", err)
-				}
-				return &id, nil
-			},
-		))
+	webMux.Handle("DELETE /view/data/progress/{id}", rawdata.HandleDeleteProgressView(wDB))
 	webMux.Handle("GET /view/data/progress", rawdata.HandleGetProgressView(roDB))
 
 	// Lift muscle mapping view
 	webMux.Handle("POST /view/data/lift_muscle_mapping", rawdata.HandlePostLiftMuscleView(roDB, wDB))
 	webMux.Handle("PATCH /view/data/lift_muscle_mapping/{lift}/{muscle}/{movement}", rawdata.HandlePatchLiftMuscleView(wDB))
-	webMux.Handle("DELETE /view/data/lift_muscle_mapping/{lift}/{muscle}/{movement}",
-		rawdata.HandleDeleteTableRowViewRequest(
-			wDB, (*workoutdb.Queries).RawDeleteLiftMuscle,
-			func(r *http.Request) (*workoutdb.RawDeleteLiftMuscleParams, error) {
-				return &workoutdb.RawDeleteLiftMuscleParams{
-					Lift:     r.PathValue("lift"),
-					Muscle:   r.PathValue("muscle"),
-					Movement: r.PathValue("movement"),
-				}, nil
-			},
-		))
+	webMux.Handle("DELETE /view/data/lift_muscle_mapping/{lift}/{muscle}/{movement}", rawdata.HandleDeleteLiftMuscleView(wDB))
 	webMux.Handle("GET /view/data/lift_muscle_mapping", rawdata.HandleGetLiftMuscleView(roDB))
 
 	// Lift workout mapping view
 	webMux.Handle("POST /view/data/lift_workout_mapping", rawdata.HandlePostLiftWorkoutView(roDB, wDB))
 	webMux.Handle("PATCH /view/data/lift_workout_mapping/{lift}/{workout}", rawdata.HandlePatchLiftWorkoutView(wDB))
-	webMux.Handle("DELETE /view/data/lift_workout_mapping/{lift}/{workout}",
-		rawdata.HandleDeleteTableRowViewRequest(
-			wDB, (*workoutdb.Queries).RawDeleteLiftWorkout,
-			func(r *http.Request) (*workoutdb.RawDeleteLiftWorkoutParams, error) {
-				return &workoutdb.RawDeleteLiftWorkoutParams{
-					Lift:    r.PathValue("lift"),
-					Workout: r.PathValue("workout"),
-				}, nil
-			},
-		))
+	webMux.Handle("DELETE /view/data/lift_workout_mapping/{lift}/{workout}", rawdata.HandleDeleteLiftWorkoutView(wDB))
 	webMux.Handle("GET /view/data/lift_workout_mapping", rawdata.HandleGetLiftWorkoutView(roDB))
 
 	// Routine workout mapping view
 	webMux.Handle("POST /view/data/routine_workout_mapping", rawdata.HandlePostRoutineWorkoutView(roDB, wDB))
 	webMux.Handle("PATCH /view/data/routine_workout_mapping/{routine}/{workout}", rawdata.HandlePatchRoutineWorkoutView(wDB))
-	webMux.Handle("DELETE /view/data/routine_workout_mapping/{routine}/{workout}",
-		rawdata.HandleDeleteTableRowViewRequest(
-			wDB, (*workoutdb.Queries).RawDeleteRoutineWorkout,
-			func(r *http.Request) (*workoutdb.RawDeleteRoutineWorkoutParams, error) {
-				return &workoutdb.RawDeleteRoutineWorkoutParams{
-					Routine: r.PathValue("routine"),
-					Workout: r.PathValue("workout"),
-				}, nil
-			},
-		))
+	webMux.Handle("DELETE /view/data/routine_workout_mapping/{routine}/{workout}", rawdata.HandleDeleteRoutineWorkoutView(wDB))
 	webMux.Handle("GET /view/data/routine_workout_mapping", rawdata.HandleGetRoutineWorkoutView(roDB))
 
 	// Subworkout mapping view
 	webMux.Handle("POST /view/data/subworkout", rawdata.HandlePostSubworkoutView(roDB, wDB))
 	webMux.Handle("PATCH /view/data/subworkout/{subworkout}/{superworkout}", rawdata.HandlePatchSubworkoutView(wDB))
-	webMux.Handle("DELETE /view/data/subworkout/{subworkout}/{superworkout}",
-		rawdata.HandleDeleteTableRowViewRequest(
-			wDB, (*workoutdb.Queries).RawDeleteSubworkout,
-			func(r *http.Request) (*workoutdb.RawDeleteSubworkoutParams, error) {
-				return &workoutdb.RawDeleteSubworkoutParams{
-					Subworkout:   r.PathValue("subworkout"),
-					Superworkout: r.PathValue("superworkout"),
-				}, nil
-			},
-		))
+	webMux.Handle("DELETE /view/data/subworkout/{subworkout}/{superworkout}", rawdata.HandleDeleteSubworkoutView(wDB))
 	webMux.Handle("GET /view/data/subworkout", rawdata.HandleGetSubworkoutView(roDB))
 
 	// Lift group table view
 	webMux.Handle("POST /view/data/lift_group", rawdata.HandlePostLiftGroupView(roDB, wDB))
 	webMux.Handle("PATCH /view/data/lift_group", rawdata.HandlePatchLiftGroupView(wDB))
 	webMux.Handle("PATCH /view/data/lift_group/{id}", rawdata.HandlePatchLiftGroupView(wDB))
-	webMux.Handle("DELETE /view/data/lift_group",
-		rawdata.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteLiftGroup))
-	webMux.Handle("DELETE /view/data/lift_group/{id}",
-		rawdata.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteLiftGroup))
+	webMux.Handle("DELETE /view/data/lift_group", rawdata.HandleDeleteLiftGroupView(wDB))
+	webMux.Handle("DELETE /view/data/lift_group/{id}", rawdata.HandleDeleteLiftGroupView(wDB))
 	webMux.Handle("GET /view/data/lift_group", rawdata.HandleGetLiftGroupView(roDB))
 }

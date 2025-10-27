@@ -13,6 +13,17 @@ import (
 	"github.com/RyRose/uplog/internal/templates"
 )
 
+// HandleGetRoutineWorkoutView godoc
+//
+//	@Summary		Get routine workout mapping data table view
+//	@Description	Renders a paginated table view of routine-workout mappings
+//	@Tags			rawdata
+//	@Produce		html
+//	@Param			offset	query		integer	false	"Pagination offset"
+//	@Success		200		{string}	string	"HTML content"
+//	@Failure		400		{string}	string	"Bad request"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/view/data/routine_workout_mapping [get]
 func HandleGetRoutineWorkoutView(roDB *sql.DB) http.HandlerFunc {
 	return base.HandleGetDataTableView(
 		roDB,
@@ -59,6 +70,20 @@ func HandleGetRoutineWorkoutView(roDB *sql.DB) http.HandlerFunc {
 	)
 }
 
+// HandlePatchRoutineWorkoutView godoc
+//
+//	@Summary		Update routine workout mapping data
+//	@Description	Updates specific fields of a routine-workout mapping
+//	@Tags			rawdata
+//	@Accept			x-www-form-urlencoded
+//	@Param			routine	path		string	true	"Routine ID"
+//	@Param			workout	path		string	true	"Workout ID"
+//	@Param			routine	formData	string	false	"New routine ID"
+//	@Param			workout	formData	string	false	"New workout ID"
+//	@Success		200		{string}	string	"OK"
+//	@Failure		400		{string}	string	"Bad request"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/view/data/routine_workout_mapping/{routine}/{workout} [patch]
 func HandlePatchRoutineWorkoutView(wDB *sql.DB) http.HandlerFunc {
 	return base.HandlePatchTableRowViewRequest(
 		wDB,
@@ -87,6 +112,19 @@ func HandlePatchRoutineWorkoutView(wDB *sql.DB) http.HandlerFunc {
 	)
 }
 
+// HandlePostRoutineWorkoutView godoc
+//
+//	@Summary		Create new routine workout mapping
+//	@Description	Creates a new routine-workout mapping in the database
+//	@Tags			rawdata
+//	@Accept			x-www-form-urlencoded
+//	@Produce		html
+//	@Param			routine	formData	string	true	"Routine ID"
+//	@Param			workout	formData	string	true	"Workout ID"
+//	@Success		201		{string}	string	"HTML content"
+//	@Failure		400		{string}	string	"Bad request"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/view/data/routine_workout_mapping [post]
 func HandlePostRoutineWorkoutView(roDB, wDB *sql.DB) http.HandlerFunc {
 	return base.HandlePostDataTableView(
 		roDB,
@@ -115,6 +153,30 @@ func HandlePostRoutineWorkoutView(roDB, wDB *sql.DB) http.HandlerFunc {
 					{Name: "routine", Type: templates.Select, Value: item.Routine, SelectOptions: routines},
 					{Name: "workout", Type: templates.Select, Value: item.Workout, SelectOptions: workouts},
 				},
+			}, nil
+		},
+	)
+}
+
+// HandleDeleteRoutineWorkoutView godoc
+//
+//	@Summary		Delete routine workout mapping
+//	@Description	Deletes a routine-workout mapping
+//	@Tags			rawdata
+//	@Param			routine	path		string	true	"Routine ID"
+//	@Param			workout	path		string	true	"Workout ID"
+//	@Success		200		{string}	string	"OK"
+//	@Failure		400		{string}	string	"Bad request"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/view/data/routine_workout_mapping/{routine}/{workout} [delete]
+func HandleDeleteRoutineWorkoutView(wDB *sql.DB) http.HandlerFunc {
+	return base.HandleDeleteTableRowViewRequest(
+		wDB,
+		(*workoutdb.Queries).RawDeleteRoutineWorkout,
+		func(r *http.Request) (*workoutdb.RawDeleteRoutineWorkoutParams, error) {
+			return &workoutdb.RawDeleteRoutineWorkoutParams{
+				Routine: r.PathValue("routine"),
+				Workout: r.PathValue("workout"),
 			}, nil
 		},
 	)

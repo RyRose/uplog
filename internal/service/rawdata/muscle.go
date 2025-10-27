@@ -12,6 +12,17 @@ import (
 	"github.com/RyRose/uplog/internal/templates"
 )
 
+// HandleGetMuscleView godoc
+//
+//	@Summary		Get muscle data table view
+//	@Description	Renders a paginated table view of muscles
+//	@Tags			rawdata
+//	@Produce		html
+//	@Param			offset	query		integer	false	"Pagination offset"
+//	@Success		200		{string}	string	"HTML content"
+//	@Failure		400		{string}	string	"Bad request"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/view/data/muscle [get]
 func HandleGetMuscleView(roDB *sql.DB) http.HandlerFunc {
 	return base.HandleGetDataTableView(
 		roDB,
@@ -51,6 +62,20 @@ func HandleGetMuscleView(roDB *sql.DB) http.HandlerFunc {
 	)
 }
 
+// HandlePatchMuscleView godoc
+//
+//	@Summary		Update muscle data
+//	@Description	Updates specific fields of a muscle entry by ID
+//	@Tags			rawdata
+//	@Accept			x-www-form-urlencoded
+//	@Param			id		path		string	true	"Muscle ID"
+//	@Param			id		formData	string	false	"New muscle ID"
+//	@Param			link	formData	string	false	"Muscle link"
+//	@Param			message	formData	string	false	"Message"
+//	@Success		200		{string}	string	"OK"
+//	@Failure		400		{string}	string	"Bad request"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/view/data/muscle/{id} [patch]
 func HandlePatchMuscleView(wDB *sql.DB) http.HandlerFunc {
 	return base.HandlePatchTableRowViewID(
 		wDB,
@@ -86,6 +111,20 @@ func HandlePatchMuscleView(wDB *sql.DB) http.HandlerFunc {
 	)
 }
 
+// HandlePostMuscleView godoc
+//
+//	@Summary		Create new muscle
+//	@Description	Creates a new muscle entry in the database
+//	@Tags			rawdata
+//	@Accept			x-www-form-urlencoded
+//	@Produce		html
+//	@Param			id		formData	string	true	"Muscle ID"
+//	@Param			link	formData	string	true	"Muscle link"
+//	@Param			message	formData	string	false	"Message"
+//	@Success		201		{string}	string	"HTML content"
+//	@Failure		400		{string}	string	"Bad request"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/view/data/muscle [post]
 func HandlePostMuscleView(roDB, wDB *sql.DB) http.HandlerFunc {
 	return base.HandlePostDataTableView(
 		roDB,
@@ -110,4 +149,17 @@ func HandlePostMuscleView(roDB, wDB *sql.DB) http.HandlerFunc {
 			}, nil
 		},
 	)
+}
+
+// HandleDeleteMuscleView godoc
+//
+//	@Summary		Delete muscle
+//	@Description	Deletes a muscle entry by ID
+//	@Tags			rawdata
+//	@Param			id	path		string	true	"Muscle ID"
+//	@Success		200	{string}	string	"OK"
+//	@Failure		500	{string}	string	"Internal server error"
+//	@Router			/view/data/muscle/{id} [delete]
+func HandleDeleteMuscleView(wDB *sql.DB) http.HandlerFunc {
+	return base.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteMuscle)
 }

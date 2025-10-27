@@ -14,6 +14,17 @@ import (
 	"github.com/RyRose/uplog/internal/templates"
 )
 
+// HandleGetProgressView godoc
+//
+//	@Summary		Get progress data table view
+//	@Description	Renders a paginated table view of progress entries
+//	@Tags			rawdata
+//	@Produce		html
+//	@Param			offset	query		integer	false	"Pagination offset"
+//	@Success		200		{string}	string	"HTML content"
+//	@Failure		400		{string}	string	"Bad request"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/view/data/progress [get]
 func HandleGetProgressView(roDB *sql.DB) http.HandlerFunc {
 	return base.HandleGetDataTableView(
 		roDB,
@@ -71,6 +82,23 @@ func HandleGetProgressView(roDB *sql.DB) http.HandlerFunc {
 	)
 }
 
+// HandlePatchProgressView godoc
+//
+//	@Summary		Update progress data
+//	@Description	Updates specific fields of a progress entry by ID
+//	@Tags			rawdata
+//	@Accept			x-www-form-urlencoded
+//	@Param			id			path		integer	true	"Progress ID"
+//	@Param			lift		formData	string	false	"Lift ID"
+//	@Param			date		formData	string	false	"Date"
+//	@Param			weight		formData	number	false	"Weight"
+//	@Param			sets		formData	integer	false	"Number of sets"
+//	@Param			reps		formData	integer	false	"Number of reps"
+//	@Param			side_weight	formData	string	false	"Side weight"
+//	@Success		200			{string}	string	"OK"
+//	@Failure		400			{string}	string	"Bad request"
+//	@Failure		500			{string}	string	"Internal server error"
+//	@Router			/view/data/progress/{id} [patch]
 func HandlePatchProgressView(wDB *sql.DB) http.HandlerFunc {
 	return base.HandlePatchTableRowViewID(
 		wDB,
@@ -169,6 +197,23 @@ func HandlePatchProgressView(wDB *sql.DB) http.HandlerFunc {
 	)
 }
 
+// HandlePostProgressView godoc
+//
+//	@Summary		Create new progress entry
+//	@Description	Creates a new progress entry in the database
+//	@Tags			rawdata
+//	@Accept			x-www-form-urlencoded
+//	@Produce		html
+//	@Param			lift		formData	string	true	"Lift ID"
+//	@Param			date		formData	string	true	"Date"
+//	@Param			weight		formData	number	true	"Weight"
+//	@Param			sets		formData	integer	true	"Number of sets"
+//	@Param			reps		formData	integer	true	"Number of reps"
+//	@Param			side_weight	formData	string	false	"Side weight"
+//	@Success		201			{string}	string	"HTML content"
+//	@Failure		400			{string}	string	"Bad request"
+//	@Failure		500			{string}	string	"Internal server error"
+//	@Router			/view/data/progress [post]
 func HandlePostProgressView(roDB, wDB *sql.DB) http.HandlerFunc {
 	return base.HandlePostDataTableView(
 		roDB,
@@ -220,6 +265,30 @@ func HandlePostProgressView(roDB, wDB *sql.DB) http.HandlerFunc {
 					{Name: "side_weight", Type: templates.Select, Value: sw, SelectOptions: append(sws, "")},
 				},
 			}, nil
+		},
+	)
+}
+
+// HandleDeleteProgressView godoc
+//
+//	@Summary		Delete progress entry
+//	@Description	Deletes a progress entry by ID
+//	@Tags			rawdata
+//	@Param			id	path		integer	true	"Progress ID"
+//	@Success		200	{string}	string	"OK"
+//	@Failure		400	{string}	string	"Bad request"
+//	@Failure		500	{string}	string	"Internal server error"
+//	@Router			/view/data/progress/{id} [delete]
+func HandleDeleteProgressView(wDB *sql.DB) http.HandlerFunc {
+	return base.HandleDeleteTableRowViewRequest(
+		wDB,
+		(*workoutdb.Queries).RawDeleteProgress,
+		func(r *http.Request) (*int64, error) {
+			id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
+			if err != nil {
+				return nil, fmt.Errorf("failed to parse id: %w", err)
+			}
+			return &id, nil
 		},
 	)
 }

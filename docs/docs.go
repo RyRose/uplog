@@ -9,22 +9,2991 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "contact": {},
+        "contact": {
+            "name": "RyRose",
+            "url": "https://github.com/RyRose/uplog"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://github.com/RyRose/uplog/blob/main/LICENSE"
+        },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
-    "paths": {}
+    "paths": {
+        "/data/{$}": {
+            "get": {
+                "description": "Renders the main index page with specified tab and CSS query parameters",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "index"
+                ],
+                "summary": "Get index page",
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/data/{tabX}/{tabY}": {
+            "get": {
+                "description": "Renders the main index page with specified tab and CSS query parameters",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "index"
+                ],
+                "summary": "Get index page",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tab X parameter",
+                        "name": "tabX",
+                        "in": "path"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Tab Y parameter",
+                        "name": "tabY",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/data/lift": {
+            "get": {
+                "description": "Renders a paginated table view of lifts with their details",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Get lift data table view",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new lift entry in the database",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Create new lift",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Lift ID",
+                        "name": "id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Lift link",
+                        "name": "link",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Default side weight",
+                        "name": "default_side_weight",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Notes",
+                        "name": "notes",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Lift group",
+                        "name": "lift_group",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/data/lift/{id}": {
+            "delete": {
+                "description": "Deletes a lift entry by ID",
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Delete lift",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Lift ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Updates specific fields of a lift entry by ID",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Update lift data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Lift ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "New lift ID",
+                        "name": "id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Lift link",
+                        "name": "link",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Default side weight",
+                        "name": "default_side_weight",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Notes",
+                        "name": "notes",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Lift group",
+                        "name": "lift_group",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/data/lift_group": {
+            "get": {
+                "description": "Renders a paginated table view of lift groups",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Get lift group data table view",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new lift group entry in the database",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Create new lift group",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Lift group ID",
+                        "name": "id",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/data/lift_group/{id}": {
+            "delete": {
+                "description": "Deletes a lift group entry by ID",
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Delete lift group",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Lift group ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Updates the ID of a lift group entry",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Update lift group data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Lift group ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "New lift group ID",
+                        "name": "id",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/data/lift_muscle_mapping": {
+            "get": {
+                "description": "Renders a paginated table view of lift-muscle-movement mappings",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Get lift muscle mapping data table view",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new lift-muscle-movement mapping in the database",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Create new lift muscle mapping",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Lift ID",
+                        "name": "lift",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Muscle ID",
+                        "name": "muscle",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Movement ID",
+                        "name": "movement",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/data/lift_muscle_mapping/{lift}/{muscle}/{movement}": {
+            "delete": {
+                "description": "Deletes a lift-muscle-movement mapping",
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Delete lift muscle mapping",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Lift ID",
+                        "name": "lift",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Muscle ID",
+                        "name": "muscle",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Movement ID",
+                        "name": "movement",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Updates specific fields of a lift-muscle-movement mapping",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Update lift muscle mapping data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Lift ID",
+                        "name": "lift",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Muscle ID",
+                        "name": "muscle",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Movement ID",
+                        "name": "movement",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "New lift ID",
+                        "name": "lift",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "New muscle ID",
+                        "name": "muscle",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "New movement ID",
+                        "name": "movement",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/data/lift_workout_mapping": {
+            "get": {
+                "description": "Renders a paginated table view of lift-workout mappings",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Get lift workout mapping data table view",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new lift-workout mapping in the database",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Create new lift workout mapping",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Lift ID",
+                        "name": "lift",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Workout ID",
+                        "name": "workout",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/data/lift_workout_mapping/{lift}/{workout}": {
+            "delete": {
+                "description": "Deletes a lift-workout mapping",
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Delete lift workout mapping",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Lift ID",
+                        "name": "lift",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Workout ID",
+                        "name": "workout",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Updates specific fields of a lift-workout mapping",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Update lift workout mapping data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Lift ID",
+                        "name": "lift",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Workout ID",
+                        "name": "workout",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "New lift ID",
+                        "name": "lift",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "New workout ID",
+                        "name": "workout",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/data/movement": {
+            "get": {
+                "description": "Renders a paginated table view of movements",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Get movement data table view",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new movement entry in the database",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Create new movement",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Movement ID",
+                        "name": "id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Movement alias",
+                        "name": "alias",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/data/movement/{id}": {
+            "delete": {
+                "description": "Deletes a movement entry by ID",
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Delete movement",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Movement ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Updates specific fields of a movement entry by ID",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Update movement data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Movement ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "New movement ID",
+                        "name": "id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Movement alias",
+                        "name": "alias",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/data/muscle": {
+            "get": {
+                "description": "Renders a paginated table view of muscles",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Get muscle data table view",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new muscle entry in the database",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Create new muscle",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Muscle ID",
+                        "name": "id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Muscle link",
+                        "name": "link",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Message",
+                        "name": "message",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/data/muscle/{id}": {
+            "delete": {
+                "description": "Deletes a muscle entry by ID",
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Delete muscle",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Muscle ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Updates specific fields of a muscle entry by ID",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Update muscle data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Muscle ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "New muscle ID",
+                        "name": "id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Muscle link",
+                        "name": "link",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Message",
+                        "name": "message",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/data/progress": {
+            "get": {
+                "description": "Renders a paginated table view of progress entries",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Get progress data table view",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new progress entry in the database",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Create new progress entry",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Lift ID",
+                        "name": "lift",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Date",
+                        "name": "date",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "Weight",
+                        "name": "weight",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of sets",
+                        "name": "sets",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of reps",
+                        "name": "reps",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Side weight",
+                        "name": "side_weight",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/data/progress/{id}": {
+            "delete": {
+                "description": "Deletes a progress entry by ID",
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Delete progress entry",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Progress ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Updates specific fields of a progress entry by ID",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Update progress data",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Progress ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Lift ID",
+                        "name": "lift",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Date",
+                        "name": "date",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "number",
+                        "description": "Weight",
+                        "name": "weight",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of sets",
+                        "name": "sets",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of reps",
+                        "name": "reps",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Side weight",
+                        "name": "side_weight",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/data/routine": {
+            "get": {
+                "description": "Renders a paginated table view of routines",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Get routine data table view",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new routine entry in the database",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Create new routine",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Routine ID",
+                        "name": "id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Routine steps",
+                        "name": "steps",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Lift ID",
+                        "name": "lift",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/data/routine/{id}": {
+            "delete": {
+                "description": "Deletes a routine entry by ID",
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Delete routine",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Routine ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Updates specific fields of a routine entry by ID",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Update routine data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Routine ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "New routine ID",
+                        "name": "id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Routine steps",
+                        "name": "steps",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Lift ID",
+                        "name": "lift",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/data/routine_workout_mapping": {
+            "get": {
+                "description": "Renders a paginated table view of routine-workout mappings",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Get routine workout mapping data table view",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new routine-workout mapping in the database",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Create new routine workout mapping",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Routine ID",
+                        "name": "routine",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Workout ID",
+                        "name": "workout",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/data/routine_workout_mapping/{routine}/{workout}": {
+            "delete": {
+                "description": "Deletes a routine-workout mapping",
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Delete routine workout mapping",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Routine ID",
+                        "name": "routine",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Workout ID",
+                        "name": "workout",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Updates specific fields of a routine-workout mapping",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Update routine workout mapping data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Routine ID",
+                        "name": "routine",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Workout ID",
+                        "name": "workout",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "New routine ID",
+                        "name": "routine",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "New workout ID",
+                        "name": "workout",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/data/side_weight": {
+            "get": {
+                "description": "Renders a paginated table view of side weights",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Get side weight data table view",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new side weight entry in the database",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Create new side weight",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Side weight ID",
+                        "name": "id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "Multiplier value",
+                        "name": "multiplier",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "Addend value",
+                        "name": "addend",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Format string",
+                        "name": "format",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/data/side_weight/{id}": {
+            "delete": {
+                "description": "Deletes a side weight entry by ID",
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Delete side weight",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Side weight ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Updates specific fields of a side weight entry by ID",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Update side weight data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Side weight ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "New side weight ID",
+                        "name": "id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "number",
+                        "description": "Multiplier value",
+                        "name": "multiplier",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "number",
+                        "description": "Addend value",
+                        "name": "addend",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Format string",
+                        "name": "format",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/data/subworkout": {
+            "get": {
+                "description": "Renders a paginated table view of subworkout-superworkout relationships",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Get subworkout data table view",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new subworkout-superworkout relationship in the database",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Create new subworkout relationship",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Subworkout ID",
+                        "name": "subworkout",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Superworkout ID",
+                        "name": "superworkout",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/data/subworkout/{subworkout}/{superworkout}": {
+            "delete": {
+                "description": "Deletes a subworkout-superworkout relationship",
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Delete subworkout relationship",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Subworkout ID",
+                        "name": "subworkout",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Superworkout ID",
+                        "name": "superworkout",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Updates specific fields of a subworkout-superworkout relationship",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Update subworkout data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Subworkout ID",
+                        "name": "subworkout",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Superworkout ID",
+                        "name": "superworkout",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "New subworkout ID",
+                        "name": "subworkout",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "New superworkout ID",
+                        "name": "superworkout",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/data/template_variable": {
+            "get": {
+                "description": "Renders a paginated table view of template variables",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Get template variable data table view",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new template variable entry in the database",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Create new template variable",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Template variable ID",
+                        "name": "id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Template variable value",
+                        "name": "value",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/data/template_variable/{id}": {
+            "delete": {
+                "description": "Deletes a template variable entry by ID",
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Delete template variable",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Template variable ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Updates specific fields of a template variable entry by ID",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Update template variable data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Template variable ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "New template variable ID",
+                        "name": "id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Template variable value",
+                        "name": "value",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/data/workout": {
+            "get": {
+                "description": "Renders a paginated table view of workouts",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Get workout data table view",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pagination offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new workout entry in the database",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Create new workout",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workout ID",
+                        "name": "id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Workout template",
+                        "name": "template",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/data/workout/{id}": {
+            "delete": {
+                "description": "Deletes a workout entry by ID",
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Delete workout",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workout ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Updates specific fields of a workout entry by ID",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "tags": [
+                    "rawdata"
+                ],
+                "summary": "Update workout data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workout ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "New workout ID",
+                        "name": "id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Workout template",
+                        "name": "template",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/liftgroups": {
+            "get": {
+                "description": "Renders the list of lift groups for today",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "index"
+                ],
+                "summary": "Get lift group list view",
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/liftselect": {
+            "get": {
+                "description": "Renders a select dropdown of lifts grouped by lift group",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "index"
+                ],
+                "summary": "Get lift select dropdown",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Input name attribute",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Selected lift ID",
+                        "name": "lift",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/progressform": {
+            "get": {
+                "description": "Renders an empty progress form",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "index"
+                ],
+                "summary": "Get progress form",
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Renders a progress form pre-filled with recent progress data for the selected lift",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "index"
+                ],
+                "summary": "Create progress form with recent data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Lift ID",
+                        "name": "lift",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Side weight",
+                        "name": "side",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Weight",
+                        "name": "weight",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sets",
+                        "name": "sets",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Reps",
+                        "name": "reps",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/progresstable": {
+            "get": {
+                "description": "Renders the progress table for today",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "index"
+                ],
+                "summary": "Get progress table",
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/progresstablerow": {
+            "post": {
+                "description": "Creates a new progress entry for today",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "index"
+                ],
+                "summary": "Create progress entry",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Lift ID",
+                        "name": "lift",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "Weight",
+                        "name": "weight",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of sets",
+                        "name": "sets",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of reps",
+                        "name": "reps",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Side weight",
+                        "name": "side",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/progresstablerow/{id}": {
+            "delete": {
+                "description": "Deletes a progress entry by ID",
+                "tags": [
+                    "index"
+                ],
+                "summary": "Delete progress entry",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Progress ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/routinetable": {
+            "get": {
+                "description": "Returns empty response as routine table functionality was removed",
+                "tags": [
+                    "index"
+                ],
+                "summary": "Get routine table",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/sideweightselect": {
+            "get": {
+                "description": "Renders a select dropdown of side weights with default selection based on lift",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "index"
+                ],
+                "summary": "Get side weight select dropdown",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Input name attribute",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Lift ID to get default side weight",
+                        "name": "lift",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/tabs/data/{tabX}/{tabY}": {
+            "get": {
+                "description": "Renders the data tab view with tabbed navigation for different data tables",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "index"
+                ],
+                "summary": "Get data tab view",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tab X index",
+                        "name": "tabX",
+                        "in": "path"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Tab Y index",
+                        "name": "tabY",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid tab index",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/view/tabs/main": {
+            "get": {
+                "description": "Renders the main tab view with progress for today and lift groups",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "index"
+                ],
+                "summary": "Get main tab view",
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/{$}": {
+            "get": {
+                "description": "Renders the main index page with specified tab and CSS query parameters",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "index"
+                ],
+                "summary": "Get index page",
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "description": "Main application pages and views",
+            "name": "index"
+        },
+        {
+            "description": "CRUD operations for raw data entities (lifts, workouts, progress, etc.)",
+            "name": "rawdata"
+        }
+    ]
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
+	Version:          "1.0",
 	Host:             "",
-	BasePath:         "",
-	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	BasePath:         "/",
+	Schemes:          []string{"http", "https"},
+	Title:            "Uplog API",
+	Description:      "A workout tracking and management system with progress logging, routine management, and workout scheduling.\nThis API provides endpoints for managing workouts, exercises, progress tracking, and muscle group mappings.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

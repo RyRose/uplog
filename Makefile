@@ -59,7 +59,7 @@ format:
 
 .PHONY: docs
 docs:
-	swag init
+	swag init -g ./cmd/uplog/main.go
 
 .PHONY: types
 types:

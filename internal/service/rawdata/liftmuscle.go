@@ -13,6 +13,17 @@ import (
 	"github.com/RyRose/uplog/internal/templates"
 )
 
+// HandleGetLiftMuscleView godoc
+//
+//	@Summary		Get lift muscle mapping data table view
+//	@Description	Renders a paginated table view of lift-muscle-movement mappings
+//	@Tags			rawdata
+//	@Produce		html
+//	@Param			offset	query		integer	false	"Pagination offset"
+//	@Success		200		{string}	string	"HTML content"
+//	@Failure		400		{string}	string	"Bad request"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/view/data/lift_muscle_mapping [get]
 func HandleGetLiftMuscleView(roDB *sql.DB) http.HandlerFunc {
 	return base.HandleGetDataTableView(
 		roDB,
@@ -65,6 +76,22 @@ func HandleGetLiftMuscleView(roDB *sql.DB) http.HandlerFunc {
 	)
 }
 
+// HandlePatchLiftMuscleView godoc
+//
+//	@Summary		Update lift muscle mapping data
+//	@Description	Updates specific fields of a lift-muscle-movement mapping
+//	@Tags			rawdata
+//	@Accept			x-www-form-urlencoded
+//	@Param			lift		path		string	true	"Lift ID"
+//	@Param			muscle		path		string	true	"Muscle ID"
+//	@Param			movement	path		string	true	"Movement ID"
+//	@Param			lift		formData	string	false	"New lift ID"
+//	@Param			muscle		formData	string	false	"New muscle ID"
+//	@Param			movement	formData	string	false	"New movement ID"
+//	@Success		200			{string}	string	"OK"
+//	@Failure		400			{string}	string	"Bad request"
+//	@Failure		500			{string}	string	"Internal server error"
+//	@Router			/view/data/lift_muscle_mapping/{lift}/{muscle}/{movement} [patch]
 func HandlePatchLiftMuscleView(wDB *sql.DB) http.HandlerFunc {
 	return base.HandlePatchTableRowViewRequest(
 		wDB,
@@ -106,6 +133,20 @@ func HandlePatchLiftMuscleView(wDB *sql.DB) http.HandlerFunc {
 	)
 }
 
+// HandlePostLiftMuscleView godoc
+//
+//	@Summary		Create new lift muscle mapping
+//	@Description	Creates a new lift-muscle-movement mapping in the database
+//	@Tags			rawdata
+//	@Accept			x-www-form-urlencoded
+//	@Produce		html
+//	@Param			lift		formData	string	true	"Lift ID"
+//	@Param			muscle		formData	string	true	"Muscle ID"
+//	@Param			movement	formData	string	true	"Movement ID"
+//	@Success		201			{string}	string	"HTML content"
+//	@Failure		400			{string}	string	"Bad request"
+//	@Failure		500			{string}	string	"Internal server error"
+//	@Router			/view/data/lift_muscle_mapping [post]
 func HandlePostLiftMuscleView(roDB, wDB *sql.DB) http.HandlerFunc {
 	return base.HandlePostDataTableView(
 		roDB,
@@ -140,6 +181,32 @@ func HandlePostLiftMuscleView(roDB, wDB *sql.DB) http.HandlerFunc {
 					{Name: "muscle", Type: templates.Select, Value: item.Muscle, SelectOptions: muscles},
 					{Name: "movement", Type: templates.Select, Value: item.Movement, SelectOptions: movements},
 				},
+			}, nil
+		},
+	)
+}
+
+// HandleDeleteLiftMuscleView godoc
+//
+//	@Summary		Delete lift muscle mapping
+//	@Description	Deletes a lift-muscle-movement mapping
+//	@Tags			rawdata
+//	@Param			lift		path		string	true	"Lift ID"
+//	@Param			muscle		path		string	true	"Muscle ID"
+//	@Param			movement	path		string	true	"Movement ID"
+//	@Success		200			{string}	string	"OK"
+//	@Failure		400			{string}	string	"Bad request"
+//	@Failure		500			{string}	string	"Internal server error"
+//	@Router			/view/data/lift_muscle_mapping/{lift}/{muscle}/{movement} [delete]
+func HandleDeleteLiftMuscleView(wDB *sql.DB) http.HandlerFunc {
+	return base.HandleDeleteTableRowViewRequest(
+		wDB,
+		(*workoutdb.Queries).RawDeleteLiftMuscle,
+		func(r *http.Request) (*workoutdb.RawDeleteLiftMuscleParams, error) {
+			return &workoutdb.RawDeleteLiftMuscleParams{
+				Lift:     r.PathValue("lift"),
+				Muscle:   r.PathValue("muscle"),
+				Movement: r.PathValue("movement"),
 			}, nil
 		},
 	)

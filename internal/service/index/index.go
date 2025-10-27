@@ -18,6 +18,19 @@ func todaysDate() time.Time {
 	return time.Now()
 }
 
+// HandleIndexPage godoc
+//
+//	@Summary		Get index page
+//	@Description	Renders the main index page with specified tab and CSS query parameters
+//	@Tags			index
+//	@Produce		html
+//	@Param			tabX	path		string	false	"Tab X parameter"
+//	@Param			tabY	path		string	false	"Tab Y parameter"
+//	@Success		200		{string}	string	"HTML content"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/{$} [get]
+//	@Router			/data/{$} [get]
+//	@Router			/data/{tabX}/{tabY} [get]
 func HandleIndexPage(tab, cssQuery string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
@@ -32,6 +45,15 @@ func HandleIndexPage(tab, cssQuery string) http.HandlerFunc {
 	}
 }
 
+// HandleMainTab godoc
+//
+//	@Summary		Get main tab view
+//	@Description	Renders the main tab view with progress for today and lift groups
+//	@Tags			index
+//	@Produce		html
+//	@Success		200	{string}	string	"HTML content"
+//	@Failure		500	{string}	string	"Internal server error"
+//	@Router			/view/tabs/main [get]
 func HandleMainTab(roDB *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
@@ -62,6 +84,15 @@ func HandleMainTab(roDB *sql.DB) http.HandlerFunc {
 	}
 }
 
+// HandleGetLiftGroupListView godoc
+//
+//	@Summary		Get lift group list view
+//	@Description	Renders the list of lift groups for today
+//	@Tags			index
+//	@Produce		html
+//	@Success		200	{string}	string	"HTML content"
+//	@Failure		500	{string}	string	"Internal server error"
+//	@Router			/view/liftgroups [get]
 func HandleGetLiftGroupListView(roDB *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
@@ -79,6 +110,15 @@ func HandleGetLiftGroupListView(roDB *sql.DB) http.HandlerFunc {
 	}
 }
 
+// HandleGetProgressTable godoc
+//
+//	@Summary		Get progress table
+//	@Description	Renders the progress table for today
+//	@Tags			index
+//	@Produce		html
+//	@Success		200	{string}	string	"HTML content"
+//	@Failure		500	{string}	string	"Internal server error"
+//	@Router			/view/progresstable [get]
 func HandleGetProgressTable(roDB *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
@@ -97,6 +137,16 @@ func HandleGetProgressTable(roDB *sql.DB) http.HandlerFunc {
 	}
 }
 
+// HandleDeleteProgress godoc
+//
+//	@Summary		Delete progress entry
+//	@Description	Deletes a progress entry by ID
+//	@Tags			index
+//	@Param			id	path		int		true	"Progress ID"
+//	@Success		200	{string}	string	"OK"
+//	@Failure		400	{string}	string	"Bad request"
+//	@Failure		500	{string}	string	"Internal server error"
+//	@Router			/view/progresstablerow/{id} [delete]
 func HandleDeleteProgress(wDB *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
@@ -122,6 +172,22 @@ func HandleDeleteProgress(wDB *sql.DB) http.HandlerFunc {
 	}
 }
 
+// HandleCreateProgress godoc
+//
+//	@Summary		Create progress entry
+//	@Description	Creates a new progress entry for today
+//	@Tags			index
+//	@Accept			x-www-form-urlencoded
+//	@Produce		html
+//	@Param			lift	formData	string	true	"Lift ID"
+//	@Param			weight	formData	number	true	"Weight"
+//	@Param			sets	formData	integer	true	"Number of sets"
+//	@Param			reps	formData	integer	true	"Number of reps"
+//	@Param			side	formData	string	false	"Side weight"
+//	@Success		200		{string}	string	"HTML content"
+//	@Failure		400		{string}	string	"Bad request"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/view/progresstablerow [post]
 func HandleCreateProgress(wDB *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
@@ -165,6 +231,13 @@ func HandleCreateProgress(wDB *sql.DB) http.HandlerFunc {
 	}
 }
 
+// HandleGetRoutineTable godoc
+//
+//	@Summary		Get routine table
+//	@Description	Returns empty response as routine table functionality was removed
+//	@Tags			index
+//	@Success		200	{string}	string	"OK"
+//	@Router			/view/routinetable [get]
 func HandleGetRoutineTable(roDB *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Routine table functionality removed - schedule concept eliminated
@@ -172,6 +245,16 @@ func HandleGetRoutineTable(roDB *sql.DB) http.HandlerFunc {
 	}
 }
 
+// HandleGetLiftSelect godoc
+//
+//	@Summary		Get lift select dropdown
+//	@Description	Renders a select dropdown of lifts grouped by lift group
+//	@Tags			index
+//	@Produce		html
+//	@Param			name	query		string	false	"Input name attribute"
+//	@Param			lift	query		string	false	"Selected lift ID"
+//	@Success		200		{string}	string	"HTML content"
+//	@Router			/view/liftselect [get]
 func HandleGetLiftSelect(roDB *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
@@ -216,6 +299,16 @@ func HandleGetLiftSelect(roDB *sql.DB) http.HandlerFunc {
 	}
 }
 
+// HandleGetSideWeightSelect godoc
+//
+//	@Summary		Get side weight select dropdown
+//	@Description	Renders a select dropdown of side weights with default selection based on lift
+//	@Tags			index
+//	@Produce		html
+//	@Param			name	query		string	false	"Input name attribute"
+//	@Param			lift	query		string	false	"Lift ID to get default side weight"
+//	@Success		200		{string}	string	"HTML content"
+//	@Router			/view/sideweightselect [get]
 func HandleGetSideWeightSelect(roDB *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
@@ -251,12 +344,34 @@ func HandleGetSideWeightSelect(roDB *sql.DB) http.HandlerFunc {
 	}
 }
 
+// HandleGetProgressForm godoc
+//
+//	@Summary		Get progress form
+//	@Description	Renders an empty progress form
+//	@Tags			index
+//	@Produce		html
+//	@Success		200	{string}	string	"HTML content"
+//	@Router			/view/progressform [get]
 func HandleGetProgressForm() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		templates.ProgressForm(templates.ProgressFormData{}).Render(r.Context(), w)
 	}
 }
 
+// HandleCreateProgressForm godoc
+//
+//	@Summary		Create progress form with recent data
+//	@Description	Renders a progress form pre-filled with recent progress data for the selected lift
+//	@Tags			index
+//	@Accept			x-www-form-urlencoded
+//	@Produce		html
+//	@Param			lift	formData	string	false	"Lift ID"
+//	@Param			side	formData	string	false	"Side weight"
+//	@Param			weight	formData	string	false	"Weight"
+//	@Param			sets	formData	string	false	"Sets"
+//	@Param			reps	formData	string	false	"Reps"
+//	@Success		200		{string}	string	"HTML content"
+//	@Router			/view/progressform [post]
 func HandleCreateProgressForm(roDB *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()

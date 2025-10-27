@@ -13,6 +13,17 @@ import (
 	"github.com/RyRose/uplog/internal/templates"
 )
 
+// HandleGetLiftWorkoutView godoc
+//
+//	@Summary		Get lift workout mapping data table view
+//	@Description	Renders a paginated table view of lift-workout mappings
+//	@Tags			rawdata
+//	@Produce		html
+//	@Param			offset	query		integer	false	"Pagination offset"
+//	@Success		200		{string}	string	"HTML content"
+//	@Failure		400		{string}	string	"Bad request"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/view/data/lift_workout_mapping [get]
 func HandleGetLiftWorkoutView(roDB *sql.DB) http.HandlerFunc {
 	return base.HandleGetDataTableView(
 		roDB,
@@ -59,6 +70,20 @@ func HandleGetLiftWorkoutView(roDB *sql.DB) http.HandlerFunc {
 	)
 }
 
+// HandlePatchLiftWorkoutView godoc
+//
+//	@Summary		Update lift workout mapping data
+//	@Description	Updates specific fields of a lift-workout mapping
+//	@Tags			rawdata
+//	@Accept			x-www-form-urlencoded
+//	@Param			lift	path		string	true	"Lift ID"
+//	@Param			workout	path		string	true	"Workout ID"
+//	@Param			lift	formData	string	false	"New lift ID"
+//	@Param			workout	formData	string	false	"New workout ID"
+//	@Success		200		{string}	string	"OK"
+//	@Failure		400		{string}	string	"Bad request"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/view/data/lift_workout_mapping/{lift}/{workout} [patch]
 func HandlePatchLiftWorkoutView(wDB *sql.DB) http.HandlerFunc {
 	return base.HandlePatchTableRowViewRequest(
 		wDB,
@@ -87,6 +112,19 @@ func HandlePatchLiftWorkoutView(wDB *sql.DB) http.HandlerFunc {
 	)
 }
 
+// HandlePostLiftWorkoutView godoc
+//
+//	@Summary		Create new lift workout mapping
+//	@Description	Creates a new lift-workout mapping in the database
+//	@Tags			rawdata
+//	@Accept			x-www-form-urlencoded
+//	@Produce		html
+//	@Param			lift	formData	string	true	"Lift ID"
+//	@Param			workout	formData	string	true	"Workout ID"
+//	@Success		201		{string}	string	"HTML content"
+//	@Failure		400		{string}	string	"Bad request"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/view/data/lift_workout_mapping [post]
 func HandlePostLiftWorkoutView(roDB, wDB *sql.DB) http.HandlerFunc {
 	return base.HandlePostDataTableView(
 		roDB,
@@ -115,6 +153,30 @@ func HandlePostLiftWorkoutView(roDB, wDB *sql.DB) http.HandlerFunc {
 					{Name: "lift", Type: templates.Select, Value: item.Lift, SelectOptions: lifts},
 					{Name: "workout", Type: templates.Select, Value: item.Workout, SelectOptions: workouts},
 				},
+			}, nil
+		},
+	)
+}
+
+// HandleDeleteLiftWorkoutView godoc
+//
+//	@Summary		Delete lift workout mapping
+//	@Description	Deletes a lift-workout mapping
+//	@Tags			rawdata
+//	@Param			lift	path		string	true	"Lift ID"
+//	@Param			workout	path		string	true	"Workout ID"
+//	@Success		200		{string}	string	"OK"
+//	@Failure		400		{string}	string	"Bad request"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/view/data/lift_workout_mapping/{lift}/{workout} [delete]
+func HandleDeleteLiftWorkoutView(wDB *sql.DB) http.HandlerFunc {
+	return base.HandleDeleteTableRowViewRequest(
+		wDB,
+		(*workoutdb.Queries).RawDeleteLiftWorkout,
+		func(r *http.Request) (*workoutdb.RawDeleteLiftWorkoutParams, error) {
+			return &workoutdb.RawDeleteLiftWorkoutParams{
+				Lift:    r.PathValue("lift"),
+				Workout: r.PathValue("workout"),
 			}, nil
 		},
 	)

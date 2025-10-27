@@ -12,6 +12,17 @@ import (
 	"github.com/RyRose/uplog/internal/templates"
 )
 
+// HandleGetWorkoutView godoc
+//
+//	@Summary		Get workout data table view
+//	@Description	Renders a paginated table view of workouts
+//	@Tags			rawdata
+//	@Produce		html
+//	@Param			offset	query		integer	false	"Pagination offset"
+//	@Success		200		{string}	string	"HTML content"
+//	@Failure		400		{string}	string	"Bad request"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/view/data/workout [get]
 func HandleGetWorkoutView(roDB *sql.DB) http.HandlerFunc {
 	return base.HandleGetDataTableView(
 		roDB,
@@ -49,6 +60,19 @@ func HandleGetWorkoutView(roDB *sql.DB) http.HandlerFunc {
 	)
 }
 
+// HandlePatchWorkoutView godoc
+//
+//	@Summary		Update workout data
+//	@Description	Updates specific fields of a workout entry by ID
+//	@Tags			rawdata
+//	@Accept			x-www-form-urlencoded
+//	@Param			id			path		string	true	"Workout ID"
+//	@Param			id			formData	string	false	"New workout ID"
+//	@Param			template	formData	string	false	"Workout template"
+//	@Success		200			{string}	string	"OK"
+//	@Failure		400			{string}	string	"Bad request"
+//	@Failure		500			{string}	string	"Internal server error"
+//	@Router			/view/data/workout/{id} [patch]
 func HandlePatchWorkoutView(wDB *sql.DB) http.HandlerFunc {
 	return base.HandlePatchTableRowViewID(
 		wDB,
@@ -75,6 +99,19 @@ func HandlePatchWorkoutView(wDB *sql.DB) http.HandlerFunc {
 	)
 }
 
+// HandlePostWorkoutView godoc
+//
+//	@Summary		Create new workout
+//	@Description	Creates a new workout entry in the database
+//	@Tags			rawdata
+//	@Accept			x-www-form-urlencoded
+//	@Produce		html
+//	@Param			id			formData	string	true	"Workout ID"
+//	@Param			template	formData	string	true	"Workout template"
+//	@Success		201			{string}	string	"HTML content"
+//	@Failure		400			{string}	string	"Bad request"
+//	@Failure		500			{string}	string	"Internal server error"
+//	@Router			/view/data/workout [post]
 func HandlePostWorkoutView(roDB, wDB *sql.DB) http.HandlerFunc {
 	return base.HandlePostDataTableView(
 		roDB,
@@ -97,4 +134,17 @@ func HandlePostWorkoutView(roDB, wDB *sql.DB) http.HandlerFunc {
 			}, nil
 		},
 	)
+}
+
+// HandleDeleteWorkoutView godoc
+//
+//	@Summary		Delete workout
+//	@Description	Deletes a workout entry by ID
+//	@Tags			rawdata
+//	@Param			id	path		string	true	"Workout ID"
+//	@Success		200	{string}	string	"OK"
+//	@Failure		500	{string}	string	"Internal server error"
+//	@Router			/view/data/workout/{id} [delete]
+func HandleDeleteWorkoutView(wDB *sql.DB) http.HandlerFunc {
+	return base.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteWorkout)
 }

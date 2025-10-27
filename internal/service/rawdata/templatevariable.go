@@ -12,6 +12,17 @@ import (
 	"github.com/RyRose/uplog/internal/templates"
 )
 
+// HandleGetTemplateVariableView godoc
+//
+//	@Summary		Get template variable data table view
+//	@Description	Renders a paginated table view of template variables
+//	@Tags			rawdata
+//	@Produce		html
+//	@Param			offset	query		integer	false	"Pagination offset"
+//	@Success		200		{string}	string	"HTML content"
+//	@Failure		400		{string}	string	"Bad request"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/view/data/template_variable [get]
 func HandleGetTemplateVariableView(roDB *sql.DB) http.HandlerFunc {
 	return base.HandleGetDataTableView(
 		roDB,
@@ -49,6 +60,19 @@ func HandleGetTemplateVariableView(roDB *sql.DB) http.HandlerFunc {
 	)
 }
 
+// HandlePatchTemplateVariableView godoc
+//
+//	@Summary		Update template variable data
+//	@Description	Updates specific fields of a template variable entry by ID
+//	@Tags			rawdata
+//	@Accept			x-www-form-urlencoded
+//	@Param			id		path		string	true	"Template variable ID"
+//	@Param			id		formData	string	false	"New template variable ID"
+//	@Param			value	formData	string	false	"Template variable value"
+//	@Success		200		{string}	string	"OK"
+//	@Failure		400		{string}	string	"Bad request"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/view/data/template_variable/{id} [patch]
 func HandlePatchTemplateVariableView(wDB *sql.DB) http.HandlerFunc {
 	return base.HandlePatchTableRowViewID(
 		wDB,
@@ -75,6 +99,19 @@ func HandlePatchTemplateVariableView(wDB *sql.DB) http.HandlerFunc {
 	)
 }
 
+// HandlePostTemplateVariableView godoc
+//
+//	@Summary		Create new template variable
+//	@Description	Creates a new template variable entry in the database
+//	@Tags			rawdata
+//	@Accept			x-www-form-urlencoded
+//	@Produce		html
+//	@Param			id		formData	string	true	"Template variable ID"
+//	@Param			value	formData	string	true	"Template variable value"
+//	@Success		201		{string}	string	"HTML content"
+//	@Failure		400		{string}	string	"Bad request"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/view/data/template_variable [post]
 func HandlePostTemplateVariableView(roDB, wDB *sql.DB) http.HandlerFunc {
 	return base.HandlePostDataTableView(
 		roDB,
@@ -97,4 +134,17 @@ func HandlePostTemplateVariableView(roDB, wDB *sql.DB) http.HandlerFunc {
 			}, nil
 		},
 	)
+}
+
+// HandleDeleteTemplateVariableView godoc
+//
+//	@Summary		Delete template variable
+//	@Description	Deletes a template variable entry by ID
+//	@Tags			rawdata
+//	@Param			id	path		string	true	"Template variable ID"
+//	@Success		200	{string}	string	"OK"
+//	@Failure		500	{string}	string	"Internal server error"
+//	@Router			/view/data/template_variable/{id} [delete]
+func HandleDeleteTemplateVariableView(wDB *sql.DB) http.HandlerFunc {
+	return base.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteTemplateVariable)
 }

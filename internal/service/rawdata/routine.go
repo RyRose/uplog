@@ -13,6 +13,17 @@ import (
 	"github.com/RyRose/uplog/internal/templates"
 )
 
+// HandleGetRoutineView godoc
+//
+//	@Summary		Get routine data table view
+//	@Description	Renders a paginated table view of routines
+//	@Tags			rawdata
+//	@Produce		html
+//	@Param			offset	query		integer	false	"Pagination offset"
+//	@Success		200		{string}	string	"HTML content"
+//	@Failure		400		{string}	string	"Bad request"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/view/data/routine [get]
 func HandleGetRoutineView(roDB *sql.DB) http.HandlerFunc {
 	return base.HandleGetDataTableView(
 		roDB,
@@ -58,6 +69,20 @@ func HandleGetRoutineView(roDB *sql.DB) http.HandlerFunc {
 	)
 }
 
+// HandlePatchRoutineView godoc
+//
+//	@Summary		Update routine data
+//	@Description	Updates specific fields of a routine entry by ID
+//	@Tags			rawdata
+//	@Accept			x-www-form-urlencoded
+//	@Param			id		path		string	true	"Routine ID"
+//	@Param			id		formData	string	false	"New routine ID"
+//	@Param			steps	formData	string	false	"Routine steps"
+//	@Param			lift	formData	string	false	"Lift ID"
+//	@Success		200		{string}	string	"OK"
+//	@Failure		400		{string}	string	"Bad request"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/view/data/routine/{id} [patch]
 func HandlePatchRoutineView(wDB *sql.DB) http.HandlerFunc {
 	return base.HandlePatchTableRowViewID(
 		wDB,
@@ -93,6 +118,20 @@ func HandlePatchRoutineView(wDB *sql.DB) http.HandlerFunc {
 	)
 }
 
+// HandlePostRoutineView godoc
+//
+//	@Summary		Create new routine
+//	@Description	Creates a new routine entry in the database
+//	@Tags			rawdata
+//	@Accept			x-www-form-urlencoded
+//	@Produce		html
+//	@Param			id		formData	string	true	"Routine ID"
+//	@Param			steps	formData	string	true	"Routine steps"
+//	@Param			lift	formData	string	true	"Lift ID"
+//	@Success		201		{string}	string	"HTML content"
+//	@Failure		400		{string}	string	"Bad request"
+//	@Failure		500		{string}	string	"Internal server error"
+//	@Router			/view/data/routine [post]
 func HandlePostRoutineView(roDB, wDB *sql.DB) http.HandlerFunc {
 	return base.HandlePostDataTableView(
 		roDB,
@@ -122,4 +161,17 @@ func HandlePostRoutineView(roDB, wDB *sql.DB) http.HandlerFunc {
 			}, nil
 		},
 	)
+}
+
+// HandleDeleteRoutineView godoc
+//
+//	@Summary		Delete routine
+//	@Description	Deletes a routine entry by ID
+//	@Tags			rawdata
+//	@Param			id	path		string	true	"Routine ID"
+//	@Success		200	{string}	string	"OK"
+//	@Failure		500	{string}	string	"Internal server error"
+//	@Router			/view/data/routine/{id} [delete]
+func HandleDeleteRoutineView(wDB *sql.DB) http.HandlerFunc {
+	return base.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteRoutine)
 }
