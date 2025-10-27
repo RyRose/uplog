@@ -1,123 +1,213 @@
 package integration
 
 import (
-	"context"
-	"fmt"
 	"io"
-	"net"
 	"net/http"
-	"os"
-	"path/filepath"
+	"strings"
 	"testing"
-	"time"
 
-	"github.com/RyRose/uplog/internal/service"
+	"github.com/RyRose/uplog/test/testutil"
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func TestIntegration_ServiceStartup(t *testing.T) {
+func TestIntegration_Endpoints(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping integration test in short mode")
 	}
 
-	tmpDir := t.TempDir()
-	dbPath := filepath.Join(tmpDir, "test.db")
+	srv := testutil.Setup(t)
+	defer srv.Cancel()
 
-	port, err := getFreePort()
-	if err != nil {
-		t.Fatalf("failed to get free port: %v", err)
-	}
+	t.Run("Health", func(t *testing.T) {
+		resp := srv.Get(t, "/health")
+		defer resp.Body.Close()
 
-	os.Setenv("PORT", fmt.Sprintf("%d", port))
-	os.Setenv("DATABASE_PATH", dbPath)
-	os.Setenv("DEBUG", "false")
-	defer func() {
-		os.Unsetenv("PORT")
-		os.Unsetenv("DATABASE_PATH")
-		os.Unsetenv("DEBUG")
-	}()
-
-	// Change to repo root so Lua's require() can find config modules
-	origDir, err := os.Getwd()
-	if err != nil {
-		t.Fatalf("failed to get working directory: %v", err)
-	}
-	defer os.Chdir(origDir)
-
-	repoRoot, err := filepath.Abs("../..")
-	if err != nil {
-		t.Fatalf("failed to get repo root: %v", err)
-	}
-
-	if err := os.Chdir(repoRoot); err != nil {
-		t.Fatalf("failed to change to repo root: %v", err)
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	errChan := make(chan error, 1)
-	go func() {
-		if err := service.Run(ctx, "./config/main.lua"); err != nil {
-			errChan <- err
+		if resp.StatusCode != http.StatusOK {
+			body, _ := io.ReadAll(resp.Body)
+			t.Fatalf("unexpected status code: got %d, want %d, body: %s",
+				resp.StatusCode, http.StatusOK, string(body))
 		}
-	}()
 
-	time.Sleep(1 * time.Second)
-
-	select {
-	case err := <-errChan:
-		t.Fatalf("server failed to start: %v", err)
-	default:
-		testMetricsEndpoint(t, port)
-		cancel()
-	}
-}
-
-func getFreePort() (int, error) {
-	listener, err := net.Listen("tcp", "127.0.0.1:0")
-	if err != nil {
-		return 0, err
-	}
-	port := listener.Addr().(*net.TCPAddr).Port
-	listener.Close()
-	return port, nil
-}
-
-func testMetricsEndpoint(t *testing.T, port int) {
-	url := fmt.Sprintf("http://localhost:%d/metrics", port)
-
-	client := &http.Client{Timeout: 3 * time.Second}
-
-	var resp *http.Response
-	var err error
-	for i := 0; i < 20; i++ {
-		resp, err = client.Get(url)
-		if err == nil {
-			break
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			t.Fatalf("failed to read response body: %v", err)
 		}
-		time.Sleep(100 * time.Millisecond)
-	}
 
-	if err != nil {
-		t.Fatalf("failed to reach /metrics endpoint: %v", err)
-	}
-	defer resp.Body.Close()
+		if string(body) != "OK" {
+			t.Errorf("expected 'OK', got %q", string(body))
+		}
+	})
 
-	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
-		t.Fatalf("unexpected status code: got %d, want %d, body: %s",
-			resp.StatusCode, http.StatusOK, string(body))
-	}
+	t.Run("Metrics", func(t *testing.T) {
+		resp := srv.Get(t, "/metrics")
+		defer resp.Body.Close()
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		t.Fatalf("failed to read response body: %v", err)
-	}
+		if resp.StatusCode != http.StatusOK {
+			body, _ := io.ReadAll(resp.Body)
+			t.Fatalf("unexpected status code: got %d, want %d, body: %s",
+				resp.StatusCode, http.StatusOK, string(body))
+		}
 
-	if len(body) == 0 {
-		t.Fatal("expected non-empty response from /metrics endpoint")
-	}
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			t.Fatalf("failed to read response body: %v", err)
+		}
 
-	t.Logf("Successfully received response from /metrics (%d bytes)", len(body))
+		if len(body) == 0 {
+			t.Fatal("expected non-empty response from /metrics endpoint")
+		}
+
+		t.Logf("Successfully received response from /metrics (%d bytes)", len(body))
+	})
+
+	t.Run("IndexPage", func(t *testing.T) {
+		resp := srv.Get(t, "/")
+		defer resp.Body.Close()
+
+		if resp.StatusCode != http.StatusOK {
+			body, _ := io.ReadAll(resp.Body)
+			t.Fatalf("GET /: unexpected status code: got %d, want %d, body: %s",
+				resp.StatusCode, http.StatusOK, string(body))
+		}
+
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			t.Fatalf("failed to read response body: %v", err)
+		}
+
+		if len(body) == 0 {
+			t.Fatal("expected non-empty response from index page")
+		}
+
+		bodyStr := string(body)
+		if !strings.Contains(bodyStr, "<!DOCTYPE html>") && !strings.Contains(bodyStr, "<html") {
+			t.Errorf("expected HTML content, got: %s", bodyStr[:min(200, len(bodyStr))])
+		}
+	})
+
+	t.Run("SchedulePage", func(t *testing.T) {
+		resp := srv.Get(t, "/schedule/")
+		defer resp.Body.Close()
+
+		if resp.StatusCode != http.StatusOK {
+			body, _ := io.ReadAll(resp.Body)
+			t.Fatalf("GET /schedule/: unexpected status code: got %d, want %d, body: %s",
+				resp.StatusCode, http.StatusOK, string(body))
+		}
+
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			t.Fatalf("failed to read response body: %v", err)
+		}
+
+		if len(body) == 0 {
+			t.Fatal("expected non-empty response from schedule page")
+		}
+	})
+
+	t.Run("DataPage", func(t *testing.T) {
+		resp := srv.Get(t, "/data/")
+		defer resp.Body.Close()
+
+		if resp.StatusCode != http.StatusOK {
+			body, _ := io.ReadAll(resp.Body)
+			t.Fatalf("GET /data/: unexpected status code: got %d, want %d, body: %s",
+				resp.StatusCode, http.StatusOK, string(body))
+		}
+
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			t.Fatalf("failed to read response body: %v", err)
+		}
+
+		if len(body) == 0 {
+			t.Fatal("expected non-empty response from data page")
+		}
+	})
+
+	t.Run("SwaggerDocs", func(t *testing.T) {
+		resp := srv.Get(t, "/docs/swagger.json")
+		defer resp.Body.Close()
+
+		if resp.StatusCode != http.StatusOK {
+			body, _ := io.ReadAll(resp.Body)
+			t.Fatalf("GET /docs/swagger.json: unexpected status code: got %d, want %d, body: %s",
+				resp.StatusCode, http.StatusOK, string(body))
+		}
+
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			t.Fatalf("failed to read response body: %v", err)
+		}
+
+		if len(body) == 0 {
+			t.Fatal("expected non-empty swagger.json")
+		}
+
+		bodyStr := string(body)
+		if !strings.Contains(bodyStr, "swagger") && !strings.Contains(bodyStr, "openapi") {
+			t.Errorf("expected swagger/openapi content in swagger.json")
+		}
+	})
+
+	t.Run("ViewEndpoints", func(t *testing.T) {
+		tests := []struct {
+			name     string
+			path     string
+			wantCode int
+		}{
+			{"main tab", "/view/tabs/main", http.StatusOK},
+			{"schedule tab", "/view/tabs/schedule", http.StatusOK},
+			{"data tab", "/view/tabs/data/", http.StatusOK},
+			{"lift groups", "/view/liftgroups", http.StatusOK},
+			{"progress table", "/view/progresstable", http.StatusOK},
+			{"routine table", "/view/routinetable", http.StatusOK},
+		}
+
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				resp := srv.Get(t, tt.path)
+				defer resp.Body.Close()
+
+				if resp.StatusCode != tt.wantCode {
+					body, _ := io.ReadAll(resp.Body)
+					t.Errorf("GET %s: got status %d, want %d, body: %s",
+						tt.path, resp.StatusCode, tt.wantCode, string(body))
+				}
+			})
+		}
+	})
+
+	t.Run("DataViewEndpoints", func(t *testing.T) {
+		dataEndpoints := []string{
+			"/view/data/lift",
+			"/view/data/movement",
+			"/view/data/muscle",
+			"/view/data/routine",
+			"/view/data/schedule_list",
+			"/view/data/side_weight",
+			"/view/data/template_variable",
+			"/view/data/workout",
+			"/view/data/schedule",
+			"/view/data/progress",
+			"/view/data/lift_muscle_mapping",
+			"/view/data/lift_workout_mapping",
+			"/view/data/routine_workout_mapping",
+			"/view/data/subworkout",
+			"/view/data/lift_group",
+		}
+
+		for _, endpoint := range dataEndpoints {
+			t.Run(endpoint, func(t *testing.T) {
+				resp := srv.Get(t, endpoint)
+				defer resp.Body.Close()
+
+				if resp.StatusCode != http.StatusOK {
+					body, _ := io.ReadAll(resp.Body)
+					t.Errorf("GET %s: got status %d, want %d, body: %s",
+						endpoint, resp.StatusCode, http.StatusOK, string(body))
+				}
+			})
+		}
+	})
 }

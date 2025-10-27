@@ -13,10 +13,12 @@ import (
 	"github.com/RyRose/uplog/internal/config"
 	"github.com/RyRose/uplog/internal/sqlc"
 	"github.com/pressly/goose/v3"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 type State struct {
 	ReadonlyDB, WriteDB *sql.DB
+	PrometheusRegistry  *prometheus.Registry
 }
 
 func (s *State) Close() error {
@@ -66,7 +68,8 @@ func NewState(ctx context.Context, cfg *config.Data) (*State, error) {
 		return nil, fmt.Errorf("failed to setup databases: %w", err)
 	}
 	return &State{
-		ReadonlyDB: rDB,
-		WriteDB:    wDB,
+		ReadonlyDB:         rDB,
+		WriteDB:            wDB,
+		PrometheusRegistry: prometheus.NewRegistry(),
 	}, nil
 }

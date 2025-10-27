@@ -29,8 +29,14 @@ func AddRoutes(
 	roDB := state.ReadonlyDB
 	wDB := state.WriteDB
 
+	// Health check endpoint.
+	rawMux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("OK"))
+	})
+
 	// Prometheus metrics.
-	traceMux.Handle("/metrics", promhttp.Handler())
+	traceMux.Handle("/metrics", promhttp.HandlerFor(state.PrometheusRegistry, promhttp.HandlerOpts{}))
 
 	// Swagger docs.
 	// TODO: Only enable swagger docs in "dev" mode.

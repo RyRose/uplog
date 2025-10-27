@@ -27,7 +27,7 @@ func NewServer(ctx context.Context, cfg *config.Data, state *State) http.Handler
 	// Prometheus metrics middleware.
 	// TODO: Replace with otelhttp.
 	handler = std.Handler("", middleware.New(middleware.Config{
-		Recorder: prometheus.NewRecorder(prometheus.Config{}),
+		Recorder: prometheus.NewRecorder(prometheus.Config{Registry: state.PrometheusRegistry}),
 	}), handler)
 
 	return handler
