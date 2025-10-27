@@ -19,11 +19,11 @@ func (s SimpleConfig) LogValue() slog.Value {
 
 // Test struct with log:"-" tags
 type SecureConfig struct {
-	PublicKey  string
-	SecretKey  string `log:"-"`
-	APIKey     string `log:"-"`
-	Port       int
-	DebugMode  bool
+	PublicKey string
+	SecretKey string `log:"-"`
+	APIKey    string `log:"-"`
+	Port      int
+	DebugMode bool
 }
 
 func (s SecureConfig) LogValue() slog.Value {

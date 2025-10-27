@@ -28,8 +28,8 @@ func todaysDate() time.Time {
 //	@Param			tabY	path		string	false	"Tab Y parameter"
 //	@Success		200		{string}	string	"HTML content"
 //	@Failure		500		{string}	string	"Internal server error"
-//	@Router			/{$} [get]
-//	@Router			/data/{$} [get]
+//	@Router			/ [get]
+//	@Router			/data [get]
 //	@Router			/data/{tabX}/{tabY} [get]
 func HandleIndexPage(tab string, cfg *config.Data, state *config.State) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

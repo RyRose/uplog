@@ -20,7 +20,7 @@ func (u Data) LogValue() slog.Value {
 // structToLogValue converts a struct to slog.Value using reflection.
 // Fields with `log:"-"` tag are excluded from the output.
 // Field names are automatically converted to snake_case.
-func structToLogValue(v interface{}) slog.Value {
+func structToLogValue(v any) slog.Value {
 	var attrs []slog.Attr
 
 	val := reflect.ValueOf(v)
@@ -61,7 +61,7 @@ func valueToAttr(name string, value reflect.Value) (slog.Attr, bool) {
 		return slog.Uint64(name, value.Uint()), true
 	case reflect.Float32, reflect.Float64:
 		return slog.Float64(name, value.Float()), true
-	case reflect.Ptr:
+	case reflect.Pointer:
 		if value.IsNil() {
 			return slog.Attr{}, false
 		}
