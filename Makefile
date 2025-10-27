@@ -31,6 +31,7 @@ serve:
 .PHONY: test
 test:
 	go test ./...
+	busted
 
 .PHONY: clean
 clean:

@@ -36,6 +36,7 @@
               sqlc
               stylua
               tailwindcss
+              luajitPackages.busted
             ];
           };
         };
