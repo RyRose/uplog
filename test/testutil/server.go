@@ -2,6 +2,7 @@ package testutil
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"net"
 	"net/http"
@@ -16,9 +17,11 @@ import (
 
 // Server represents a test server instance.
 type Server struct {
-	Port   int
-	cancel context.CancelFunc
-	errCh  chan error
+	Port    int
+	cancel  context.CancelFunc
+	errCh   chan error
+	writeDB *sql.DB
+	readDB  *sql.DB
 }
 
 // Setup creates and starts a test server instance.
@@ -79,10 +82,22 @@ func Setup(t *testing.T) *Server {
 		}
 	}
 
+	// Open database connections for test data manipulation
+	writeDB, readDB, err := openDatabases(dbPath)
+	if err != nil {
+		t.Fatalf("failed to open test databases: %v", err)
+	}
+	t.Cleanup(func() {
+		writeDB.Close()
+		readDB.Close()
+	})
+
 	return &Server{
-		Port:   port,
-		cancel: cancel,
-		errCh:  errChan,
+		Port:    port,
+		cancel:  cancel,
+		errCh:   errChan,
+		writeDB: writeDB,
+		readDB:  readDB,
 	}
 }
 
@@ -111,6 +126,41 @@ func (s *Server) Get(t *testing.T, path string) *http.Response {
 // Cancel stops the server.
 func (s *Server) Cancel() {
 	s.cancel()
+}
+
+// GetWriteDB returns the write database connection for inserting test data.
+func (s *Server) GetWriteDB(t *testing.T) *sql.DB {
+	t.Helper()
+	return s.writeDB
+}
+
+// GetReadDB returns the read-only database connection.
+func (s *Server) GetReadDB(t *testing.T) *sql.DB {
+	t.Helper()
+	return s.readDB
+}
+
+// GetPort returns the server port as a string for building URLs.
+func (s *Server) GetPort(t *testing.T) string {
+	t.Helper()
+	return fmt.Sprintf("%d", s.Port)
+}
+
+func openDatabases(dbPath string) (*sql.DB, *sql.DB, error) {
+	// Open write connection
+	writeDB, err := sql.Open("sqlite3", dbPath)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to open write db: %w", err)
+	}
+
+	// Open read connection
+	readDB, err := sql.Open("sqlite3", dbPath)
+	if err != nil {
+		writeDB.Close()
+		return nil, nil, fmt.Errorf("failed to open read db: %w", err)
+	}
+
+	return writeDB, readDB, nil
 }
 
 func waitForServer(port int, timeout time.Duration) error {

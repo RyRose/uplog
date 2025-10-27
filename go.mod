@@ -1,10 +1,11 @@
 module github.com/RyRose/uplog
 
-go 1.23
+go 1.23.0
 
-toolchain go1.23.1
+toolchain go1.23.4
 
 require (
+	github.com/PuerkitoBio/goquery v1.10.3
 	github.com/RyRose/gluamapper v0.0.0-20150323120927-d836955830e7
 	github.com/a-h/templ v0.3.833
 	github.com/mattn/go-sqlite3 v1.14.23
@@ -20,6 +21,7 @@ require (
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
+	github.com/andybalholm/cascadia v1.3.3 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
@@ -42,8 +44,9 @@ require (
 	go.opentelemetry.io/otel/trace v1.29.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/mod v0.20.0 // indirect
+	golang.org/x/net v0.39.0 // indirect
 	golang.org/x/sync v0.10.0 // indirect
-	golang.org/x/sys v0.29.0 // indirect
+	golang.org/x/sys v0.32.0 // indirect
 	golang.org/x/tools v0.24.0 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
