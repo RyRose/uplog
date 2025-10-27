@@ -29,7 +29,7 @@ serve:
 	./scripts/air.sh
 
 .PHONY: test
-test:
+test: build
 	go test ./...
 	busted
 
@@ -63,6 +63,10 @@ docs:
 types:
 	go run ./cmd/generatetypes > ./config/typedefinitions.lua
 
+.PHONY: docker
+docker:
+	docker build .
+
 .PHONY: ci
-ci: tidy build format test
+ci: tidy build format test docker
 
