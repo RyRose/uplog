@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    templ.url = "github:a-h/templ";
+    templ.url = "github:a-h/templ?ref=v0.3.960";
     flake-parts.url = "github:hercules-ci/flake-parts";
   };
 

@@ -47,7 +47,9 @@ nix:
 
 .PHONY: deps
 deps:
+	nix flake update
 	npm install
+	go get -u ./...
 
 .PHONY: format
 format:

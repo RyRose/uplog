@@ -7,7 +7,7 @@ toolchain go1.23.4
 require (
 	github.com/PuerkitoBio/goquery v1.10.3
 	github.com/RyRose/gluamapper v0.0.0-20150323120927-d836955830e7
-	github.com/a-h/templ v0.3.833
+	github.com/a-h/templ v0.3.960
 	github.com/mattn/go-sqlite3 v1.14.23
 	github.com/pressly/goose/v3 v3.22.1
 	github.com/prometheus/client_golang v1.20.5
@@ -43,11 +43,11 @@ require (
 	go.opentelemetry.io/otel v1.29.0 // indirect
 	go.opentelemetry.io/otel/trace v1.29.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/mod v0.20.0 // indirect
-	golang.org/x/net v0.39.0 // indirect
-	golang.org/x/sync v0.10.0 // indirect
-	golang.org/x/sys v0.32.0 // indirect
-	golang.org/x/tools v0.24.0 // indirect
+	golang.org/x/mod v0.26.0 // indirect
+	golang.org/x/net v0.42.0 // indirect
+	golang.org/x/sync v0.16.0 // indirect
+	golang.org/x/sys v0.34.0 // indirect
+	golang.org/x/tools v0.35.0 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
