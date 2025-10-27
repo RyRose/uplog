@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/RyRose/uplog/internal/config"
 	"github.com/RyRose/uplog/internal/service/rawdata/base"
 	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
@@ -23,9 +24,9 @@ import (
 //	@Failure		400		{string}	string	"Bad request"
 //	@Failure		500		{string}	string	"Internal server error"
 //	@Router			/view/data/muscle [get]
-func HandleGetMuscleView(roDB *sql.DB) http.HandlerFunc {
+func HandleGetMuscleView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandleGetDataTableView(
-		roDB,
+		state.ReadonlyDB,
 		base.TableViewMetadata{
 			Headers: []string{"ID", "Link", "Message"},
 			Post:    "/view/data/muscle",
@@ -76,9 +77,9 @@ func HandleGetMuscleView(roDB *sql.DB) http.HandlerFunc {
 //	@Failure		400		{string}	string	"Bad request"
 //	@Failure		500		{string}	string	"Internal server error"
 //	@Router			/view/data/muscle/{id} [patch]
-func HandlePatchMuscleView(wDB *sql.DB) http.HandlerFunc {
+func HandlePatchMuscleView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePatchTableRowViewID(
-		wDB,
+		state.WriteDB,
 		map[string]base.PatcherID{
 			"id": &base.PatchIDParams[workoutdb.RawUpdateMuscleIdParams]{
 				Query: (*workoutdb.Queries).RawUpdateMuscleId,
@@ -125,10 +126,10 @@ func HandlePatchMuscleView(wDB *sql.DB) http.HandlerFunc {
 //	@Failure		400		{string}	string	"Bad request"
 //	@Failure		500		{string}	string	"Internal server error"
 //	@Router			/view/data/muscle [post]
-func HandlePostMuscleView(roDB, wDB *sql.DB) http.HandlerFunc {
+func HandlePostMuscleView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePostDataTableView(
-		roDB,
-		wDB,
+		state.ReadonlyDB,
+		state.WriteDB,
 		(*workoutdb.Queries).RawInsertMuscle,
 		func(_ context.Context, values url.Values) (*workoutdb.RawInsertMuscleParams, error) {
 			return &workoutdb.RawInsertMuscleParams{
@@ -160,6 +161,6 @@ func HandlePostMuscleView(roDB, wDB *sql.DB) http.HandlerFunc {
 //	@Success		200	{string}	string	"OK"
 //	@Failure		500	{string}	string	"Internal server error"
 //	@Router			/view/data/muscle/{id} [delete]
-func HandleDeleteMuscleView(wDB *sql.DB) http.HandlerFunc {
-	return base.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteMuscle)
+func HandleDeleteMuscleView(_ *config.Data, state *config.State) http.HandlerFunc {
+	return base.HandleDeleteTableRowViewID(state.WriteDB, (*workoutdb.Queries).RawDeleteMuscle)
 }

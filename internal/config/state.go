@@ -1,4 +1,4 @@
-package service
+package config
 
 import (
 	"context"
@@ -9,9 +9,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
-	"time"
 
-	"github.com/RyRose/uplog/internal/config"
 	"github.com/RyRose/uplog/internal/sqlc"
 	"github.com/pressly/goose/v3"
 	"github.com/prometheus/client_golang/prometheus"
@@ -20,7 +18,6 @@ import (
 type State struct {
 	ReadonlyDB, WriteDB *sql.DB
 	PrometheusRegistry  *prometheus.Registry
-	StartTimestamp      time.Time
 }
 
 func (s *State) Close() error {
@@ -64,8 +61,7 @@ func setupDatabases(ctx context.Context, dbPath string) (*sql.DB, *sql.DB, error
 	return db, rdb, nil
 }
 
-func NewState(ctx context.Context, cfg *config.Data) (*State, error) {
-	start := time.Now()
+func NewState(ctx context.Context, cfg *Data) (*State, error) {
 	wDB, rDB, err := setupDatabases(ctx, cfg.DatabasePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to setup databases: %w", err)
@@ -74,6 +70,5 @@ func NewState(ctx context.Context, cfg *config.Data) (*State, error) {
 		ReadonlyDB:         rDB,
 		WriteDB:            wDB,
 		PrometheusRegistry: prometheus.NewRegistry(),
-		StartTimestamp:     start,
 	}, nil
 }

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/RyRose/uplog/internal/config"
 	"github.com/RyRose/uplog/internal/service/rawdata/base"
 	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
@@ -23,9 +24,9 @@ import (
 //	@Failure		400		{string}	string	"Bad request"
 //	@Failure		500		{string}	string	"Internal server error"
 //	@Router			/view/data/workout [get]
-func HandleGetWorkoutView(roDB *sql.DB) http.HandlerFunc {
+func HandleGetWorkoutView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandleGetDataTableView(
-		roDB,
+		state.ReadonlyDB,
 		base.TableViewMetadata{
 			Headers: []string{"ID", "Template"},
 			Post:    "/view/data/workout",
@@ -73,9 +74,9 @@ func HandleGetWorkoutView(roDB *sql.DB) http.HandlerFunc {
 //	@Failure		400			{string}	string	"Bad request"
 //	@Failure		500			{string}	string	"Internal server error"
 //	@Router			/view/data/workout/{id} [patch]
-func HandlePatchWorkoutView(wDB *sql.DB) http.HandlerFunc {
+func HandlePatchWorkoutView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePatchTableRowViewID(
-		wDB,
+		state.WriteDB,
 		map[string]base.PatcherID{
 			"id": &base.PatchIDParams[workoutdb.RawUpdateWorkoutIdParams]{
 				Query: (*workoutdb.Queries).RawUpdateWorkoutId,
@@ -112,10 +113,10 @@ func HandlePatchWorkoutView(wDB *sql.DB) http.HandlerFunc {
 //	@Failure		400			{string}	string	"Bad request"
 //	@Failure		500			{string}	string	"Internal server error"
 //	@Router			/view/data/workout [post]
-func HandlePostWorkoutView(roDB, wDB *sql.DB) http.HandlerFunc {
+func HandlePostWorkoutView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePostDataTableView(
-		roDB,
-		wDB,
+		state.ReadonlyDB,
+		state.WriteDB,
 		(*workoutdb.Queries).RawInsertWorkout,
 		func(_ context.Context, values url.Values) (*workoutdb.RawInsertWorkoutParams, error) {
 			return &workoutdb.RawInsertWorkoutParams{
@@ -145,6 +146,6 @@ func HandlePostWorkoutView(roDB, wDB *sql.DB) http.HandlerFunc {
 //	@Success		200	{string}	string	"OK"
 //	@Failure		500	{string}	string	"Internal server error"
 //	@Router			/view/data/workout/{id} [delete]
-func HandleDeleteWorkoutView(wDB *sql.DB) http.HandlerFunc {
-	return base.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteWorkout)
+func HandleDeleteWorkoutView(_ *config.Data, state *config.State) http.HandlerFunc {
+	return base.HandleDeleteTableRowViewID(state.WriteDB, (*workoutdb.Queries).RawDeleteWorkout)
 }

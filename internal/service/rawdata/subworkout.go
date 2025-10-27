@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/RyRose/uplog/internal/config"
 	"github.com/RyRose/uplog/internal/service/rawdata/base"
 	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
@@ -24,9 +25,9 @@ import (
 //	@Failure		400		{string}	string	"Bad request"
 //	@Failure		500		{string}	string	"Internal server error"
 //	@Router			/view/data/subworkout [get]
-func HandleGetSubworkoutView(roDB *sql.DB) http.HandlerFunc {
+func HandleGetSubworkoutView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandleGetDataTableView(
-		roDB,
+		state.ReadonlyDB,
 		base.TableViewMetadata{
 			Headers: []string{"Subworkout", "Superworkout"},
 			Post:    "/view/data/subworkout",
@@ -80,9 +81,9 @@ func HandleGetSubworkoutView(roDB *sql.DB) http.HandlerFunc {
 //	@Failure		400				{string}	string	"Bad request"
 //	@Failure		500				{string}	string	"Internal server error"
 //	@Router			/view/data/subworkout/{subworkout}/{superworkout} [patch]
-func HandlePatchSubworkoutView(wDB *sql.DB) http.HandlerFunc {
+func HandlePatchSubworkoutView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePatchTableRowViewRequest(
-		wDB,
+		state.WriteDB,
 		map[string]base.PatcherReq{
 			"subworkout": &base.PatchReqParams[workoutdb.RawUpdateSubworkoutSubworkoutParams]{
 				Query: (*workoutdb.Queries).RawUpdateSubworkoutSubworkout,
@@ -121,10 +122,10 @@ func HandlePatchSubworkoutView(wDB *sql.DB) http.HandlerFunc {
 //	@Failure		400				{string}	string	"Bad request"
 //	@Failure		500				{string}	string	"Internal server error"
 //	@Router			/view/data/subworkout [post]
-func HandlePostSubworkoutView(roDB, wDB *sql.DB) http.HandlerFunc {
+func HandlePostSubworkoutView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePostDataTableView(
-		roDB,
-		wDB,
+		state.ReadonlyDB,
+		state.WriteDB,
 		(*workoutdb.Queries).RawInsertSubworkout,
 		func(_ context.Context, values url.Values) (*workoutdb.RawInsertSubworkoutParams, error) {
 			return &workoutdb.RawInsertSubworkoutParams{
@@ -161,9 +162,9 @@ func HandlePostSubworkoutView(roDB, wDB *sql.DB) http.HandlerFunc {
 //	@Failure		400				{string}	string	"Bad request"
 //	@Failure		500				{string}	string	"Internal server error"
 //	@Router			/view/data/subworkout/{subworkout}/{superworkout} [delete]
-func HandleDeleteSubworkoutView(wDB *sql.DB) http.HandlerFunc {
+func HandleDeleteSubworkoutView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandleDeleteTableRowViewRequest(
-		wDB,
+		state.WriteDB,
 		(*workoutdb.Queries).RawDeleteSubworkout,
 		func(r *http.Request) (*workoutdb.RawDeleteSubworkoutParams, error) {
 			return &workoutdb.RawDeleteSubworkoutParams{

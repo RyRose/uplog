@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/RyRose/uplog/internal/config"
@@ -17,13 +16,10 @@ func AddRoutes(
 	_ context.Context,
 	rawMux *http.ServeMux,
 	cfg *config.Data,
-	state *State) {
+	state *config.State) {
 
-	ts := fmt.Sprint(state.StartTimestamp.Unix())
 	traceMux := &mux.Trace{Mux: rawMux}
 	webMux := &mux.Web{Mux: traceMux}
-	roDB := state.ReadonlyDB
-	wDB := state.WriteDB
 
 	// Health check endpoint.
 	rawMux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
@@ -44,125 +40,124 @@ func AddRoutes(
 	traceMux.Handle("GET /web/vendor/", http.FileServer(http.Dir(".")))
 
 	// Index pages.
-	// TODO: Use hash of css for cache busting instead of date.
-	traceMux.HandleFunc("GET /{$}", index.HandleIndexPage("main", ts))
-	traceMux.HandleFunc("GET /data/{$}", index.HandleIndexPage("data", ts))
-	traceMux.HandleFunc("GET /data/{tabX}/{tabY}", index.HandleIndexPage("data", ts))
+	traceMux.HandleFunc("GET /{$}", index.HandleIndexPage("main", cfg, state))
+	traceMux.HandleFunc("GET /data/{$}", index.HandleIndexPage("data", cfg, state))
+	traceMux.HandleFunc("GET /data/{tabX}/{tabY}", index.HandleIndexPage("data", cfg, state))
 
 	// Main view.
-	webMux.Handle("GET /view/tabs/main", index.HandleMainTab(roDB))
-	webMux.Handle("GET /view/liftgroups", index.HandleGetLiftGroupListView(roDB))
+	webMux.Handle("GET /view/tabs/main", index.HandleMainTab(cfg, state))
+	webMux.Handle("GET /view/liftgroups", index.HandleGetLiftGroupListView(cfg, state))
 
 	// Progress table
-	webMux.Handle("GET /view/progresstable", index.HandleGetProgressTable(roDB))
-	webMux.Handle("DELETE /view/progresstablerow/{id}", index.HandleDeleteProgress(wDB))
-	webMux.Handle("POST /view/progresstablerow", index.HandleCreateProgress(wDB))
+	webMux.Handle("GET /view/progresstable", index.HandleGetProgressTable(cfg, state))
+	webMux.Handle("DELETE /view/progresstablerow/{id}", index.HandleDeleteProgress(cfg, state))
+	webMux.Handle("POST /view/progresstablerow", index.HandleCreateProgress(cfg, state))
 
 	// Routine table.
-	webMux.Handle("GET /view/routinetable", index.HandleGetRoutineTable(roDB))
+	webMux.Handle("GET /view/routinetable", index.HandleGetRoutineTable(cfg, state))
 
 	// Progress form.
-	webMux.Handle("GET /view/liftselect", index.HandleGetLiftSelect(roDB))
-	webMux.Handle("GET /view/sideweightselect", index.HandleGetSideWeightSelect(roDB))
+	webMux.Handle("GET /view/liftselect", index.HandleGetLiftSelect(cfg, state))
+	webMux.Handle("GET /view/sideweightselect", index.HandleGetSideWeightSelect(cfg, state))
 	webMux.Handle("GET /view/progressform", index.HandleGetProgressForm())
-	webMux.Handle("POST /view/progressform", index.HandleCreateProgressForm(roDB))
+	webMux.Handle("POST /view/progressform", index.HandleCreateProgressForm(cfg, state))
 
 	// Data view
 	webMux.Handle("GET /view/tabs/data/{$}", index.HandleGetDataTabView())
 	webMux.Handle("GET /view/tabs/data/{tabX}/{tabY}", index.HandleGetDataTabView())
 
 	// Lift table view
-	webMux.Handle("POST /view/data/lift", rawdata.HandlePostLiftView(roDB, wDB))
-	webMux.Handle("PATCH /view/data/lift", rawdata.HandlePatchLiftView(wDB))
-	webMux.Handle("PATCH /view/data/lift/{id}", rawdata.HandlePatchLiftView(wDB))
-	webMux.Handle("DELETE /view/data/lift", rawdata.HandleDeleteLiftView(wDB))
-	webMux.Handle("DELETE /view/data/lift/{id}", rawdata.HandleDeleteLiftView(wDB))
-	webMux.Handle("GET /view/data/lift", rawdata.HandleGetLiftView(roDB))
+	webMux.Handle("POST /view/data/lift", rawdata.HandlePostLiftView(cfg, state))
+	webMux.Handle("PATCH /view/data/lift", rawdata.HandlePatchLiftView(cfg, state))
+	webMux.Handle("PATCH /view/data/lift/{id}", rawdata.HandlePatchLiftView(cfg, state))
+	webMux.Handle("DELETE /view/data/lift", rawdata.HandleDeleteLiftView(cfg, state))
+	webMux.Handle("DELETE /view/data/lift/{id}", rawdata.HandleDeleteLiftView(cfg, state))
+	webMux.Handle("GET /view/data/lift", rawdata.HandleGetLiftView(cfg, state))
 
 	// Movement table view
-	webMux.Handle("POST /view/data/movement", rawdata.HandlePostMovementView(roDB, wDB))
-	webMux.Handle("PATCH /view/data/movement", rawdata.HandlePatchMovementView(wDB))
-	webMux.Handle("PATCH /view/data/movement/{id}", rawdata.HandlePatchMovementView(wDB))
-	webMux.Handle("DELETE /view/data/movement", rawdata.HandleDeleteMovementView(wDB))
-	webMux.Handle("DELETE /view/data/movement/{id}", rawdata.HandleDeleteMovementView(wDB))
-	webMux.Handle("GET /view/data/movement", rawdata.HandleGetMovementView(roDB))
+	webMux.Handle("POST /view/data/movement", rawdata.HandlePostMovementView(cfg, state))
+	webMux.Handle("PATCH /view/data/movement", rawdata.HandlePatchMovementView(cfg, state))
+	webMux.Handle("PATCH /view/data/movement/{id}", rawdata.HandlePatchMovementView(cfg, state))
+	webMux.Handle("DELETE /view/data/movement", rawdata.HandleDeleteMovementView(cfg, state))
+	webMux.Handle("DELETE /view/data/movement/{id}", rawdata.HandleDeleteMovementView(cfg, state))
+	webMux.Handle("GET /view/data/movement", rawdata.HandleGetMovementView(cfg, state))
 
 	// Muscle table view
-	webMux.Handle("POST /view/data/muscle", rawdata.HandlePostMuscleView(roDB, wDB))
-	webMux.Handle("PATCH /view/data/muscle", rawdata.HandlePatchMuscleView(wDB))
-	webMux.Handle("PATCH /view/data/muscle/{id}", rawdata.HandlePatchMuscleView(wDB))
-	webMux.Handle("DELETE /view/data/muscle", rawdata.HandleDeleteMuscleView(wDB))
-	webMux.Handle("DELETE /view/data/muscle/{id}", rawdata.HandleDeleteMuscleView(wDB))
-	webMux.Handle("GET /view/data/muscle", rawdata.HandleGetMuscleView(roDB))
+	webMux.Handle("POST /view/data/muscle", rawdata.HandlePostMuscleView(cfg, state))
+	webMux.Handle("PATCH /view/data/muscle", rawdata.HandlePatchMuscleView(cfg, state))
+	webMux.Handle("PATCH /view/data/muscle/{id}", rawdata.HandlePatchMuscleView(cfg, state))
+	webMux.Handle("DELETE /view/data/muscle", rawdata.HandleDeleteMuscleView(cfg, state))
+	webMux.Handle("DELETE /view/data/muscle/{id}", rawdata.HandleDeleteMuscleView(cfg, state))
+	webMux.Handle("GET /view/data/muscle", rawdata.HandleGetMuscleView(cfg, state))
 
 	// Routine table view
-	webMux.Handle("POST /view/data/routine", rawdata.HandlePostRoutineView(roDB, wDB))
-	webMux.Handle("PATCH /view/data/routine", rawdata.HandlePatchRoutineView(wDB))
-	webMux.Handle("PATCH /view/data/routine/{id}", rawdata.HandlePatchRoutineView(wDB))
-	webMux.Handle("DELETE /view/data/routine", rawdata.HandleDeleteRoutineView(wDB))
-	webMux.Handle("DELETE /view/data/routine/{id}", rawdata.HandleDeleteRoutineView(wDB))
-	webMux.Handle("GET /view/data/routine", rawdata.HandleGetRoutineView(roDB))
+	webMux.Handle("POST /view/data/routine", rawdata.HandlePostRoutineView(cfg, state))
+	webMux.Handle("PATCH /view/data/routine", rawdata.HandlePatchRoutineView(cfg, state))
+	webMux.Handle("PATCH /view/data/routine/{id}", rawdata.HandlePatchRoutineView(cfg, state))
+	webMux.Handle("DELETE /view/data/routine", rawdata.HandleDeleteRoutineView(cfg, state))
+	webMux.Handle("DELETE /view/data/routine/{id}", rawdata.HandleDeleteRoutineView(cfg, state))
+	webMux.Handle("GET /view/data/routine", rawdata.HandleGetRoutineView(cfg, state))
 
 	// Side weight view
-	webMux.Handle("POST /view/data/side_weight", rawdata.HandlePostSideWeightView(roDB, wDB))
-	webMux.Handle("PATCH /view/data/side_weight", rawdata.HandlePatchSideWeightView(wDB))
-	webMux.Handle("PATCH /view/data/side_weight/{id}", rawdata.HandlePatchSideWeightView(wDB))
-	webMux.Handle("DELETE /view/data/side_weight", rawdata.HandleDeleteSideWeightView(wDB))
-	webMux.Handle("DELETE /view/data/side_weight/{id}", rawdata.HandleDeleteSideWeightView(wDB))
-	webMux.Handle("GET /view/data/side_weight", rawdata.HandleGetSideWeightView(roDB))
+	webMux.Handle("POST /view/data/side_weight", rawdata.HandlePostSideWeightView(cfg, state))
+	webMux.Handle("PATCH /view/data/side_weight", rawdata.HandlePatchSideWeightView(cfg, state))
+	webMux.Handle("PATCH /view/data/side_weight/{id}", rawdata.HandlePatchSideWeightView(cfg, state))
+	webMux.Handle("DELETE /view/data/side_weight", rawdata.HandleDeleteSideWeightView(cfg, state))
+	webMux.Handle("DELETE /view/data/side_weight/{id}", rawdata.HandleDeleteSideWeightView(cfg, state))
+	webMux.Handle("GET /view/data/side_weight", rawdata.HandleGetSideWeightView(cfg, state))
 
 	// Template variable view
-	webMux.Handle("POST /view/data/template_variable", rawdata.HandlePostTemplateVariableView(roDB, wDB))
-	webMux.Handle("PATCH /view/data/template_variable", rawdata.HandlePatchTemplateVariableView(wDB))
-	webMux.Handle("PATCH /view/data/template_variable/{id}", rawdata.HandlePatchTemplateVariableView(wDB))
-	webMux.Handle("DELETE /view/data/template_variable", rawdata.HandleDeleteTemplateVariableView(wDB))
-	webMux.Handle("DELETE /view/data/template_variable/{id}", rawdata.HandleDeleteTemplateVariableView(wDB))
-	webMux.Handle("GET /view/data/template_variable", rawdata.HandleGetTemplateVariableView(roDB))
+	webMux.Handle("POST /view/data/template_variable", rawdata.HandlePostTemplateVariableView(cfg, state))
+	webMux.Handle("PATCH /view/data/template_variable", rawdata.HandlePatchTemplateVariableView(cfg, state))
+	webMux.Handle("PATCH /view/data/template_variable/{id}", rawdata.HandlePatchTemplateVariableView(cfg, state))
+	webMux.Handle("DELETE /view/data/template_variable", rawdata.HandleDeleteTemplateVariableView(cfg, state))
+	webMux.Handle("DELETE /view/data/template_variable/{id}", rawdata.HandleDeleteTemplateVariableView(cfg, state))
+	webMux.Handle("GET /view/data/template_variable", rawdata.HandleGetTemplateVariableView(cfg, state))
 
 	// Workout view
-	webMux.Handle("POST /view/data/workout", rawdata.HandlePostWorkoutView(roDB, wDB))
-	webMux.Handle("PATCH /view/data/workout", rawdata.HandlePatchWorkoutView(wDB))
-	webMux.Handle("PATCH /view/data/workout/{id}", rawdata.HandlePatchWorkoutView(wDB))
-	webMux.Handle("DELETE /view/data/workout", rawdata.HandleDeleteWorkoutView(wDB))
-	webMux.Handle("DELETE /view/data/workout/{id}", rawdata.HandleDeleteWorkoutView(wDB))
-	webMux.Handle("GET /view/data/workout", rawdata.HandleGetWorkoutView(roDB))
+	webMux.Handle("POST /view/data/workout", rawdata.HandlePostWorkoutView(cfg, state))
+	webMux.Handle("PATCH /view/data/workout", rawdata.HandlePatchWorkoutView(cfg, state))
+	webMux.Handle("PATCH /view/data/workout/{id}", rawdata.HandlePatchWorkoutView(cfg, state))
+	webMux.Handle("DELETE /view/data/workout", rawdata.HandleDeleteWorkoutView(cfg, state))
+	webMux.Handle("DELETE /view/data/workout/{id}", rawdata.HandleDeleteWorkoutView(cfg, state))
+	webMux.Handle("GET /view/data/workout", rawdata.HandleGetWorkoutView(cfg, state))
 
 	// Progress view
-	webMux.Handle("POST /view/data/progress", rawdata.HandlePostProgressView(roDB, wDB))
-	webMux.Handle("PATCH /view/data/progress", rawdata.HandlePatchProgressView(wDB))
-	webMux.Handle("PATCH /view/data/progress/{id}", rawdata.HandlePatchProgressView(wDB))
-	webMux.Handle("DELETE /view/data/progress/{id}", rawdata.HandleDeleteProgressView(wDB))
-	webMux.Handle("GET /view/data/progress", rawdata.HandleGetProgressView(roDB))
+	webMux.Handle("POST /view/data/progress", rawdata.HandlePostProgressView(cfg, state))
+	webMux.Handle("PATCH /view/data/progress", rawdata.HandlePatchProgressView(cfg, state))
+	webMux.Handle("PATCH /view/data/progress/{id}", rawdata.HandlePatchProgressView(cfg, state))
+	webMux.Handle("DELETE /view/data/progress/{id}", rawdata.HandleDeleteProgressView(cfg, state))
+	webMux.Handle("GET /view/data/progress", rawdata.HandleGetProgressView(cfg, state))
 
 	// Lift muscle mapping view
-	webMux.Handle("POST /view/data/lift_muscle_mapping", rawdata.HandlePostLiftMuscleView(roDB, wDB))
-	webMux.Handle("PATCH /view/data/lift_muscle_mapping/{lift}/{muscle}/{movement}", rawdata.HandlePatchLiftMuscleView(wDB))
-	webMux.Handle("DELETE /view/data/lift_muscle_mapping/{lift}/{muscle}/{movement}", rawdata.HandleDeleteLiftMuscleView(wDB))
-	webMux.Handle("GET /view/data/lift_muscle_mapping", rawdata.HandleGetLiftMuscleView(roDB))
+	webMux.Handle("POST /view/data/lift_muscle_mapping", rawdata.HandlePostLiftMuscleView(cfg, state))
+	webMux.Handle("PATCH /view/data/lift_muscle_mapping/{lift}/{muscle}/{movement}", rawdata.HandlePatchLiftMuscleView(cfg, state))
+	webMux.Handle("DELETE /view/data/lift_muscle_mapping/{lift}/{muscle}/{movement}", rawdata.HandleDeleteLiftMuscleView(cfg, state))
+	webMux.Handle("GET /view/data/lift_muscle_mapping", rawdata.HandleGetLiftMuscleView(cfg, state))
 
 	// Lift workout mapping view
-	webMux.Handle("POST /view/data/lift_workout_mapping", rawdata.HandlePostLiftWorkoutView(roDB, wDB))
-	webMux.Handle("PATCH /view/data/lift_workout_mapping/{lift}/{workout}", rawdata.HandlePatchLiftWorkoutView(wDB))
-	webMux.Handle("DELETE /view/data/lift_workout_mapping/{lift}/{workout}", rawdata.HandleDeleteLiftWorkoutView(wDB))
-	webMux.Handle("GET /view/data/lift_workout_mapping", rawdata.HandleGetLiftWorkoutView(roDB))
+	webMux.Handle("POST /view/data/lift_workout_mapping", rawdata.HandlePostLiftWorkoutView(cfg, state))
+	webMux.Handle("PATCH /view/data/lift_workout_mapping/{lift}/{workout}", rawdata.HandlePatchLiftWorkoutView(cfg, state))
+	webMux.Handle("DELETE /view/data/lift_workout_mapping/{lift}/{workout}", rawdata.HandleDeleteLiftWorkoutView(cfg, state))
+	webMux.Handle("GET /view/data/lift_workout_mapping", rawdata.HandleGetLiftWorkoutView(cfg, state))
 
 	// Routine workout mapping view
-	webMux.Handle("POST /view/data/routine_workout_mapping", rawdata.HandlePostRoutineWorkoutView(roDB, wDB))
-	webMux.Handle("PATCH /view/data/routine_workout_mapping/{routine}/{workout}", rawdata.HandlePatchRoutineWorkoutView(wDB))
-	webMux.Handle("DELETE /view/data/routine_workout_mapping/{routine}/{workout}", rawdata.HandleDeleteRoutineWorkoutView(wDB))
-	webMux.Handle("GET /view/data/routine_workout_mapping", rawdata.HandleGetRoutineWorkoutView(roDB))
+	webMux.Handle("POST /view/data/routine_workout_mapping", rawdata.HandlePostRoutineWorkoutView(cfg, state))
+	webMux.Handle("PATCH /view/data/routine_workout_mapping/{routine}/{workout}", rawdata.HandlePatchRoutineWorkoutView(cfg, state))
+	webMux.Handle("DELETE /view/data/routine_workout_mapping/{routine}/{workout}", rawdata.HandleDeleteRoutineWorkoutView(cfg, state))
+	webMux.Handle("GET /view/data/routine_workout_mapping", rawdata.HandleGetRoutineWorkoutView(cfg, state))
 
 	// Subworkout mapping view
-	webMux.Handle("POST /view/data/subworkout", rawdata.HandlePostSubworkoutView(roDB, wDB))
-	webMux.Handle("PATCH /view/data/subworkout/{subworkout}/{superworkout}", rawdata.HandlePatchSubworkoutView(wDB))
-	webMux.Handle("DELETE /view/data/subworkout/{subworkout}/{superworkout}", rawdata.HandleDeleteSubworkoutView(wDB))
-	webMux.Handle("GET /view/data/subworkout", rawdata.HandleGetSubworkoutView(roDB))
+	webMux.Handle("POST /view/data/subworkout", rawdata.HandlePostSubworkoutView(cfg, state))
+	webMux.Handle("PATCH /view/data/subworkout/{subworkout}/{superworkout}", rawdata.HandlePatchSubworkoutView(cfg, state))
+	webMux.Handle("DELETE /view/data/subworkout/{subworkout}/{superworkout}", rawdata.HandleDeleteSubworkoutView(cfg, state))
+	webMux.Handle("GET /view/data/subworkout", rawdata.HandleGetSubworkoutView(cfg, state))
 
 	// Lift group table view
-	webMux.Handle("POST /view/data/lift_group", rawdata.HandlePostLiftGroupView(roDB, wDB))
-	webMux.Handle("PATCH /view/data/lift_group", rawdata.HandlePatchLiftGroupView(wDB))
-	webMux.Handle("PATCH /view/data/lift_group/{id}", rawdata.HandlePatchLiftGroupView(wDB))
-	webMux.Handle("DELETE /view/data/lift_group", rawdata.HandleDeleteLiftGroupView(wDB))
-	webMux.Handle("DELETE /view/data/lift_group/{id}", rawdata.HandleDeleteLiftGroupView(wDB))
-	webMux.Handle("GET /view/data/lift_group", rawdata.HandleGetLiftGroupView(roDB))
+	webMux.Handle("POST /view/data/lift_group", rawdata.HandlePostLiftGroupView(cfg, state))
+	webMux.Handle("PATCH /view/data/lift_group", rawdata.HandlePatchLiftGroupView(cfg, state))
+	webMux.Handle("PATCH /view/data/lift_group/{id}", rawdata.HandlePatchLiftGroupView(cfg, state))
+	webMux.Handle("DELETE /view/data/lift_group", rawdata.HandleDeleteLiftGroupView(cfg, state))
+	webMux.Handle("DELETE /view/data/lift_group/{id}", rawdata.HandleDeleteLiftGroupView(cfg, state))
+	webMux.Handle("GET /view/data/lift_group", rawdata.HandleGetLiftGroupView(cfg, state))
 }

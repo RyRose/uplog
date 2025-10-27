@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"strconv"
 
+	"github.com/RyRose/uplog/internal/config"
 	"github.com/RyRose/uplog/internal/service/rawdata/base"
 	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
@@ -25,9 +26,9 @@ import (
 //	@Failure		400		{string}	string	"Bad request"
 //	@Failure		500		{string}	string	"Internal server error"
 //	@Router			/view/data/progress [get]
-func HandleGetProgressView(roDB *sql.DB) http.HandlerFunc {
+func HandleGetProgressView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandleGetDataTableView(
-		roDB,
+		state.ReadonlyDB,
 		base.TableViewMetadata{
 			Headers: []string{"ID", "Lift", "Date", "Weight", "Sets", "Reps", "SW"},
 			Post:    "/view/data/progress",
@@ -99,9 +100,9 @@ func HandleGetProgressView(roDB *sql.DB) http.HandlerFunc {
 //	@Failure		400			{string}	string	"Bad request"
 //	@Failure		500			{string}	string	"Internal server error"
 //	@Router			/view/data/progress/{id} [patch]
-func HandlePatchProgressView(wDB *sql.DB) http.HandlerFunc {
+func HandlePatchProgressView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePatchTableRowViewID(
-		wDB,
+		state.WriteDB,
 		map[string]base.PatcherID{
 			"lift": &base.PatchIDParams[workoutdb.RawUpdateProgressLiftParams]{
 				Query: (*workoutdb.Queries).RawUpdateProgressLift,
@@ -214,10 +215,10 @@ func HandlePatchProgressView(wDB *sql.DB) http.HandlerFunc {
 //	@Failure		400			{string}	string	"Bad request"
 //	@Failure		500			{string}	string	"Internal server error"
 //	@Router			/view/data/progress [post]
-func HandlePostProgressView(roDB, wDB *sql.DB) http.HandlerFunc {
+func HandlePostProgressView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePostDataTableView(
-		roDB,
-		wDB,
+		state.ReadonlyDB,
+		state.WriteDB,
 		(*workoutdb.Queries).RawInsertProgress,
 		func(_ context.Context, values url.Values) (*workoutdb.RawInsertProgressParams, error) {
 			weight, err := strconv.ParseFloat(values.Get("weight"), 64)
@@ -279,9 +280,9 @@ func HandlePostProgressView(roDB, wDB *sql.DB) http.HandlerFunc {
 //	@Failure		400	{string}	string	"Bad request"
 //	@Failure		500	{string}	string	"Internal server error"
 //	@Router			/view/data/progress/{id} [delete]
-func HandleDeleteProgressView(wDB *sql.DB) http.HandlerFunc {
+func HandleDeleteProgressView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandleDeleteTableRowViewRequest(
-		wDB,
+		state.WriteDB,
 		(*workoutdb.Queries).RawDeleteProgress,
 		func(r *http.Request) (*int64, error) {
 			id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)

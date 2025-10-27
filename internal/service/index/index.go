@@ -1,7 +1,6 @@
 package index
 
 import (
-	"database/sql"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -10,6 +9,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/RyRose/uplog/internal/config"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
 	"github.com/RyRose/uplog/internal/templates"
 )
@@ -31,11 +31,11 @@ func todaysDate() time.Time {
 //	@Router			/{$} [get]
 //	@Router			/data/{$} [get]
 //	@Router			/data/{tabX}/{tabY} [get]
-func HandleIndexPage(tab, cssQuery string) http.HandlerFunc {
+func HandleIndexPage(tab string, cfg *config.Data, state *config.State) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		err := templates.IndexPage(
-			cssQuery,
+			*cfg.Version,
 			path.Join("/view/tabs", tab, r.PathValue("tabX"), r.PathValue("tabY")),
 		).Render(ctx, w)
 		if err != nil {
@@ -54,11 +54,11 @@ func HandleIndexPage(tab, cssQuery string) http.HandlerFunc {
 //	@Success		200	{string}	string	"HTML content"
 //	@Failure		500	{string}	string	"Internal server error"
 //	@Router			/view/tabs/main [get]
-func HandleMainTab(roDB *sql.DB) http.HandlerFunc {
+func HandleMainTab(_ *config.Data, state *config.State) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		date := todaysDate()
-		queries := workoutdb.New(roDB)
+		queries := workoutdb.New(state.ReadonlyDB)
 
 		ps, err := queries.ListProgressForDay(ctx, date.Format(time.DateOnly))
 		if err != nil {
@@ -93,11 +93,11 @@ func HandleMainTab(roDB *sql.DB) http.HandlerFunc {
 //	@Success		200	{string}	string	"HTML content"
 //	@Failure		500	{string}	string	"Internal server error"
 //	@Router			/view/liftgroups [get]
-func HandleGetLiftGroupListView(roDB *sql.DB) http.HandlerFunc {
+func HandleGetLiftGroupListView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		date := todaysDate()
-		queries := workoutdb.New(roDB)
+		queries := workoutdb.New(state.ReadonlyDB)
 
 		lgs, err := queries.QueryLiftGroupsForDate(ctx, date.Format(time.DateOnly))
 		if err != nil {
@@ -119,11 +119,11 @@ func HandleGetLiftGroupListView(roDB *sql.DB) http.HandlerFunc {
 //	@Success		200	{string}	string	"HTML content"
 //	@Failure		500	{string}	string	"Internal server error"
 //	@Router			/view/progresstable [get]
-func HandleGetProgressTable(roDB *sql.DB) http.HandlerFunc {
+func HandleGetProgressTable(_ *config.Data, state *config.State) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		date := todaysDate()
-		queries := workoutdb.New(roDB)
+		queries := workoutdb.New(state.ReadonlyDB)
 		ps, err := queries.ListProgressForDay(ctx, date.Format(time.DateOnly))
 		if err != nil {
 			slog.ErrorContext(ctx, "failed to retrieve progress", "date", date, "error", err)
@@ -147,11 +147,11 @@ func HandleGetProgressTable(roDB *sql.DB) http.HandlerFunc {
 //	@Failure		400	{string}	string	"Bad request"
 //	@Failure		500	{string}	string	"Internal server error"
 //	@Router			/view/progresstablerow/{id} [delete]
-func HandleDeleteProgress(wDB *sql.DB) http.HandlerFunc {
+func HandleDeleteProgress(_ *config.Data, state *config.State) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		idStr := r.PathValue("id")
-		queries := workoutdb.New(wDB)
+		queries := workoutdb.New(state.WriteDB)
 		idInt, err := strconv.ParseInt(idStr, 10, 64)
 		if err != nil {
 			http.Error(
@@ -188,10 +188,10 @@ func HandleDeleteProgress(wDB *sql.DB) http.HandlerFunc {
 //	@Failure		400		{string}	string	"Bad request"
 //	@Failure		500		{string}	string	"Internal server error"
 //	@Router			/view/progresstablerow [post]
-func HandleCreateProgress(wDB *sql.DB) http.HandlerFunc {
+func HandleCreateProgress(_ *config.Data, state *config.State) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		queries := workoutdb.New(wDB)
+		queries := workoutdb.New(state.WriteDB)
 
 		weight, err := strconv.ParseFloat(r.PostFormValue("weight"), 64)
 		if err != nil {
@@ -238,7 +238,7 @@ func HandleCreateProgress(wDB *sql.DB) http.HandlerFunc {
 //	@Tags			index
 //	@Success		200	{string}	string	"OK"
 //	@Router			/view/routinetable [get]
-func HandleGetRoutineTable(roDB *sql.DB) http.HandlerFunc {
+func HandleGetRoutineTable(_ *config.Data, state *config.State) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Routine table functionality removed - schedule concept eliminated
 		w.WriteHeader(http.StatusOK)
@@ -255,10 +255,10 @@ func HandleGetRoutineTable(roDB *sql.DB) http.HandlerFunc {
 //	@Param			lift	query		string	false	"Selected lift ID"
 //	@Success		200		{string}	string	"HTML content"
 //	@Router			/view/liftselect [get]
-func HandleGetLiftSelect(roDB *sql.DB) http.HandlerFunc {
+func HandleGetLiftSelect(_ *config.Data, state *config.State) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		queries := workoutdb.New(roDB)
+		queries := workoutdb.New(state.ReadonlyDB)
 		lifts, err := queries.RawSelectLift(ctx)
 		if err != nil {
 			slog.ErrorContext(ctx, "failed to list all lifts", "error", err)
@@ -309,10 +309,10 @@ func HandleGetLiftSelect(roDB *sql.DB) http.HandlerFunc {
 //	@Param			lift	query		string	false	"Lift ID to get default side weight"
 //	@Success		200		{string}	string	"HTML content"
 //	@Router			/view/sideweightselect [get]
-func HandleGetSideWeightSelect(roDB *sql.DB) http.HandlerFunc {
+func HandleGetSideWeightSelect(_ *config.Data, state *config.State) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		queries := workoutdb.New(roDB)
+		queries := workoutdb.New(state.ReadonlyDB)
 		name := r.URL.Query().Get("name")
 		sideWeights, err := queries.ListAllIndividualSideWeights(ctx)
 		if err != nil {
@@ -372,10 +372,10 @@ func HandleGetProgressForm() http.HandlerFunc {
 //	@Param			reps	formData	string	false	"Reps"
 //	@Success		200		{string}	string	"HTML content"
 //	@Router			/view/progressform [post]
-func HandleCreateProgressForm(roDB *sql.DB) http.HandlerFunc {
+func HandleCreateProgressForm(_ *config.Data, state *config.State) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		queries := workoutdb.New(roDB)
+		queries := workoutdb.New(state.ReadonlyDB)
 
 		lift := r.PostFormValue("lift")
 		var progress []workoutdb.Progress

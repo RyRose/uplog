@@ -28,7 +28,7 @@ func Run(ctx context.Context, configPath string) error {
 		slog.SetLogLoggerLevel(slog.LevelDebug)
 	}
 
-	state, err := NewState(ctx, cfg)
+	state, err := config.NewState(ctx, cfg)
 	if err != nil {
 		return fmt.Errorf("failed to create service state: %w", err)
 	}

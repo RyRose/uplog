@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/RyRose/uplog/internal/config"
 	"github.com/RyRose/uplog/internal/service/rawdata/base"
 	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
@@ -24,9 +25,9 @@ import (
 //	@Failure		400		{string}	string	"Bad request"
 //	@Failure		500		{string}	string	"Internal server error"
 //	@Router			/view/data/lift [get]
-func HandleGetLiftView(roDB *sql.DB) http.HandlerFunc {
+func HandleGetLiftView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandleGetDataTableView(
-		roDB,
+		state.ReadonlyDB,
 		base.TableViewMetadata{
 			Headers: []string{"ID", "Link", "Side", "Notes", "Group"},
 			Post:    "/view/data/lift",
@@ -99,9 +100,9 @@ func HandleGetLiftView(roDB *sql.DB) http.HandlerFunc {
 //	@Failure		400					{string}	string	"Bad request"
 //	@Failure		500					{string}	string	"Internal server error"
 //	@Router			/view/data/lift/{id} [patch]
-func HandlePatchLiftView(wDB *sql.DB) http.HandlerFunc {
+func HandlePatchLiftView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePatchTableRowViewID(
-		wDB,
+		state.WriteDB,
 		map[string]base.PatcherID{
 			"id": &base.PatchIDParams[workoutdb.RawUpdateLiftIdParams]{
 				Query: (*workoutdb.Queries).RawUpdateLiftId,
@@ -168,10 +169,10 @@ func HandlePatchLiftView(wDB *sql.DB) http.HandlerFunc {
 //	@Failure		400					{string}	string	"Bad request"
 //	@Failure		500					{string}	string	"Internal server error"
 //	@Router			/view/data/lift [post]
-func HandlePostLiftView(roDB, wDB *sql.DB) http.HandlerFunc {
+func HandlePostLiftView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePostDataTableView(
-		roDB,
-		wDB,
+		state.ReadonlyDB,
+		state.WriteDB,
 		(*workoutdb.Queries).RawInsertLift,
 		func(_ context.Context, values url.Values) (*workoutdb.RawInsertLiftParams, error) {
 			return &workoutdb.RawInsertLiftParams{
@@ -219,6 +220,6 @@ func HandlePostLiftView(roDB, wDB *sql.DB) http.HandlerFunc {
 //	@Success		200	{string}	string	"OK"
 //	@Failure		500	{string}	string	"Internal server error"
 //	@Router			/view/data/lift/{id} [delete]
-func HandleDeleteLiftView(wDB *sql.DB) http.HandlerFunc {
-	return base.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteLift)
+func HandleDeleteLiftView(_ *config.Data, state *config.State) http.HandlerFunc {
+	return base.HandleDeleteTableRowViewID(state.WriteDB, (*workoutdb.Queries).RawDeleteLift)
 }

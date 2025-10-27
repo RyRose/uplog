@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/RyRose/uplog/internal/config"
 	"github.com/RyRose/uplog/internal/service/rawdata/base"
 	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
@@ -24,9 +25,9 @@ import (
 //	@Failure		400		{string}	string	"Bad request"
 //	@Failure		500		{string}	string	"Internal server error"
 //	@Router			/view/data/routine_workout_mapping [get]
-func HandleGetRoutineWorkoutView(roDB *sql.DB) http.HandlerFunc {
+func HandleGetRoutineWorkoutView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandleGetDataTableView(
-		roDB,
+		state.ReadonlyDB,
 		base.TableViewMetadata{
 			Headers: []string{"Routine", "Workout"},
 			Post:    "/view/data/routine_workout_mapping",
@@ -84,9 +85,9 @@ func HandleGetRoutineWorkoutView(roDB *sql.DB) http.HandlerFunc {
 //	@Failure		400		{string}	string	"Bad request"
 //	@Failure		500		{string}	string	"Internal server error"
 //	@Router			/view/data/routine_workout_mapping/{routine}/{workout} [patch]
-func HandlePatchRoutineWorkoutView(wDB *sql.DB) http.HandlerFunc {
+func HandlePatchRoutineWorkoutView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePatchTableRowViewRequest(
-		wDB,
+		state.WriteDB,
 		map[string]base.PatcherReq{
 			"routine": &base.PatchReqParams[workoutdb.RawUpdateRoutineWorkoutMappingRoutineParams]{
 				Query: (*workoutdb.Queries).RawUpdateRoutineWorkoutMappingRoutine,
@@ -125,10 +126,10 @@ func HandlePatchRoutineWorkoutView(wDB *sql.DB) http.HandlerFunc {
 //	@Failure		400		{string}	string	"Bad request"
 //	@Failure		500		{string}	string	"Internal server error"
 //	@Router			/view/data/routine_workout_mapping [post]
-func HandlePostRoutineWorkoutView(roDB, wDB *sql.DB) http.HandlerFunc {
+func HandlePostRoutineWorkoutView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePostDataTableView(
-		roDB,
-		wDB,
+		state.ReadonlyDB,
+		state.WriteDB,
 		(*workoutdb.Queries).RawInsertRoutineWorkout,
 		func(_ context.Context, values url.Values) (*workoutdb.RawInsertRoutineWorkoutParams, error) {
 			return &workoutdb.RawInsertRoutineWorkoutParams{
@@ -169,9 +170,9 @@ func HandlePostRoutineWorkoutView(roDB, wDB *sql.DB) http.HandlerFunc {
 //	@Failure		400		{string}	string	"Bad request"
 //	@Failure		500		{string}	string	"Internal server error"
 //	@Router			/view/data/routine_workout_mapping/{routine}/{workout} [delete]
-func HandleDeleteRoutineWorkoutView(wDB *sql.DB) http.HandlerFunc {
+func HandleDeleteRoutineWorkoutView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandleDeleteTableRowViewRequest(
-		wDB,
+		state.WriteDB,
 		(*workoutdb.Queries).RawDeleteRoutineWorkout,
 		func(r *http.Request) (*workoutdb.RawDeleteRoutineWorkoutParams, error) {
 			return &workoutdb.RawDeleteRoutineWorkoutParams{

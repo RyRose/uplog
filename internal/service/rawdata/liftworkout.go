@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/RyRose/uplog/internal/config"
 	"github.com/RyRose/uplog/internal/service/rawdata/base"
 	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
@@ -24,9 +25,9 @@ import (
 //	@Failure		400		{string}	string	"Bad request"
 //	@Failure		500		{string}	string	"Internal server error"
 //	@Router			/view/data/lift_workout_mapping [get]
-func HandleGetLiftWorkoutView(roDB *sql.DB) http.HandlerFunc {
+func HandleGetLiftWorkoutView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandleGetDataTableView(
-		roDB,
+		state.ReadonlyDB,
 		base.TableViewMetadata{
 			Headers: []string{"Lift", "Workout"},
 			Post:    "/view/data/lift_workout_mapping",
@@ -84,9 +85,9 @@ func HandleGetLiftWorkoutView(roDB *sql.DB) http.HandlerFunc {
 //	@Failure		400		{string}	string	"Bad request"
 //	@Failure		500		{string}	string	"Internal server error"
 //	@Router			/view/data/lift_workout_mapping/{lift}/{workout} [patch]
-func HandlePatchLiftWorkoutView(wDB *sql.DB) http.HandlerFunc {
+func HandlePatchLiftWorkoutView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePatchTableRowViewRequest(
-		wDB,
+		state.WriteDB,
 		map[string]base.PatcherReq{
 			"lift": &base.PatchReqParams[workoutdb.RawUpdateLiftWorkoutMappingLiftParams]{
 				Query: (*workoutdb.Queries).RawUpdateLiftWorkoutMappingLift,
@@ -125,10 +126,10 @@ func HandlePatchLiftWorkoutView(wDB *sql.DB) http.HandlerFunc {
 //	@Failure		400		{string}	string	"Bad request"
 //	@Failure		500		{string}	string	"Internal server error"
 //	@Router			/view/data/lift_workout_mapping [post]
-func HandlePostLiftWorkoutView(roDB, wDB *sql.DB) http.HandlerFunc {
+func HandlePostLiftWorkoutView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePostDataTableView(
-		roDB,
-		wDB,
+		state.ReadonlyDB,
+		state.WriteDB,
 		(*workoutdb.Queries).RawInsertLiftWorkout,
 		func(_ context.Context, values url.Values) (*workoutdb.RawInsertLiftWorkoutParams, error) {
 			return &workoutdb.RawInsertLiftWorkoutParams{
@@ -169,9 +170,9 @@ func HandlePostLiftWorkoutView(roDB, wDB *sql.DB) http.HandlerFunc {
 //	@Failure		400		{string}	string	"Bad request"
 //	@Failure		500		{string}	string	"Internal server error"
 //	@Router			/view/data/lift_workout_mapping/{lift}/{workout} [delete]
-func HandleDeleteLiftWorkoutView(wDB *sql.DB) http.HandlerFunc {
+func HandleDeleteLiftWorkoutView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandleDeleteTableRowViewRequest(
-		wDB,
+		state.WriteDB,
 		(*workoutdb.Queries).RawDeleteLiftWorkout,
 		func(r *http.Request) (*workoutdb.RawDeleteLiftWorkoutParams, error) {
 			return &workoutdb.RawDeleteLiftWorkoutParams{

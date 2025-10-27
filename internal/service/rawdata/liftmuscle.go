@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/RyRose/uplog/internal/config"
 	"github.com/RyRose/uplog/internal/service/rawdata/base"
 	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
@@ -24,9 +25,9 @@ import (
 //	@Failure		400		{string}	string	"Bad request"
 //	@Failure		500		{string}	string	"Internal server error"
 //	@Router			/view/data/lift_muscle_mapping [get]
-func HandleGetLiftMuscleView(roDB *sql.DB) http.HandlerFunc {
+func HandleGetLiftMuscleView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandleGetDataTableView(
-		roDB,
+		state.ReadonlyDB,
 		base.TableViewMetadata{
 			Headers: []string{"Lift", "Muscle", "Movement"},
 			Post:    "/view/data/lift_muscle_mapping",
@@ -92,9 +93,9 @@ func HandleGetLiftMuscleView(roDB *sql.DB) http.HandlerFunc {
 //	@Failure		400			{string}	string	"Bad request"
 //	@Failure		500			{string}	string	"Internal server error"
 //	@Router			/view/data/lift_muscle_mapping/{lift}/{muscle}/{movement} [patch]
-func HandlePatchLiftMuscleView(wDB *sql.DB) http.HandlerFunc {
+func HandlePatchLiftMuscleView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePatchTableRowViewRequest(
-		wDB,
+		state.WriteDB,
 		map[string]base.PatcherReq{
 			"lift": &base.PatchReqParams[workoutdb.RawUpdateLiftMuscleMappingLiftParams]{
 				Query: (*workoutdb.Queries).RawUpdateLiftMuscleMappingLift,
@@ -147,10 +148,10 @@ func HandlePatchLiftMuscleView(wDB *sql.DB) http.HandlerFunc {
 //	@Failure		400			{string}	string	"Bad request"
 //	@Failure		500			{string}	string	"Internal server error"
 //	@Router			/view/data/lift_muscle_mapping [post]
-func HandlePostLiftMuscleView(roDB, wDB *sql.DB) http.HandlerFunc {
+func HandlePostLiftMuscleView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePostDataTableView(
-		roDB,
-		wDB,
+		state.ReadonlyDB,
+		state.WriteDB,
 		(*workoutdb.Queries).RawInsertLiftMuscle,
 		func(_ context.Context, values url.Values) (*workoutdb.RawInsertLiftMuscleParams, error) {
 			return &workoutdb.RawInsertLiftMuscleParams{
@@ -198,9 +199,9 @@ func HandlePostLiftMuscleView(roDB, wDB *sql.DB) http.HandlerFunc {
 //	@Failure		400			{string}	string	"Bad request"
 //	@Failure		500			{string}	string	"Internal server error"
 //	@Router			/view/data/lift_muscle_mapping/{lift}/{muscle}/{movement} [delete]
-func HandleDeleteLiftMuscleView(wDB *sql.DB) http.HandlerFunc {
+func HandleDeleteLiftMuscleView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandleDeleteTableRowViewRequest(
-		wDB,
+		state.WriteDB,
 		(*workoutdb.Queries).RawDeleteLiftMuscle,
 		func(r *http.Request) (*workoutdb.RawDeleteLiftMuscleParams, error) {
 			return &workoutdb.RawDeleteLiftMuscleParams{

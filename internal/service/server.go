@@ -12,7 +12,7 @@ import (
 	"github.com/slok/go-http-metrics/middleware/std"
 )
 
-func NewServer(ctx context.Context, cfg *config.Data, state *State) http.Handler {
+func NewServer(ctx context.Context, cfg *config.Data, state *config.State) http.Handler {
 	mux := http.NewServeMux()
 	AddRoutes(ctx, mux, cfg, state)
 

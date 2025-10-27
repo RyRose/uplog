@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/RyRose/uplog/internal/config"
 	"github.com/RyRose/uplog/internal/service/rawdata/base"
 	"github.com/RyRose/uplog/internal/service/rawdata/util"
 	"github.com/RyRose/uplog/internal/sqlc/workoutdb"
@@ -23,9 +24,9 @@ import (
 //	@Failure		400		{string}	string	"Bad request"
 //	@Failure		500		{string}	string	"Internal server error"
 //	@Router			/view/data/template_variable [get]
-func HandleGetTemplateVariableView(roDB *sql.DB) http.HandlerFunc {
+func HandleGetTemplateVariableView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandleGetDataTableView(
-		roDB,
+		state.ReadonlyDB,
 		base.TableViewMetadata{
 			Headers: []string{"ID", "Value"},
 			Post:    "/view/data/template_variable",
@@ -73,9 +74,9 @@ func HandleGetTemplateVariableView(roDB *sql.DB) http.HandlerFunc {
 //	@Failure		400		{string}	string	"Bad request"
 //	@Failure		500		{string}	string	"Internal server error"
 //	@Router			/view/data/template_variable/{id} [patch]
-func HandlePatchTemplateVariableView(wDB *sql.DB) http.HandlerFunc {
+func HandlePatchTemplateVariableView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePatchTableRowViewID(
-		wDB,
+		state.WriteDB,
 		map[string]base.PatcherID{
 			"id": &base.PatchIDParams[workoutdb.RawUpdateTemplateVariableIdParams]{
 				Query: (*workoutdb.Queries).RawUpdateTemplateVariableId,
@@ -112,10 +113,10 @@ func HandlePatchTemplateVariableView(wDB *sql.DB) http.HandlerFunc {
 //	@Failure		400		{string}	string	"Bad request"
 //	@Failure		500		{string}	string	"Internal server error"
 //	@Router			/view/data/template_variable [post]
-func HandlePostTemplateVariableView(roDB, wDB *sql.DB) http.HandlerFunc {
+func HandlePostTemplateVariableView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePostDataTableView(
-		roDB,
-		wDB,
+		state.ReadonlyDB,
+		state.WriteDB,
 		(*workoutdb.Queries).RawInsertTemplateVariable,
 		func(_ context.Context, values url.Values) (*workoutdb.RawInsertTemplateVariableParams, error) {
 			return &workoutdb.RawInsertTemplateVariableParams{
@@ -145,6 +146,6 @@ func HandlePostTemplateVariableView(roDB, wDB *sql.DB) http.HandlerFunc {
 //	@Success		200	{string}	string	"OK"
 //	@Failure		500	{string}	string	"Internal server error"
 //	@Router			/view/data/template_variable/{id} [delete]
-func HandleDeleteTemplateVariableView(wDB *sql.DB) http.HandlerFunc {
-	return base.HandleDeleteTableRowViewID(wDB, (*workoutdb.Queries).RawDeleteTemplateVariable)
+func HandleDeleteTemplateVariableView(_ *config.Data, state *config.State) http.HandlerFunc {
+	return base.HandleDeleteTableRowViewID(state.WriteDB, (*workoutdb.Queries).RawDeleteTemplateVariable)
 }
