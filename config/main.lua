@@ -9,7 +9,7 @@ local M = {
 	version = env.Get("VERSION", types.String),
 	database_path = env.Or("DATABASE_PATH", "./tmp/db/data.db"),
 	port = port,
-	swagger_url = "http://localhost:" .. port .. "/docs/swagger.json",
+	swagger_url = env.Or("SWAGGER_URL", "http://localhost:" .. port .. "/docs/swagger.json"),
 }
 
 return M

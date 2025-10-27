@@ -26,10 +26,10 @@ It's not pretty to just have an unordered list. Think about this.
 
 Big problem is that fundamentally, there's too much effort. I want to show up to my workout, visit this application (for the first time!), click one button to start the workout, and start working out. All of this should effectively be less than 10 seconds. Here's what I think this means:
 
-* Get rid of pre-defined schedule. This takes time and is tedious.
-* Have a default routine that is just any lift (full-body workout effectively). Having to select or define a routine takes time.
-* Automatically enter lift selection phase when starting a workout, which, if following a routine, recommend lifts according to the routine with weights defined by that routine if possible.
-* If not, recommend lifts based on the following:
+* [x] Get rid of pre-defined schedule. This takes time and is tedious.
+* [ ] Have a default routine that is just any lift (full-body workout effectively). Having to select or define a routine takes time.
+* [ ] Automatically enter lift selection phase when starting a workout, which, if following a routine, recommend lifts according to the routine with weights defined by that routine if possible.
+* [ ] If not, recommend lifts based on the following:
   1. If the lifts already been done this workout (exclude!).
   1. Muscle group that yet to be done.
   1. Lifts done most recently.
