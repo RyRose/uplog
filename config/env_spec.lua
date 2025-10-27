@@ -12,6 +12,7 @@ describe("env", function()
 	describe("Or", function()
 		describe("with string defaults", function()
 			it("should return default when env var is not set", function()
+				--- @diagnostic disable-next-line: duplicate-set-field
 				os.getenv = function()
 					return nil
 				end
@@ -19,6 +20,7 @@ describe("env", function()
 			end)
 
 			it("should return env var value when set", function()
+				--- @diagnostic disable-next-line: duplicate-set-field
 				os.getenv = function(key)
 					if key == "TEST_VAR" then
 						return "value"
@@ -28,6 +30,7 @@ describe("env", function()
 			end)
 
 			it("should trim whitespace from env var", function()
+				--- @diagnostic disable-next-line: duplicate-set-field
 				os.getenv = function(key)
 					if key == "TEST_VAR" then
 						return "  value  "
@@ -37,6 +40,7 @@ describe("env", function()
 			end)
 
 			it("should return default when env var is empty string", function()
+				--- @diagnostic disable-next-line: duplicate-set-field
 				os.getenv = function(key)
 					if key == "TEST_VAR" then
 						return ""
@@ -46,6 +50,7 @@ describe("env", function()
 			end)
 
 			it("should return default when env var is whitespace only", function()
+				--- @diagnostic disable-next-line: duplicate-set-field
 				os.getenv = function(key)
 					if key == "TEST_VAR" then
 						return "   "
@@ -57,6 +62,7 @@ describe("env", function()
 
 		describe("with boolean defaults", function()
 			it("should return default when env var is not set", function()
+				--- @diagnostic disable-next-line: duplicate-set-field
 				os.getenv = function()
 					return nil
 				end
@@ -64,6 +70,7 @@ describe("env", function()
 			end)
 
 			it("should return true for '1'", function()
+				--- @diagnostic disable-next-line: duplicate-set-field
 				os.getenv = function(key)
 					if key == "TEST_VAR" then
 						return "1"
@@ -73,6 +80,7 @@ describe("env", function()
 			end)
 
 			it("should return true for 'true'", function()
+				--- @diagnostic disable-next-line: duplicate-set-field
 				os.getenv = function(key)
 					if key == "TEST_VAR" then
 						return "true"
@@ -82,6 +90,7 @@ describe("env", function()
 			end)
 
 			it("should return true for 'TRUE' (case insensitive)", function()
+				--- @diagnostic disable-next-line: duplicate-set-field
 				os.getenv = function(key)
 					if key == "TEST_VAR" then
 						return "TRUE"
@@ -91,6 +100,7 @@ describe("env", function()
 			end)
 
 			it("should return true for 'yes'", function()
+				--- @diagnostic disable-next-line: duplicate-set-field
 				os.getenv = function(key)
 					if key == "TEST_VAR" then
 						return "yes"
@@ -100,6 +110,7 @@ describe("env", function()
 			end)
 
 			it("should return true for 'on'", function()
+				--- @diagnostic disable-next-line: duplicate-set-field
 				os.getenv = function(key)
 					if key == "TEST_VAR" then
 						return "on"
@@ -109,6 +120,7 @@ describe("env", function()
 			end)
 
 			it("should return false for other values", function()
+				--- @diagnostic disable-next-line: duplicate-set-field
 				os.getenv = function(key)
 					if key == "TEST_VAR" then
 						return "0"
@@ -118,6 +130,7 @@ describe("env", function()
 			end)
 
 			it("should return false for 'false'", function()
+				--- @diagnostic disable-next-line: duplicate-set-field
 				os.getenv = function(key)
 					if key == "TEST_VAR" then
 						return "false"
@@ -129,6 +142,7 @@ describe("env", function()
 
 		describe("with number defaults", function()
 			it("should return default when env var is not set", function()
+				--- @diagnostic disable-next-line: duplicate-set-field
 				os.getenv = function()
 					return nil
 				end
@@ -136,6 +150,7 @@ describe("env", function()
 			end)
 
 			it("should parse integer values", function()
+				--- @diagnostic disable-next-line: duplicate-set-field
 				os.getenv = function(key)
 					if key == "TEST_VAR" then
 						return "123"
@@ -145,6 +160,7 @@ describe("env", function()
 			end)
 
 			it("should parse float values", function()
+				--- @diagnostic disable-next-line: duplicate-set-field
 				os.getenv = function(key)
 					if key == "TEST_VAR" then
 						return "3.14"
@@ -154,6 +170,7 @@ describe("env", function()
 			end)
 
 			it("should parse negative numbers", function()
+				--- @diagnostic disable-next-line: duplicate-set-field
 				os.getenv = function(key)
 					if key == "TEST_VAR" then
 						return "-42"
@@ -163,6 +180,7 @@ describe("env", function()
 			end)
 
 			it("should throw error for invalid numeric values", function()
+				--- @diagnostic disable-next-line: duplicate-set-field
 				os.getenv = function(key)
 					if key == "TEST_VAR" then
 						return "not a number"
@@ -178,6 +196,7 @@ describe("env", function()
 	describe("Get", function()
 		describe("with string type", function()
 			it("should return nil when env var is not set", function()
+				--- @diagnostic disable-next-line: duplicate-set-field
 				os.getenv = function()
 					return nil
 				end
@@ -185,6 +204,7 @@ describe("env", function()
 			end)
 
 			it("should return env var value when set", function()
+				--- @diagnostic disable-next-line: duplicate-set-field
 				os.getenv = function(key)
 					if key == "TEST_VAR" then
 						return "value"
@@ -194,6 +214,7 @@ describe("env", function()
 			end)
 
 			it("should trim whitespace from env var", function()
+				--- @diagnostic disable-next-line: duplicate-set-field
 				os.getenv = function(key)
 					if key == "TEST_VAR" then
 						return "  value  "
@@ -203,6 +224,7 @@ describe("env", function()
 			end)
 
 			it("should return nil when env var is empty string", function()
+				--- @diagnostic disable-next-line: duplicate-set-field
 				os.getenv = function(key)
 					if key == "TEST_VAR" then
 						return ""
@@ -214,6 +236,7 @@ describe("env", function()
 
 		describe("with boolean type", function()
 			it("should return nil when env var is not set", function()
+				--- @diagnostic disable-next-line: duplicate-set-field
 				os.getenv = function()
 					return nil
 				end
@@ -221,6 +244,7 @@ describe("env", function()
 			end)
 
 			it("should return true for 'true'", function()
+				--- @diagnostic disable-next-line: duplicate-set-field
 				os.getenv = function(key)
 					if key == "TEST_VAR" then
 						return "true"
@@ -230,6 +254,7 @@ describe("env", function()
 			end)
 
 			it("should return false for other values", function()
+				--- @diagnostic disable-next-line: duplicate-set-field
 				os.getenv = function(key)
 					if key == "TEST_VAR" then
 						return "false"
@@ -241,6 +266,7 @@ describe("env", function()
 
 		describe("with number type", function()
 			it("should return nil when env var is not set", function()
+				--- @diagnostic disable-next-line: duplicate-set-field
 				os.getenv = function()
 					return nil
 				end
@@ -248,6 +274,7 @@ describe("env", function()
 			end)
 
 			it("should parse integer values", function()
+				--- @diagnostic disable-next-line: duplicate-set-field
 				os.getenv = function(key)
 					if key == "TEST_VAR" then
 						return "456"
@@ -257,6 +284,7 @@ describe("env", function()
 			end)
 
 			it("should throw error for invalid numeric values", function()
+				--- @diagnostic disable-next-line: duplicate-set-field
 				os.getenv = function(key)
 					if key == "TEST_VAR" then
 						return "invalid"

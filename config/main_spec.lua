@@ -9,6 +9,7 @@ describe("main", function()
 
 	describe("structural snapshot", function()
 		it("should match expected structure with defaults", function()
+			--- @diagnostic disable-next-line: duplicate-set-field
 			os.getenv = function()
 				return nil
 			end
@@ -30,6 +31,7 @@ describe("main", function()
 		end)
 
 		it("should match expected structure with all env vars set", function()
+			--- @diagnostic disable-next-line: duplicate-set-field
 			os.getenv = function(key)
 				if key == "DEBUG" then
 					return "true"
