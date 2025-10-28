@@ -58,7 +58,7 @@ func HandleMainTab(_ *config.Data, state *config.State) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		date := todaysDate()
-		queries := workoutdb.New(state.ReadonlyDB)
+		queries := workoutdb.New(state.RDB)
 
 		ps, err := queries.ListProgressForDay(ctx, date.Format(time.DateOnly))
 		if err != nil {
@@ -97,7 +97,7 @@ func HandleGetLiftGroupListView(_ *config.Data, state *config.State) http.Handle
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		date := todaysDate()
-		queries := workoutdb.New(state.ReadonlyDB)
+		queries := workoutdb.New(state.RDB)
 
 		lgs, err := queries.QueryLiftGroupsForDate(ctx, date.Format(time.DateOnly))
 		if err != nil {
@@ -123,7 +123,7 @@ func HandleGetProgressTable(_ *config.Data, state *config.State) http.HandlerFun
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		date := todaysDate()
-		queries := workoutdb.New(state.ReadonlyDB)
+		queries := workoutdb.New(state.RDB)
 		ps, err := queries.ListProgressForDay(ctx, date.Format(time.DateOnly))
 		if err != nil {
 			slog.ErrorContext(ctx, "failed to retrieve progress", "date", date, "error", err)
@@ -151,7 +151,7 @@ func HandleDeleteProgress(_ *config.Data, state *config.State) http.HandlerFunc 
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		idStr := r.PathValue("id")
-		queries := workoutdb.New(state.WriteDB)
+		queries := workoutdb.New(state.WDB)
 		idInt, err := strconv.ParseInt(idStr, 10, 64)
 		if err != nil {
 			http.Error(
@@ -191,7 +191,7 @@ func HandleDeleteProgress(_ *config.Data, state *config.State) http.HandlerFunc 
 func HandleCreateProgress(_ *config.Data, state *config.State) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		queries := workoutdb.New(state.WriteDB)
+		queries := workoutdb.New(state.WDB)
 
 		weight, err := strconv.ParseFloat(r.PostFormValue("weight"), 64)
 		if err != nil {
@@ -258,7 +258,7 @@ func HandleGetRoutineTable(_ *config.Data, state *config.State) http.HandlerFunc
 func HandleGetLiftSelect(_ *config.Data, state *config.State) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		queries := workoutdb.New(state.ReadonlyDB)
+		queries := workoutdb.New(state.RDB)
 		lifts, err := queries.RawSelectLift(ctx)
 		if err != nil {
 			slog.ErrorContext(ctx, "failed to list all lifts", "error", err)
@@ -312,7 +312,7 @@ func HandleGetLiftSelect(_ *config.Data, state *config.State) http.HandlerFunc {
 func HandleGetSideWeightSelect(_ *config.Data, state *config.State) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		queries := workoutdb.New(state.ReadonlyDB)
+		queries := workoutdb.New(state.RDB)
 		name := r.URL.Query().Get("name")
 		sideWeights, err := queries.ListAllIndividualSideWeights(ctx)
 		if err != nil {
@@ -375,7 +375,7 @@ func HandleGetProgressForm() http.HandlerFunc {
 func HandleCreateProgressForm(_ *config.Data, state *config.State) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		queries := workoutdb.New(state.ReadonlyDB)
+		queries := workoutdb.New(state.RDB)
 
 		lift := r.PostFormValue("lift")
 		var progress []workoutdb.Progress

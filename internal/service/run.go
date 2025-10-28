@@ -50,7 +50,8 @@ func Run(ctx context.Context, configPath string) error {
 		}
 	}(ctx)
 
-	slog.InfoContext(ctx, "start listening", "addr", srv.Addr, "cfg", cfg)
+	state.TLog.InfoContext(ctx, "start listening", "addr", srv.Addr)
+	state.JLog.InfoContext(ctx, "configuration", "cfg", cfg)
 	err = srv.ListenAndServe()
 	if errors.Is(err, http.ErrServerClosed) {
 		return nil

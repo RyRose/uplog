@@ -24,9 +24,9 @@ import (
 //	@Failure		400		{string}	string	"Bad request"
 //	@Failure		500		{string}	string	"Internal server error"
 //	@Router			/view/data/workout [get]
-func HandleGetWorkoutView(_ *config.Data, state *config.State) http.HandlerFunc {
+func HandleGetWorkoutView(_ *config.Data, s *config.State) http.HandlerFunc {
 	return base.HandleGetDataTableView(
-		state.ReadonlyDB,
+		s.RDB,
 		base.TableViewMetadata{
 			Headers: []string{"ID", "Template"},
 			Post:    "/view/data/workout",
@@ -76,7 +76,7 @@ func HandleGetWorkoutView(_ *config.Data, state *config.State) http.HandlerFunc 
 //	@Router			/view/data/workout/{id} [patch]
 func HandlePatchWorkoutView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePatchTableRowViewID(
-		state.WriteDB,
+		state.WDB,
 		map[string]base.PatcherID{
 			"id": &base.PatchIDParams[workoutdb.RawUpdateWorkoutIdParams]{
 				Query: (*workoutdb.Queries).RawUpdateWorkoutId,
@@ -115,8 +115,8 @@ func HandlePatchWorkoutView(_ *config.Data, state *config.State) http.HandlerFun
 //	@Router			/view/data/workout [post]
 func HandlePostWorkoutView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePostDataTableView(
-		state.ReadonlyDB,
-		state.WriteDB,
+		state.RDB,
+		state.WDB,
 		(*workoutdb.Queries).RawInsertWorkout,
 		func(_ context.Context, values url.Values) (*workoutdb.RawInsertWorkoutParams, error) {
 			return &workoutdb.RawInsertWorkoutParams{
@@ -147,5 +147,5 @@ func HandlePostWorkoutView(_ *config.Data, state *config.State) http.HandlerFunc
 //	@Failure		500	{string}	string	"Internal server error"
 //	@Router			/view/data/workout/{id} [delete]
 func HandleDeleteWorkoutView(_ *config.Data, state *config.State) http.HandlerFunc {
-	return base.HandleDeleteTableRowViewID(state.WriteDB, (*workoutdb.Queries).RawDeleteWorkout)
+	return base.HandleDeleteTableRowViewID(state.WDB, (*workoutdb.Queries).RawDeleteWorkout)
 }

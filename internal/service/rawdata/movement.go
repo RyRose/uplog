@@ -26,7 +26,7 @@ import (
 //	@Router			/view/data/movement [get]
 func HandleGetMovementView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandleGetDataTableView(
-		state.ReadonlyDB,
+		state.RDB,
 		base.TableViewMetadata{
 			Headers: []string{"ID", "Alias"},
 			Post:    "/view/data/movement",
@@ -76,7 +76,7 @@ func HandleGetMovementView(_ *config.Data, state *config.State) http.HandlerFunc
 //	@Router			/view/data/movement/{id} [patch]
 func HandlePatchMovementView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePatchTableRowViewID(
-		state.WriteDB,
+		state.WDB,
 		map[string]base.PatcherID{
 			"id": &base.PatchIDParams[workoutdb.RawUpdateMovementIdParams]{
 				Query: (*workoutdb.Queries).RawUpdateMovementId,
@@ -115,8 +115,8 @@ func HandlePatchMovementView(_ *config.Data, state *config.State) http.HandlerFu
 //	@Router			/view/data/movement [post]
 func HandlePostMovementView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePostDataTableView(
-		state.ReadonlyDB,
-		state.WriteDB,
+		state.RDB,
+		state.WDB,
 		(*workoutdb.Queries).RawInsertMovement,
 		func(_ context.Context, values url.Values) (*workoutdb.RawInsertMovementParams, error) {
 			return &workoutdb.RawInsertMovementParams{
@@ -147,5 +147,5 @@ func HandlePostMovementView(_ *config.Data, state *config.State) http.HandlerFun
 //	@Failure		500	{string}	string	"Internal server error"
 //	@Router			/view/data/movement/{id} [delete]
 func HandleDeleteMovementView(_ *config.Data, state *config.State) http.HandlerFunc {
-	return base.HandleDeleteTableRowViewID(state.WriteDB, (*workoutdb.Queries).RawDeleteMovement)
+	return base.HandleDeleteTableRowViewID(state.WDB, (*workoutdb.Queries).RawDeleteMovement)
 }

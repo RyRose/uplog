@@ -28,7 +28,7 @@ import (
 //	@Router			/view/data/side_weight [get]
 func HandleGetSideWeightView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandleGetDataTableView(
-		state.ReadonlyDB,
+		state.RDB,
 		base.TableViewMetadata{
 			Headers: []string{"ID", "Mult", "Addend", "Format"},
 			Post:    "/view/data/side_weight",
@@ -84,7 +84,7 @@ func HandleGetSideWeightView(_ *config.Data, state *config.State) http.HandlerFu
 //	@Router			/view/data/side_weight/{id} [patch]
 func HandlePatchSideWeightView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePatchTableRowViewID(
-		state.WriteDB,
+		state.WDB,
 		map[string]base.PatcherID{
 			"id": &base.PatchIDParams[workoutdb.RawUpdateSideWeightIdParams]{
 				Query: (*workoutdb.Queries).RawUpdateSideWeightId,
@@ -151,8 +151,8 @@ func HandlePatchSideWeightView(_ *config.Data, state *config.State) http.Handler
 //	@Router			/view/data/side_weight [post]
 func HandlePostSideWeightView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePostDataTableView(
-		state.ReadonlyDB,
-		state.WriteDB,
+		state.RDB,
+		state.WDB,
 		(*workoutdb.Queries).RawInsertSideWeight,
 		func(_ context.Context, values url.Values) (*workoutdb.RawInsertSideWeightParams, error) {
 			multiplier, err := strconv.ParseFloat(values.Get("multiplier"), 64)
@@ -195,5 +195,5 @@ func HandlePostSideWeightView(_ *config.Data, state *config.State) http.HandlerF
 //	@Failure		500	{string}	string	"Internal server error"
 //	@Router			/view/data/side_weight/{id} [delete]
 func HandleDeleteSideWeightView(_ *config.Data, state *config.State) http.HandlerFunc {
-	return base.HandleDeleteTableRowViewID(state.WriteDB, (*workoutdb.Queries).RawDeleteSideWeight)
+	return base.HandleDeleteTableRowViewID(state.WDB, (*workoutdb.Queries).RawDeleteSideWeight)
 }

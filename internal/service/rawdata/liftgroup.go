@@ -26,7 +26,7 @@ import (
 //	@Router			/view/data/lift_group [get]
 func HandleGetLiftGroupView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandleGetDataTableView(
-		state.ReadonlyDB,
+		state.RDB,
 		base.TableViewMetadata{
 			Headers: []string{"ID"},
 			Post:    "/view/data/lift_group",
@@ -73,7 +73,7 @@ func HandleGetLiftGroupView(_ *config.Data, state *config.State) http.HandlerFun
 //	@Router			/view/data/lift_group/{id} [patch]
 func HandlePatchLiftGroupView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePatchTableRowViewID(
-		state.WriteDB,
+		state.WDB,
 		map[string]base.PatcherID{
 			"id": &base.PatchIDParams[workoutdb.RawUpdateLiftGroupIdParams]{
 				Query: (*workoutdb.Queries).RawUpdateLiftGroupId,
@@ -102,8 +102,8 @@ func HandlePatchLiftGroupView(_ *config.Data, state *config.State) http.HandlerF
 //	@Router			/view/data/lift_group [post]
 func HandlePostLiftGroupView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePostDataTableView(
-		state.ReadonlyDB,
-		state.WriteDB,
+		state.RDB,
+		state.WDB,
 		(*workoutdb.Queries).RawInsertLiftGroup,
 		func(_ context.Context, values url.Values) (*string, error) {
 			id := values.Get("id")
@@ -131,5 +131,5 @@ func HandlePostLiftGroupView(_ *config.Data, state *config.State) http.HandlerFu
 //	@Failure		500	{string}	string	"Internal server error"
 //	@Router			/view/data/lift_group/{id} [delete]
 func HandleDeleteLiftGroupView(_ *config.Data, state *config.State) http.HandlerFunc {
-	return base.HandleDeleteTableRowViewID(state.WriteDB, (*workoutdb.Queries).RawDeleteLiftGroup)
+	return base.HandleDeleteTableRowViewID(state.WDB, (*workoutdb.Queries).RawDeleteLiftGroup)
 }

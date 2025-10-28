@@ -26,7 +26,7 @@ import (
 //	@Router			/view/data/muscle [get]
 func HandleGetMuscleView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandleGetDataTableView(
-		state.ReadonlyDB,
+		state.RDB,
 		base.TableViewMetadata{
 			Headers: []string{"ID", "Link", "Message"},
 			Post:    "/view/data/muscle",
@@ -79,7 +79,7 @@ func HandleGetMuscleView(_ *config.Data, state *config.State) http.HandlerFunc {
 //	@Router			/view/data/muscle/{id} [patch]
 func HandlePatchMuscleView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePatchTableRowViewID(
-		state.WriteDB,
+		state.WDB,
 		map[string]base.PatcherID{
 			"id": &base.PatchIDParams[workoutdb.RawUpdateMuscleIdParams]{
 				Query: (*workoutdb.Queries).RawUpdateMuscleId,
@@ -128,8 +128,8 @@ func HandlePatchMuscleView(_ *config.Data, state *config.State) http.HandlerFunc
 //	@Router			/view/data/muscle [post]
 func HandlePostMuscleView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePostDataTableView(
-		state.ReadonlyDB,
-		state.WriteDB,
+		state.RDB,
+		state.WDB,
 		(*workoutdb.Queries).RawInsertMuscle,
 		func(_ context.Context, values url.Values) (*workoutdb.RawInsertMuscleParams, error) {
 			return &workoutdb.RawInsertMuscleParams{
@@ -162,5 +162,5 @@ func HandlePostMuscleView(_ *config.Data, state *config.State) http.HandlerFunc 
 //	@Failure		500	{string}	string	"Internal server error"
 //	@Router			/view/data/muscle/{id} [delete]
 func HandleDeleteMuscleView(_ *config.Data, state *config.State) http.HandlerFunc {
-	return base.HandleDeleteTableRowViewID(state.WriteDB, (*workoutdb.Queries).RawDeleteMuscle)
+	return base.HandleDeleteTableRowViewID(state.WDB, (*workoutdb.Queries).RawDeleteMuscle)
 }

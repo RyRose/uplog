@@ -27,7 +27,7 @@ import (
 //	@Router			/view/data/subworkout [get]
 func HandleGetSubworkoutView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandleGetDataTableView(
-		state.ReadonlyDB,
+		state.RDB,
 		base.TableViewMetadata{
 			Headers: []string{"Subworkout", "Superworkout"},
 			Post:    "/view/data/subworkout",
@@ -83,7 +83,7 @@ func HandleGetSubworkoutView(_ *config.Data, state *config.State) http.HandlerFu
 //	@Router			/view/data/subworkout/{subworkout}/{superworkout} [patch]
 func HandlePatchSubworkoutView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePatchTableRowViewRequest(
-		state.WriteDB,
+		state.WDB,
 		map[string]base.PatcherReq{
 			"subworkout": &base.PatchReqParams[workoutdb.RawUpdateSubworkoutSubworkoutParams]{
 				Query: (*workoutdb.Queries).RawUpdateSubworkoutSubworkout,
@@ -124,8 +124,8 @@ func HandlePatchSubworkoutView(_ *config.Data, state *config.State) http.Handler
 //	@Router			/view/data/subworkout [post]
 func HandlePostSubworkoutView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePostDataTableView(
-		state.ReadonlyDB,
-		state.WriteDB,
+		state.RDB,
+		state.WDB,
 		(*workoutdb.Queries).RawInsertSubworkout,
 		func(_ context.Context, values url.Values) (*workoutdb.RawInsertSubworkoutParams, error) {
 			return &workoutdb.RawInsertSubworkoutParams{
@@ -164,7 +164,7 @@ func HandlePostSubworkoutView(_ *config.Data, state *config.State) http.HandlerF
 //	@Router			/view/data/subworkout/{subworkout}/{superworkout} [delete]
 func HandleDeleteSubworkoutView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandleDeleteTableRowViewRequest(
-		state.WriteDB,
+		state.WDB,
 		(*workoutdb.Queries).RawDeleteSubworkout,
 		func(r *http.Request) (*workoutdb.RawDeleteSubworkoutParams, error) {
 			return &workoutdb.RawDeleteSubworkoutParams{

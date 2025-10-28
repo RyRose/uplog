@@ -28,7 +28,7 @@ import (
 //	@Router			/view/data/progress [get]
 func HandleGetProgressView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandleGetDataTableView(
-		state.ReadonlyDB,
+		state.RDB,
 		base.TableViewMetadata{
 			Headers: []string{"ID", "Lift", "Date", "Weight", "Sets", "Reps", "SW"},
 			Post:    "/view/data/progress",
@@ -102,7 +102,7 @@ func HandleGetProgressView(_ *config.Data, state *config.State) http.HandlerFunc
 //	@Router			/view/data/progress/{id} [patch]
 func HandlePatchProgressView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePatchTableRowViewID(
-		state.WriteDB,
+		state.WDB,
 		map[string]base.PatcherID{
 			"lift": &base.PatchIDParams[workoutdb.RawUpdateProgressLiftParams]{
 				Query: (*workoutdb.Queries).RawUpdateProgressLift,
@@ -217,8 +217,8 @@ func HandlePatchProgressView(_ *config.Data, state *config.State) http.HandlerFu
 //	@Router			/view/data/progress [post]
 func HandlePostProgressView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePostDataTableView(
-		state.ReadonlyDB,
-		state.WriteDB,
+		state.RDB,
+		state.WDB,
 		(*workoutdb.Queries).RawInsertProgress,
 		func(_ context.Context, values url.Values) (*workoutdb.RawInsertProgressParams, error) {
 			weight, err := strconv.ParseFloat(values.Get("weight"), 64)
@@ -282,7 +282,7 @@ func HandlePostProgressView(_ *config.Data, state *config.State) http.HandlerFun
 //	@Router			/view/data/progress/{id} [delete]
 func HandleDeleteProgressView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandleDeleteTableRowViewRequest(
-		state.WriteDB,
+		state.WDB,
 		(*workoutdb.Queries).RawDeleteProgress,
 		func(r *http.Request) (*int64, error) {
 			id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)

@@ -26,7 +26,7 @@ import (
 //	@Router			/view/data/template_variable [get]
 func HandleGetTemplateVariableView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandleGetDataTableView(
-		state.ReadonlyDB,
+		state.RDB,
 		base.TableViewMetadata{
 			Headers: []string{"ID", "Value"},
 			Post:    "/view/data/template_variable",
@@ -76,7 +76,7 @@ func HandleGetTemplateVariableView(_ *config.Data, state *config.State) http.Han
 //	@Router			/view/data/template_variable/{id} [patch]
 func HandlePatchTemplateVariableView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePatchTableRowViewID(
-		state.WriteDB,
+		state.WDB,
 		map[string]base.PatcherID{
 			"id": &base.PatchIDParams[workoutdb.RawUpdateTemplateVariableIdParams]{
 				Query: (*workoutdb.Queries).RawUpdateTemplateVariableId,
@@ -115,8 +115,8 @@ func HandlePatchTemplateVariableView(_ *config.Data, state *config.State) http.H
 //	@Router			/view/data/template_variable [post]
 func HandlePostTemplateVariableView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePostDataTableView(
-		state.ReadonlyDB,
-		state.WriteDB,
+		state.RDB,
+		state.WDB,
 		(*workoutdb.Queries).RawInsertTemplateVariable,
 		func(_ context.Context, values url.Values) (*workoutdb.RawInsertTemplateVariableParams, error) {
 			return &workoutdb.RawInsertTemplateVariableParams{
@@ -147,5 +147,5 @@ func HandlePostTemplateVariableView(_ *config.Data, state *config.State) http.Ha
 //	@Failure		500	{string}	string	"Internal server error"
 //	@Router			/view/data/template_variable/{id} [delete]
 func HandleDeleteTemplateVariableView(_ *config.Data, state *config.State) http.HandlerFunc {
-	return base.HandleDeleteTableRowViewID(state.WriteDB, (*workoutdb.Queries).RawDeleteTemplateVariable)
+	return base.HandleDeleteTableRowViewID(state.WDB, (*workoutdb.Queries).RawDeleteTemplateVariable)
 }

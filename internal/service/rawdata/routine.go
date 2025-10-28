@@ -27,7 +27,7 @@ import (
 //	@Router			/view/data/routine [get]
 func HandleGetRoutineView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandleGetDataTableView(
-		state.ReadonlyDB,
+		state.RDB,
 		base.TableViewMetadata{
 			Headers: []string{"ID", "Steps", "Lift"},
 			Post:    "/view/data/routine",
@@ -86,7 +86,7 @@ func HandleGetRoutineView(_ *config.Data, state *config.State) http.HandlerFunc 
 //	@Router			/view/data/routine/{id} [patch]
 func HandlePatchRoutineView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePatchTableRowViewID(
-		state.WriteDB,
+		state.WDB,
 		map[string]base.PatcherID{
 			"id": &base.PatchIDParams[workoutdb.RawUpdateRoutineIdParams]{
 				Query: (*workoutdb.Queries).RawUpdateRoutineId,
@@ -135,8 +135,8 @@ func HandlePatchRoutineView(_ *config.Data, state *config.State) http.HandlerFun
 //	@Router			/view/data/routine [post]
 func HandlePostRoutineView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePostDataTableView(
-		state.ReadonlyDB,
-		state.WriteDB,
+		state.RDB,
+		state.WDB,
 		(*workoutdb.Queries).RawInsertRoutine,
 		func(_ context.Context, values url.Values) (*workoutdb.RawInsertRoutineParams, error) {
 			return &workoutdb.RawInsertRoutineParams{
@@ -174,5 +174,5 @@ func HandlePostRoutineView(_ *config.Data, state *config.State) http.HandlerFunc
 //	@Failure		500	{string}	string	"Internal server error"
 //	@Router			/view/data/routine/{id} [delete]
 func HandleDeleteRoutineView(_ *config.Data, state *config.State) http.HandlerFunc {
-	return base.HandleDeleteTableRowViewID(state.WriteDB, (*workoutdb.Queries).RawDeleteRoutine)
+	return base.HandleDeleteTableRowViewID(state.WDB, (*workoutdb.Queries).RawDeleteRoutine)
 }

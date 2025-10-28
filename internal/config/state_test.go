@@ -24,10 +24,10 @@ func TestNewState(t *testing.T) {
 	}
 	defer state.Close()
 
-	if state.ReadonlyDB == nil {
+	if state.RDB == nil {
 		t.Error("ReadonlyDB is nil")
 	}
-	if state.WriteDB == nil {
+	if state.WDB == nil {
 		t.Error("WriteDB is nil")
 	}
 	if state.PrometheusRegistry == nil {
@@ -35,13 +35,13 @@ func TestNewState(t *testing.T) {
 	}
 
 	// Verify readonly DB is actually readonly
-	_, err = state.ReadonlyDB.Exec("CREATE TABLE test (id INTEGER)")
+	_, err = state.RDB.Exec("CREATE TABLE test (id INTEGER)")
 	if err == nil {
 		t.Error("expected readonly DB to reject writes, but it didn't")
 	}
 
 	// Verify write DB can write
-	_, err = state.WriteDB.Exec("CREATE TABLE test (id INTEGER)")
+	_, err = state.WDB.Exec("CREATE TABLE test (id INTEGER)")
 	if err != nil {
 		t.Errorf("write DB should allow writes, got error: %v", err)
 	}
@@ -100,12 +100,12 @@ func TestState_Close(t *testing.T) {
 	}
 
 	// Verify DBs are closed by trying to ping them
-	err = state.ReadonlyDB.Ping()
+	err = state.RDB.Ping()
 	if err == nil {
 		t.Error("ReadonlyDB should be closed, but Ping succeeded")
 	}
 
-	err = state.WriteDB.Ping()
+	err = state.WDB.Ping()
 	if err == nil {
 		t.Error("WriteDB should be closed, but Ping succeeded")
 	}

@@ -16,16 +16,28 @@ import (
 )
 
 type State struct {
-	ReadonlyDB, WriteDB *sql.DB
-	PrometheusRegistry  *prometheus.Registry
+	// RDB is a readonly database connection.
+	RDB *sql.DB
+
+	// WDB is a write database connection.
+	WDB *sql.DB
+
+	// PrometheusRegistry is a Prometheus metrics registry.
+	PrometheusRegistry *prometheus.Registry
+
+	// JLog is a JSON slog logger.
+	JLog *slog.Logger
+
+	// TLog is a text slog logger.
+	TLog *slog.Logger
 }
 
 func (s *State) Close() error {
 	var errs []error
-	if err := s.ReadonlyDB.Close(); err != nil {
+	if err := s.RDB.Close(); err != nil {
 		errs = append(errs, fmt.Errorf("failed to close readonly database: %w", err))
 	}
-	if err := s.WriteDB.Close(); err != nil {
+	if err := s.WDB.Close(); err != nil {
 		errs = append(errs, fmt.Errorf("failed to close write database: %w", err))
 	}
 	return errors.Join(errs...)
@@ -67,8 +79,10 @@ func NewState(ctx context.Context, cfg *Data) (*State, error) {
 		return nil, fmt.Errorf("failed to setup databases: %w", err)
 	}
 	return &State{
-		ReadonlyDB:         rDB,
-		WriteDB:            wDB,
+		RDB:                rDB,
+		WDB:                wDB,
 		PrometheusRegistry: prometheus.NewRegistry(),
+		JLog:               slog.New(slog.NewJSONHandler(os.Stderr, nil)),
+		TLog:               slog.New(slog.NewTextHandler(os.Stderr, nil)),
 	}, nil
 }

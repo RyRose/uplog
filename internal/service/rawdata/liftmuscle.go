@@ -27,7 +27,7 @@ import (
 //	@Router			/view/data/lift_muscle_mapping [get]
 func HandleGetLiftMuscleView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandleGetDataTableView(
-		state.ReadonlyDB,
+		state.RDB,
 		base.TableViewMetadata{
 			Headers: []string{"Lift", "Muscle", "Movement"},
 			Post:    "/view/data/lift_muscle_mapping",
@@ -95,7 +95,7 @@ func HandleGetLiftMuscleView(_ *config.Data, state *config.State) http.HandlerFu
 //	@Router			/view/data/lift_muscle_mapping/{lift}/{muscle}/{movement} [patch]
 func HandlePatchLiftMuscleView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePatchTableRowViewRequest(
-		state.WriteDB,
+		state.WDB,
 		map[string]base.PatcherReq{
 			"lift": &base.PatchReqParams[workoutdb.RawUpdateLiftMuscleMappingLiftParams]{
 				Query: (*workoutdb.Queries).RawUpdateLiftMuscleMappingLift,
@@ -150,8 +150,8 @@ func HandlePatchLiftMuscleView(_ *config.Data, state *config.State) http.Handler
 //	@Router			/view/data/lift_muscle_mapping [post]
 func HandlePostLiftMuscleView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePostDataTableView(
-		state.ReadonlyDB,
-		state.WriteDB,
+		state.RDB,
+		state.WDB,
 		(*workoutdb.Queries).RawInsertLiftMuscle,
 		func(_ context.Context, values url.Values) (*workoutdb.RawInsertLiftMuscleParams, error) {
 			return &workoutdb.RawInsertLiftMuscleParams{
@@ -201,7 +201,7 @@ func HandlePostLiftMuscleView(_ *config.Data, state *config.State) http.HandlerF
 //	@Router			/view/data/lift_muscle_mapping/{lift}/{muscle}/{movement} [delete]
 func HandleDeleteLiftMuscleView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandleDeleteTableRowViewRequest(
-		state.WriteDB,
+		state.WDB,
 		(*workoutdb.Queries).RawDeleteLiftMuscle,
 		func(r *http.Request) (*workoutdb.RawDeleteLiftMuscleParams, error) {
 			return &workoutdb.RawDeleteLiftMuscleParams{

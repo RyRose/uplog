@@ -27,7 +27,7 @@ import (
 //	@Router			/view/data/lift [get]
 func HandleGetLiftView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandleGetDataTableView(
-		state.ReadonlyDB,
+		state.RDB,
 		base.TableViewMetadata{
 			Headers: []string{"ID", "Link", "Side", "Notes", "Group"},
 			Post:    "/view/data/lift",
@@ -102,7 +102,7 @@ func HandleGetLiftView(_ *config.Data, state *config.State) http.HandlerFunc {
 //	@Router			/view/data/lift/{id} [patch]
 func HandlePatchLiftView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePatchTableRowViewID(
-		state.WriteDB,
+		state.WDB,
 		map[string]base.PatcherID{
 			"id": &base.PatchIDParams[workoutdb.RawUpdateLiftIdParams]{
 				Query: (*workoutdb.Queries).RawUpdateLiftId,
@@ -171,8 +171,8 @@ func HandlePatchLiftView(_ *config.Data, state *config.State) http.HandlerFunc {
 //	@Router			/view/data/lift [post]
 func HandlePostLiftView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePostDataTableView(
-		state.ReadonlyDB,
-		state.WriteDB,
+		state.RDB,
+		state.WDB,
 		(*workoutdb.Queries).RawInsertLift,
 		func(_ context.Context, values url.Values) (*workoutdb.RawInsertLiftParams, error) {
 			return &workoutdb.RawInsertLiftParams{
@@ -221,5 +221,5 @@ func HandlePostLiftView(_ *config.Data, state *config.State) http.HandlerFunc {
 //	@Failure		500	{string}	string	"Internal server error"
 //	@Router			/view/data/lift/{id} [delete]
 func HandleDeleteLiftView(_ *config.Data, state *config.State) http.HandlerFunc {
-	return base.HandleDeleteTableRowViewID(state.WriteDB, (*workoutdb.Queries).RawDeleteLift)
+	return base.HandleDeleteTableRowViewID(state.WDB, (*workoutdb.Queries).RawDeleteLift)
 }

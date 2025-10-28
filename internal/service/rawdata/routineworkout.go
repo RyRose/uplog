@@ -27,7 +27,7 @@ import (
 //	@Router			/view/data/routine_workout_mapping [get]
 func HandleGetRoutineWorkoutView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandleGetDataTableView(
-		state.ReadonlyDB,
+		state.RDB,
 		base.TableViewMetadata{
 			Headers: []string{"Routine", "Workout"},
 			Post:    "/view/data/routine_workout_mapping",
@@ -87,7 +87,7 @@ func HandleGetRoutineWorkoutView(_ *config.Data, state *config.State) http.Handl
 //	@Router			/view/data/routine_workout_mapping/{routine}/{workout} [patch]
 func HandlePatchRoutineWorkoutView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePatchTableRowViewRequest(
-		state.WriteDB,
+		state.WDB,
 		map[string]base.PatcherReq{
 			"routine": &base.PatchReqParams[workoutdb.RawUpdateRoutineWorkoutMappingRoutineParams]{
 				Query: (*workoutdb.Queries).RawUpdateRoutineWorkoutMappingRoutine,
@@ -128,8 +128,8 @@ func HandlePatchRoutineWorkoutView(_ *config.Data, state *config.State) http.Han
 //	@Router			/view/data/routine_workout_mapping [post]
 func HandlePostRoutineWorkoutView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandlePostDataTableView(
-		state.ReadonlyDB,
-		state.WriteDB,
+		state.RDB,
+		state.WDB,
 		(*workoutdb.Queries).RawInsertRoutineWorkout,
 		func(_ context.Context, values url.Values) (*workoutdb.RawInsertRoutineWorkoutParams, error) {
 			return &workoutdb.RawInsertRoutineWorkoutParams{
@@ -172,7 +172,7 @@ func HandlePostRoutineWorkoutView(_ *config.Data, state *config.State) http.Hand
 //	@Router			/view/data/routine_workout_mapping/{routine}/{workout} [delete]
 func HandleDeleteRoutineWorkoutView(_ *config.Data, state *config.State) http.HandlerFunc {
 	return base.HandleDeleteTableRowViewRequest(
-		state.WriteDB,
+		state.WDB,
 		(*workoutdb.Queries).RawDeleteRoutineWorkout,
 		func(r *http.Request) (*workoutdb.RawDeleteRoutineWorkoutParams, error) {
 			return &workoutdb.RawDeleteRoutineWorkoutParams{
