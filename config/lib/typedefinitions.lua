@@ -23,12 +23,5 @@
 -- swagger_url specifies the URL for the Swagger documentation.
 ---@field swagger_url string
 -- first_day_of_week specifies the first day of the week (0 = Sunday, 1 =
--- Monday, etc.).
+-- Monday, ...).
 ---@field first_day_of_week number
--- foo is a sample nested configuration.
----@field foo FooData
-
--- FooData is a sample struct to demonstrate Lua type generation.
----@class FooData
--- bar is a sample field.
----@field bar string
