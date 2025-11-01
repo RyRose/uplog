@@ -73,8 +73,11 @@ docker:
 lint:
 	golangci-lint run
 
+install:
+	npm ci
+
 .PHONY: gha
-gha: build tidy format test lint
+gha: clean install build tidy format test lint
 
 .PHONY: ci
 ci: gha docker
