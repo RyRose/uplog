@@ -63,7 +63,7 @@ docs:
 
 .PHONY: types
 types:
-	go run ./cmd/generatetypes > ./config/typedefinitions.lua
+	go run ./cmd/generatetypes > ./config/typedefinitions.lua &
 
 .PHONY: docker
 docker:
@@ -77,7 +77,7 @@ install:
 	npm ci
 
 .PHONY: gha
-gha: install build tidy format test lint
+gha: install build format test lint
 
 .PHONY: ci
 ci: clean gha docker
