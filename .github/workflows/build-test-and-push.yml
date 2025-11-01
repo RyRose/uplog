@@ -1,4 +1,4 @@
-name: Build, Test, and Push Docker Image
+name: Build, test, and push Docker image
 on:
   push:
     branches:
@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 jobs:
   test:
-    name: Build, lint, and test UpLog
+    name: Build, lint, and test
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -22,7 +22,7 @@ jobs:
         shell: 'nix develop -c bash -e {0}'
         run: make gha
   build-and-push:
-    name: Build and push UpLog Docker image.
+    name: Build and push image
     needs: test
     runs-on: ubuntu-latest
     permissions:

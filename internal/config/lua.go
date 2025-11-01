@@ -149,3 +149,52 @@ func GenerateLuaType(v any) (string, error) {
 	}
 	return strings.Join(lines, "\n"), nil
 }
+
+func getZeroValues(v any) []any {
+	seen := make(map[reflect.Type]bool)
+	return getZeroValuesWithSeen(v, seen)
+}
+
+func getZeroValuesWithSeen(v any, seen map[reflect.Type]bool) []any {
+	var zeroValues []any
+	val := reflect.ValueOf(v)
+
+	// Ensure we are working with the value of the struct
+	if val.Kind() == reflect.Ptr {
+		val = val.Elem()
+	}
+	if val.Kind() != reflect.Struct {
+		return zeroValues
+	}
+
+	// Skip if we've already seen this type
+	t := val.Type()
+	if seen[t] {
+		return zeroValues
+	}
+	seen[t] = true
+
+	// Add the zero value of the current struct
+	zeroValues = append(zeroValues, reflect.New(t).Elem().Interface())
+
+	// Iterate through fields to find nested structs
+	for i := 0; i < val.NumField(); i++ {
+		field := val.Field(i)
+		fieldType := val.Type().Field(i)
+
+		// Check if the field is a struct (and not a pointer to a struct)
+		if field.Kind() == reflect.Struct {
+			zeroValues = append(zeroValues, getZeroValuesWithSeen(field.Interface(), seen)...)
+		} else if field.Kind() == reflect.Ptr && fieldType.Type.Elem().Kind() == reflect.Struct {
+			// Handle pointers to structs
+			zeroValues = append(zeroValues, getZeroValuesWithSeen(reflect.New(fieldType.Type.Elem()).Elem().Interface(), seen)...)
+		}
+	}
+
+	return zeroValues
+}
+
+// LuaTypes returns a slice of config types for Lua integration.
+func LuaTypes() []any {
+	return getZeroValues(Data{})
+}

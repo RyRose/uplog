@@ -338,3 +338,119 @@ func TestLuaType(t *testing.T) {
 		})
 	}
 }
+
+func TestLuaTypes(t *testing.T) {
+	types := LuaTypes()
+
+	if len(types) == 0 {
+		t.Error("LuaTypes() returned empty slice")
+	}
+
+	// Check that Data is in the types
+	foundData := false
+	for _, typ := range types {
+		if _, ok := typ.(Data); ok {
+			foundData = true
+			break
+		}
+	}
+
+	if !foundData {
+		t.Error("LuaTypes() did not include Data type")
+	}
+}
+
+type SharedType struct {
+	Value string
+}
+
+type ParentWithDuplicates struct {
+	First  SharedType
+	Second SharedType
+	Third  *SharedType
+}
+
+type NestedDuplicates struct {
+	Parent1 ParentWithDuplicates
+	Parent2 ParentWithDuplicates
+	Shared  SharedType
+}
+
+func TestGetZeroValues_Deduplication(t *testing.T) {
+	tests := []struct {
+		name          string
+		input         any
+		expectedTypes []string
+	}{
+		{
+			name:  "simple struct with no duplicates",
+			input: SimplePrimitives{},
+			expectedTypes: []string{
+				"config.SimplePrimitives",
+			},
+		},
+		{
+			name:  "struct with duplicate nested types",
+			input: ParentWithDuplicates{},
+			expectedTypes: []string{
+				"config.ParentWithDuplicates",
+				"config.SharedType",
+			},
+		},
+		{
+			name:  "deeply nested duplicates",
+			input: NestedDuplicates{},
+			expectedTypes: []string{
+				"config.NestedDuplicates",
+				"config.ParentWithDuplicates",
+				"config.SharedType",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := getZeroValues(tt.input)
+
+			// Check count matches
+			if len(got) != len(tt.expectedTypes) {
+				t.Errorf("getZeroValues() returned %d types, want %d", len(got), len(tt.expectedTypes))
+			}
+
+			// Build a map of actual types
+			actualTypes := make(map[string]bool)
+			for _, v := range got {
+				typeName := reflect.TypeOf(v).String()
+				if actualTypes[typeName] {
+					t.Errorf("getZeroValues() returned duplicate type: %s", typeName)
+				}
+				actualTypes[typeName] = true
+			}
+
+			// Check all expected types are present
+			for _, expectedType := range tt.expectedTypes {
+				if !actualTypes[expectedType] {
+					t.Errorf("getZeroValues() missing expected type: %s", expectedType)
+				}
+			}
+		})
+	}
+}
+
+func TestGetZeroValues_NoDuplicates(t *testing.T) {
+	// Test with the actual Data struct to ensure no duplicates
+	types := LuaTypes()
+
+	typeMap := make(map[string]int)
+	for _, v := range types {
+		typeName := reflect.TypeOf(v).String()
+		typeMap[typeName]++
+	}
+
+	// Check for duplicates
+	for typeName, count := range typeMap {
+		if count > 1 {
+			t.Errorf("LuaTypes() returned type %s %d times (expected 1)", typeName, count)
+		}
+	}
+}

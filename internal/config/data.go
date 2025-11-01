@@ -18,10 +18,3 @@ type Data struct {
 	// FirstDayOfWeek specifies the first day of the week (0 = Sunday, 1 = Monday, etc.).
 	FirstDayOfWeek int
 }
-
-// LuaTypes returns a slice of config types for Lua integration.
-func LuaTypes() []any {
-	return []any{
-		Data{},
-	}
-}

@@ -45,24 +45,3 @@ func TestLoad(t *testing.T) {
 		t.Errorf("Debug = %v, want true", cfg.Debug)
 	}
 }
-
-func TestLuaTypes(t *testing.T) {
-	types := LuaTypes()
-
-	if len(types) == 0 {
-		t.Error("LuaTypes() returned empty slice")
-	}
-
-	// Check that Data is in the types
-	foundData := false
-	for _, typ := range types {
-		if _, ok := typ.(Data); ok {
-			foundData = true
-			break
-		}
-	}
-
-	if !foundData {
-		t.Error("LuaTypes() did not include Data type")
-	}
-}

@@ -15,5 +15,5 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to generate types file: %v", err)
 	}
-	fmt.Print(output)
+	fmt.Println(output)
 }
