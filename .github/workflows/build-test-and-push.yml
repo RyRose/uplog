@@ -1,12 +1,28 @@
-name: Build and Push Docker Image
+name: Build, Test, and Push Docker Image
 on:
-  workflow_run:
-    workflows: ["Test"]
-    types:
-      - completed
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
   workflow_dispatch:
 jobs:
+  test:
+    name: Build, lint, and test UpLog
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Pre-build devShell
+        run: nix build --no-link .#devShells.$(nix eval --impure --raw --expr 'builtins.currentSystem').default
+      - name: "Run make gha"
+        shell: 'nix develop -c bash -e {0}'
+        run: make gha
   build-and-push:
+    name: Build and push UpLog Docker image.
+    needs: test
     runs-on: ubuntu-latest
     permissions:
       # Necessary for build attestation.
