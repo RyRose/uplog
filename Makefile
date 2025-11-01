@@ -77,8 +77,8 @@ install:
 	npm ci
 
 .PHONY: gha
-gha: clean install build tidy format test lint
+gha: install build tidy format test lint
 
 .PHONY: ci
-ci: gha docker
+ci: clean gha docker
 
