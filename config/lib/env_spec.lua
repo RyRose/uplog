@@ -5,8 +5,8 @@ describe("env", function()
 	before_each(function()
 		package.loaded["config.env"] = nil
 		package.loaded["config.types"] = nil
-		types = require("config.types")
-		env = require("config.env")
+		types = require("config.lib.types")
+		env = require("config.lib.env")
 	end)
 
 	describe("Or", function()

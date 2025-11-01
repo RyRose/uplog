@@ -63,7 +63,7 @@ docs:
 
 .PHONY: types
 types:
-	go run ./cmd/generatetypes > ./config/typedefinitions.lua &
+	go run ./cmd/generatetypes > ./config/lib/typedefinitions.lua
 
 .PHONY: docker
 docker:

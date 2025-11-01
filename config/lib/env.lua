@@ -1,6 +1,6 @@
 -- Utility functions for configuration.
 
-local types = require("config.types")
+local types = require("config.lib.types")
 
 local M = {}
 

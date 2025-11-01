@@ -160,7 +160,7 @@ func getZeroValuesWithSeen(v any, seen map[reflect.Type]bool) []any {
 	val := reflect.ValueOf(v)
 
 	// Ensure we are working with the value of the struct
-	if val.Kind() == reflect.Ptr {
+	if val.Kind() == reflect.Pointer {
 		val = val.Elem()
 	}
 	if val.Kind() != reflect.Struct {
@@ -182,11 +182,10 @@ func getZeroValuesWithSeen(v any, seen map[reflect.Type]bool) []any {
 		field := val.Field(i)
 		fieldType := val.Type().Field(i)
 
-		// Check if the field is a struct (and not a pointer to a struct)
+		// Check if the field is a struct or a pointer to a struct
 		if field.Kind() == reflect.Struct {
 			zeroValues = append(zeroValues, getZeroValuesWithSeen(field.Interface(), seen)...)
-		} else if field.Kind() == reflect.Ptr && fieldType.Type.Elem().Kind() == reflect.Struct {
-			// Handle pointers to structs
+		} else if field.Kind() == reflect.Pointer && fieldType.Type.Elem().Kind() == reflect.Struct {
 			zeroValues = append(zeroValues, getZeroValuesWithSeen(reflect.New(fieldType.Type.Elem()).Elem().Interface(), seen)...)
 		}
 	}

@@ -7,7 +7,7 @@
 *_spec.lua
 
 # Generated type definition files.
-config/typedefinitions.lua
+config/lib/typedefinitions.lua
 
 # Generated sqlc files.
 internal/sqlc/workoutdb

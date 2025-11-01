@@ -2,7 +2,7 @@ describe("types", function()
 	local types
 
 	before_each(function()
-		types = require("config.types")
+		types = require("config.lib.types")
 	end)
 
 	describe("type constants", function()

@@ -1,5 +1,5 @@
-local env = require("config.env")
-local types = require("config.types")
+local env = require("config.lib.env")
+local types = require("config.lib.types")
 
 local port = env.Or("PORT", "8080")
 local curtime = os.time()

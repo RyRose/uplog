@@ -3,8 +3,6 @@ describe("main", function()
 
 	before_each(function()
 		package.loaded["config.main"] = nil
-		package.loaded["config.env"] = nil
-		package.loaded["config.types"] = nil
 	end)
 
 	describe("structural snapshot", function()
