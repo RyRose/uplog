@@ -13,5 +13,8 @@ jobs:
       - uses: cachix/install-nix-action@v31
         with:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
-      - run: nix develop
-      - run: make gha
+      - name: Pre-build devShell
+        run: nix build --no-link .#devShells.$(nix eval --impure --raw --expr 'builtins.currentSystem').default
+      - name: "Run make gha"
+        shell: 'nix develop -c bash -e {0}'
+        run: make gha
