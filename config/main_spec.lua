@@ -45,12 +45,14 @@ describe("main", function()
 			end
 			main = require("config.main")
 
+			---@type Data
 			local expected = {
 				debug = true,
 				version = "1.0.0",
 				database_path = "/var/db/data.db",
 				port = "3000",
 				swagger_url = "http://localhost:3000/docs/swagger.json?v=1.0.0",
+				first_day_of_week = 0,
 			}
 
 			assert.same(expected, main)

@@ -22,7 +22,7 @@ func TestNewState(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewState() error = %v", err)
 	}
-	defer state.Close()
+	defer func() { _ = state.Close() }()
 
 	if state.RDB == nil {
 		t.Error("ReadonlyDB is nil")
@@ -72,7 +72,7 @@ func TestNewState_CreatesDirectories(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewState() error = %v", err)
 	}
-	defer state.Close()
+	defer func() { _ = state.Close() }()
 
 	// Verify the directory was created
 	if _, err := os.Stat(filepath.Dir(dbPath)); os.IsNotExist(err) {
@@ -148,8 +148,8 @@ func TestSetupDatabases(t *testing.T) {
 	if err != nil {
 		t.Fatalf("setupDatabases() error = %v", err)
 	}
-	defer wDB.Close()
-	defer rDB.Close()
+	defer func() { _ = wDB.Close() }()
+	defer func() { _ = rDB.Close() }()
 
 	if wDB == nil {
 		t.Error("write DB is nil")
@@ -178,8 +178,8 @@ func TestSetupDatabases_MigrationsApplied(t *testing.T) {
 	if err != nil {
 		t.Fatalf("setupDatabases() error = %v", err)
 	}
-	defer wDB.Close()
-	defer rDB.Close()
+	defer func() { _ = wDB.Close() }()
+	defer func() { _ = rDB.Close() }()
 
 	// Verify goose_db_version table exists (created by goose migrations)
 	var tableName string
@@ -198,8 +198,8 @@ func TestSetupDatabases_WriteDBMaxConnections(t *testing.T) {
 	if err != nil {
 		t.Fatalf("setupDatabases() error = %v", err)
 	}
-	defer wDB.Close()
-	defer rDB.Close()
+	defer func() { _ = wDB.Close() }()
+	defer func() { _ = rDB.Close() }()
 
 	// The max open conns should be set to 1
 	stats := wDB.Stats()

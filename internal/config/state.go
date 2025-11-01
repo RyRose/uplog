@@ -67,7 +67,9 @@ func setupDatabases(ctx context.Context, dbPath string) (*sql.DB, *sql.DB, error
 	rdsn := fmt.Sprintf("file:%s?mode=ro&_journal_mode=WAL&_txlock=immediate", url.QueryEscape(dbPath))
 	rdb, err := sql.Open("sqlite3", rdsn)
 	if err != nil {
-		db.Close()
+		if closeErr := db.Close(); closeErr != nil {
+			slog.Warn("failed to close database during error cleanup", "error", closeErr)
+		}
 		return nil, nil, fmt.Errorf("failed to open %v: %w", rdsn, err)
 	}
 	return db, rdb, nil

@@ -54,8 +54,7 @@ func HandleGetDataTableView[dataType any, limitParams any](
 			slog.ErrorContext(ctx, "failed to convert data", "error", err)
 			return
 		}
-		var viewLimit int64
-		viewLimit = util.Minimum(limit, int64(len(rows)-1))
+		viewLimit := util.Minimum(limit, int64(len(rows)-1))
 		tbl := templates.DataTable{
 			Header: templates.DataTableHeader{
 				Values: metadata.Headers,
@@ -70,6 +69,8 @@ func HandleGetDataTableView[dataType any, limitParams any](
 			End:         fmt.Sprint(offset + viewLimit),
 			LastPage:    viewLimit != limit,
 		}
-		templates.DataTableView(tbl).Render(ctx, w)
+		if err := templates.DataTableView(tbl).Render(ctx, w); err != nil {
+			slog.WarnContext(ctx, "failed to render data table view", "error", err)
+		}
 	}
 }

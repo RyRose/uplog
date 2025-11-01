@@ -20,7 +20,7 @@ func TestIntegration_Endpoints(t *testing.T) {
 
 	t.Run("Health", func(t *testing.T) {
 		resp := srv.Get(t, "/health")
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 
 		if resp.StatusCode != http.StatusOK {
 			body, _ := io.ReadAll(resp.Body)
@@ -40,7 +40,7 @@ func TestIntegration_Endpoints(t *testing.T) {
 
 	t.Run("Metrics", func(t *testing.T) {
 		resp := srv.Get(t, "/metrics")
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 
 		if resp.StatusCode != http.StatusOK {
 			body, _ := io.ReadAll(resp.Body)
@@ -62,7 +62,7 @@ func TestIntegration_Endpoints(t *testing.T) {
 
 	t.Run("IndexPage", func(t *testing.T) {
 		resp := srv.Get(t, "/")
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 
 		if resp.StatusCode != http.StatusOK {
 			body, _ := io.ReadAll(resp.Body)
@@ -87,7 +87,7 @@ func TestIntegration_Endpoints(t *testing.T) {
 
 	t.Run("DataPage", func(t *testing.T) {
 		resp := srv.Get(t, "/data/")
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 
 		if resp.StatusCode != http.StatusOK {
 			body, _ := io.ReadAll(resp.Body)
@@ -107,7 +107,7 @@ func TestIntegration_Endpoints(t *testing.T) {
 
 	t.Run("SwaggerDocs", func(t *testing.T) {
 		resp := srv.Get(t, "/docs/swagger.json")
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 
 		if resp.StatusCode != http.StatusOK {
 			body, _ := io.ReadAll(resp.Body)
@@ -146,7 +146,7 @@ func TestIntegration_Endpoints(t *testing.T) {
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				resp := srv.Get(t, tt.path)
-				defer resp.Body.Close()
+				defer func() { _ = resp.Body.Close() }()
 
 				if resp.StatusCode != tt.wantCode {
 					body, _ := io.ReadAll(resp.Body)
@@ -177,7 +177,7 @@ func TestIntegration_Endpoints(t *testing.T) {
 		for _, endpoint := range dataEndpoints {
 			t.Run(endpoint, func(t *testing.T) {
 				resp := srv.Get(t, endpoint)
-				defer resp.Body.Close()
+				defer func() { _ = resp.Body.Close() }()
 
 				if resp.StatusCode != http.StatusOK {
 					body, _ := io.ReadAll(resp.Body)

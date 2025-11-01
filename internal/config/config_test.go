@@ -10,12 +10,12 @@ import (
 
 func TestLoad(t *testing.T) {
 	// Set some environment variables for testing
-	os.Setenv("DATABASE_PATH", "/test/db.db")
-	os.Setenv("PORT", "9090")
-	os.Setenv("DEBUG", "true")
-	defer os.Unsetenv("DATABASE_PATH")
-	defer os.Unsetenv("PORT")
-	defer os.Unsetenv("DEBUG")
+	_ = os.Setenv("DATABASE_PATH", "/test/db.db")
+	_ = os.Setenv("PORT", "9090")
+	_ = os.Setenv("DEBUG", "true")
+	defer func() { _ = os.Unsetenv("DATABASE_PATH") }()
+	defer func() { _ = os.Unsetenv("PORT") }()
+	defer func() { _ = os.Unsetenv("DEBUG") }()
 
 	origDir, err := os.Getwd()
 	if err != nil {

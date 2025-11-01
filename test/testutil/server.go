@@ -37,13 +37,13 @@ func Setup(t *testing.T) *Server {
 		t.Fatalf("failed to get free port: %v", err)
 	}
 
-	os.Setenv("PORT", fmt.Sprintf("%d", port))
-	os.Setenv("DATABASE_PATH", dbPath)
-	os.Setenv("DEBUG", "false")
+	_ = os.Setenv("PORT", fmt.Sprintf("%d", port))
+	_ = os.Setenv("DATABASE_PATH", dbPath)
+	_ = os.Setenv("DEBUG", "false")
 	t.Cleanup(func() {
-		os.Unsetenv("PORT")
-		os.Unsetenv("DATABASE_PATH")
-		os.Unsetenv("DEBUG")
+		_ = os.Unsetenv("PORT")
+		_ = os.Unsetenv("DATABASE_PATH")
+		_ = os.Unsetenv("DEBUG")
 	})
 
 	// Change to repo root so Lua's require() can find config modules
@@ -51,7 +51,7 @@ func Setup(t *testing.T) *Server {
 	if err != nil {
 		t.Fatalf("failed to get working directory: %v", err)
 	}
-	t.Cleanup(func() { os.Chdir(origDir) })
+	t.Cleanup(func() { _ = os.Chdir(origDir) })
 
 	repoRoot, err := filepath.Abs("../..")
 	if err != nil {
@@ -88,8 +88,8 @@ func Setup(t *testing.T) *Server {
 		t.Fatalf("failed to open test databases: %v", err)
 	}
 	t.Cleanup(func() {
-		writeDB.Close()
-		readDB.Close()
+		_ = writeDB.Close()
+		_ = readDB.Close()
 	})
 
 	return &Server{
@@ -156,7 +156,7 @@ func openDatabases(dbPath string) (*sql.DB, *sql.DB, error) {
 	// Open read connection
 	readDB, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
-		writeDB.Close()
+		_ = writeDB.Close()
 		return nil, nil, fmt.Errorf("failed to open read db: %w", err)
 	}
 
@@ -171,7 +171,7 @@ func waitForServer(port int, timeout time.Duration) error {
 	for time.Now().Before(deadline) {
 		resp, err := client.Get(url)
 		if err == nil {
-			resp.Body.Close()
+			_ = resp.Body.Close()
 			if resp.StatusCode == http.StatusOK {
 				return nil
 			}
@@ -188,6 +188,6 @@ func getFreePort() (int, error) {
 		return 0, err
 	}
 	port := listener.Addr().(*net.TCPAddr).Port
-	listener.Close()
+	_ = listener.Close()
 	return port, nil
 }

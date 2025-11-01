@@ -44,3 +44,28 @@ Then, we enter set entry phase, which should allow inputing reps+weight quickly 
 * Consider multi-tenancy. What happens if someone else wants to use the same app? Also, it means better support as a managed solution instead of needing to self-host.
   * Tables should support a notion of uid for user-level data.
 * Support supersetting. That is, support entering sets for multiple lifts simultaneously.
+
+### Design
+
+#### New Models
+
+* workout session
+  * id
+  * start timestamp
+  * end timestamp (optional)
+  * state - UNKNOWN (0), ACTIVE (1), DONE (2)
+
+* routine weeks
+  * id
+  * routine
+  * week index
+  * workout
+
+* +routine
+  * routine type (week or no weeks)
+
+#### New Views
+
+* View for workout duration at top-left.
+* View for starting workout with drop-down for routine.
+* View should have most recent workouts.

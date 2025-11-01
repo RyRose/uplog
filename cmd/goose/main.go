@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"log/slog"
 	"net/url"
 	"os"
 
@@ -34,7 +35,11 @@ func run(ctx context.Context, args []string) error {
 		return fmt.Errorf("failed to open %v: %w", dsn, err)
 	}
 	db.SetMaxOpenConns(1)
-	defer db.Close()
+	defer func() {
+		if err := db.Close(); err != nil {
+			slog.WarnContext(ctx, "failed to close database", "error", err)
+		}
+	}()
 
 	goose.SetBaseFS(sqlc.EmbedMigrations)
 	return goose.RunContext(ctx, command, db, "migrations", arguments...)

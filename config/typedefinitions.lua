@@ -12,3 +12,4 @@
 ---@field database_path string
 ---@field port string
 ---@field swagger_url string
+---@field first_day_of_week number

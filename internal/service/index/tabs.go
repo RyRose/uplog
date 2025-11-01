@@ -47,7 +47,9 @@ func HandleGetDataTabView() http.HandlerFunc {
 		ctx := r.Context()
 		rawTabX, rawTabY := r.PathValue("tabX"), r.PathValue("tabY")
 		if rawTabX == "" && rawTabY == "" {
-			templates.DataTabView(tabs, 0, 0).Render(ctx, w)
+			if err := templates.DataTabView(tabs, 0, 0).Render(ctx, w); err != nil {
+				slog.WarnContext(ctx, "failed to render data tab view", "error", err)
+			}
 			return
 		}
 		tabX, err := strconv.Atoi(rawTabX)
@@ -62,6 +64,8 @@ func HandleGetDataTabView() http.HandlerFunc {
 			slog.ErrorContext(ctx, "invalid tab index", "tabY", r.PathValue("tabY"), "error", err)
 			return
 		}
-		templates.DataTabView(tabs, tabX, tabY).Render(ctx, w)
+		if err := templates.DataTabView(tabs, tabX, tabY).Render(ctx, w); err != nil {
+			slog.WarnContext(ctx, "failed to render data tab view", "error", err)
+		}
 	}
 }

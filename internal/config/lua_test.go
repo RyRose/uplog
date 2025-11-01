@@ -60,7 +60,6 @@ type User struct {
 
 type WithUnexported struct {
 	PublicField   string
-	privateField  string
 	AnotherPublic int
 }
 

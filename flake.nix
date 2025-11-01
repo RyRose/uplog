@@ -37,6 +37,7 @@
               stylua
               tailwindcss
               luajitPackages.busted
+              golangci-lint
             ];
           };
         };

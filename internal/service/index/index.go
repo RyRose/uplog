@@ -77,10 +77,12 @@ func HandleMainTab(_ *config.Data, state *config.State) http.HandlerFunc {
 			return
 		}
 
-		templates.MainView(templates.MainViewData{
+		if err := templates.MainView(templates.MainViewData{
 			Progress:   ps,
 			LiftGroups: lgs,
-		}).Render(ctx, w)
+		}).Render(ctx, w); err != nil {
+			slog.WarnContext(ctx, "failed to render main view", "error", err)
+		}
 	}
 }
 
@@ -106,7 +108,9 @@ func HandleGetLiftGroupListView(_ *config.Data, state *config.State) http.Handle
 			return
 		}
 
-		templates.LiftGroupList(lgs).Render(ctx, w)
+		if err := templates.LiftGroupList(lgs).Render(ctx, w); err != nil {
+			slog.WarnContext(ctx, "failed to render lift group list", "error", err)
+		}
 	}
 }
 
@@ -133,7 +137,9 @@ func HandleGetProgressTable(_ *config.Data, state *config.State) http.HandlerFun
 				http.StatusInternalServerError)
 			return
 		}
-		templates.ProgressTable(ps).Render(ctx, w)
+		if err := templates.ProgressTable(ps).Render(ctx, w); err != nil {
+			slog.WarnContext(ctx, "failed to render progress table", "error", err)
+		}
 	}
 }
 
@@ -227,7 +233,9 @@ func HandleCreateProgress(_ *config.Data, state *config.State) http.HandlerFunc 
 		}
 
 		w.Header().Set("HX-Trigger", "newProgress")
-		templates.ProgressTableRow(progress).Render(ctx, w)
+		if err := templates.ProgressTableRow(progress).Render(ctx, w); err != nil {
+			slog.WarnContext(ctx, "failed to render progress table row", "error", err)
+		}
 	}
 }
 
@@ -291,11 +299,13 @@ func HandleGetLiftSelect(_ *config.Data, state *config.State) http.HandlerFunc {
 			})
 		}
 
-		templates.LiftSelect(
+		if err := templates.LiftSelect(
 			r.URL.Query().Get("name"),
 			r.URL.Query().Get("lift"),
 			groups,
-		).Render(ctx, w)
+		).Render(ctx, w); err != nil {
+			slog.WarnContext(ctx, "failed to render lift select", "error", err)
+		}
 	}
 }
 
@@ -322,14 +332,18 @@ func HandleGetSideWeightSelect(_ *config.Data, state *config.State) http.Handler
 
 		liftParam := r.URL.Query().Get("lift")
 		if liftParam == "" {
-			templates.SideweightSelect(name, "", sideWeights).Render(ctx, w)
+			if err := templates.SideweightSelect(name, "", sideWeights).Render(ctx, w); err != nil {
+				slog.WarnContext(ctx, "failed to render sideweight select", "error", err)
+			}
 			return
 		}
 
 		lift, err := queries.GetLift(ctx, liftParam)
 		if err != nil {
 			slog.WarnContext(ctx, "failed to get lift", "lift", liftParam, "error", err)
-			templates.SideweightSelect(name, "", sideWeights).Render(ctx, w)
+			if err := templates.SideweightSelect(name, "", sideWeights).Render(ctx, w); err != nil {
+				slog.WarnContext(ctx, "failed to render sideweight select", "error", err)
+			}
 			return
 		}
 
@@ -337,10 +351,12 @@ func HandleGetSideWeightSelect(_ *config.Data, state *config.State) http.Handler
 		if lift.DefaultSideWeight != nil {
 			selected = *lift.DefaultSideWeight
 		}
-		templates.SideweightSelect(
+		if err := templates.SideweightSelect(
 			name,
 			selected,
-			sideWeights).Render(ctx, w)
+			sideWeights).Render(ctx, w); err != nil {
+			slog.WarnContext(ctx, "failed to render sideweight select", "error", err)
+		}
 	}
 }
 
@@ -354,7 +370,9 @@ func HandleGetSideWeightSelect(_ *config.Data, state *config.State) http.Handler
 //	@Router			/view/progressform [get]
 func HandleGetProgressForm() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		templates.ProgressForm(templates.ProgressFormData{}).Render(r.Context(), w)
+		if err := templates.ProgressForm(templates.ProgressFormData{}).Render(r.Context(), w); err != nil {
+			slog.WarnContext(r.Context(), "failed to render progress form", "error", err)
+		}
 	}
 }
 
@@ -391,13 +409,15 @@ func HandleCreateProgressForm(_ *config.Data, state *config.State) http.HandlerF
 				progress = nil
 			}
 		}
-		templates.ProgressForm(templates.ProgressFormData{
+		if err := templates.ProgressForm(templates.ProgressFormData{
 			Lift:       lift,
 			SideWeight: r.PostFormValue("side"),
 			Weight:     r.PostFormValue("weight"),
 			Sets:       r.PostFormValue("sets"),
 			Reps:       r.PostFormValue("reps"),
 			Progress:   progress,
-		}).Render(ctx, w)
+		}).Render(ctx, w); err != nil {
+			slog.WarnContext(ctx, "failed to render progress form", "error", err)
+		}
 	}
 }

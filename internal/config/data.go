@@ -15,6 +15,8 @@ type Data struct {
 	Port string
 	// SwaggerURL specifies the URL for the Swagger documentation.
 	SwaggerURL string
+	// FirstDayOfWeek specifies the first day of the week (0 = Sunday, 1 = Monday, etc.).
+	FirstDayOfWeek int
 }
 
 // LuaTypes returns a slice of config types for Lua integration.

@@ -115,7 +115,7 @@ func TestIntegration_RawDataMutations(t *testing.T) {
 				if err != nil {
 					t.Fatalf("failed to make request: %v", err)
 				}
-				defer resp.Body.Close()
+				defer func() { _ = resp.Body.Close() }()
 
 				if resp.StatusCode != http.StatusOK {
 					body, _ := io.ReadAll(resp.Body)
@@ -147,7 +147,7 @@ func TestIntegration_RawDataMutations(t *testing.T) {
 				if err != nil {
 					t.Fatalf("failed to make request: %v", err)
 				}
-				defer resp.Body.Close()
+				defer func() { _ = resp.Body.Close() }()
 
 				if resp.StatusCode != http.StatusOK {
 					body, _ := io.ReadAll(resp.Body)
@@ -172,7 +172,7 @@ func TestIntegration_RawDataMutations(t *testing.T) {
 				if err != nil {
 					t.Fatalf("failed to make request: %v", err)
 				}
-				defer resp.Body.Close()
+				defer func() { _ = resp.Body.Close() }()
 
 				if resp.StatusCode != http.StatusOK {
 					body, _ := io.ReadAll(resp.Body)
@@ -216,7 +216,7 @@ func TestIntegration_ProgressTableMutations(t *testing.T) {
 		if err != nil {
 			t.Fatalf("failed to make request: %v", err)
 		}
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 
 		if resp.StatusCode != http.StatusOK {
 			body, _ := io.ReadAll(resp.Body)
@@ -257,7 +257,7 @@ func TestIntegration_ProgressTableMutations(t *testing.T) {
 		if err != nil {
 			t.Fatalf("failed to make request: %v", err)
 		}
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 
 		// This endpoint returns the form again, not the row
 		if resp.StatusCode != http.StatusOK {
@@ -297,7 +297,7 @@ func TestIntegration_MappingMutations(t *testing.T) {
 		if err != nil {
 			t.Fatalf("failed to make request: %v", err)
 		}
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 
 		if resp.StatusCode >= 500 {
 			body, _ := io.ReadAll(resp.Body)
@@ -314,7 +314,7 @@ func TestIntegration_MappingMutations(t *testing.T) {
 		if err != nil {
 			t.Fatalf("failed to make delete request: %v", err)
 		}
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 
 		if resp.StatusCode >= 500 {
 			body, _ := io.ReadAll(resp.Body)
@@ -355,7 +355,7 @@ func TestIntegration_DataProgressMutations(t *testing.T) {
 		if err != nil {
 			t.Fatalf("failed to make request: %v", err)
 		}
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 
 		if resp.StatusCode >= 500 {
 			body, _ := io.ReadAll(resp.Body)
@@ -391,7 +391,7 @@ func TestIntegration_DataProgressMutations(t *testing.T) {
 		if err != nil {
 			t.Fatalf("failed to make request: %v", err)
 		}
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 
 		if resp.StatusCode >= 500 {
 			body, _ := io.ReadAll(resp.Body)

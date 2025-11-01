@@ -69,7 +69,7 @@ func TestWeb_Handle(t *testing.T) {
 
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("web handler"))
+		_, _ = w.Write([]byte("web handler"))
 	})
 
 	web.Handle("/test", handler)
@@ -95,7 +95,7 @@ func TestWeb_HandleFunc(t *testing.T) {
 
 	web.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusCreated)
-		w.Write([]byte("created"))
+		_, _ = w.Write([]byte("created"))
 	})
 
 	req := httptest.NewRequest("POST", "/test", nil)
@@ -119,7 +119,7 @@ func TestWeb_HandleError(t *testing.T) {
 
 	web.HandleFunc("/error", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("error message"))
+		_, _ = w.Write([]byte("error message"))
 	})
 
 	req := httptest.NewRequest("GET", "/error", nil)
@@ -146,8 +146,8 @@ func TestErrorResponseWriter_MultipleWrites(t *testing.T) {
 		statusCode:     http.StatusOK,
 	}
 
-	ew.Write([]byte("first "))
-	ew.Write([]byte("second"))
+	_, _ = ew.Write([]byte("first "))
+	_, _ = ew.Write([]byte("second"))
 
 	body := w.Body.String()
 	if body != "first second" {

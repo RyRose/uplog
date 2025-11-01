@@ -69,6 +69,13 @@ types:
 docker:
 	docker build .
 
+.PHONY: lint
+lint:
+	golangci-lint run
+
+.PHONY: gha
+gha: tidy build format test lint
+
 .PHONY: ci
-ci: tidy build format test docker
+ci: gha docker
 
