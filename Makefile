@@ -74,7 +74,7 @@ lint:
 	golangci-lint run
 
 .PHONY: gha
-gha: tidy build format test lint
+gha: build tidy format test lint
 
 .PHONY: ci
 ci: gha docker
