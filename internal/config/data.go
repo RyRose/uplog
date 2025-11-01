@@ -1,5 +1,11 @@
 package config
 
+// FooData is a sample struct to demonstrate Lua type generation.
+type FooData struct {
+	// Bar is a sample field.
+	Bar string
+}
+
 // Data holds the configuration data for the application typically loaded from a Lua file.
 // To log this struct, to use slog's JSON logging to ensure certain fields are expunged.
 // Sensitive fields should be marked with `json:"-"` struct tags.
@@ -15,6 +21,8 @@ type Data struct {
 	Port string
 	// SwaggerURL specifies the URL for the Swagger documentation.
 	SwaggerURL string
-	// FirstDayOfWeek specifies the first day of the week (0 = Sunday, 1 = Monday, etc.).
+	// FirstDayOfWeek specifies the first day of the week (0 = Sunday, 1 = Monday, ...).
 	FirstDayOfWeek int
+	// Foo is a sample nested configuration.
+	Foo FooData
 }

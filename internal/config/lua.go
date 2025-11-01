@@ -2,6 +2,9 @@ package config
 
 import (
 	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
 	"reflect"
 	"strings"
 	"unicode"
@@ -71,6 +74,49 @@ func ToUpperCamelCase(s string) string {
 	return string(result)
 }
 
+// wrapComment wraps a comment string at the specified width, prefixing each line with "-- "
+func wrapComment(comment string, width int) []string {
+	if width <= 3 {
+		return []string{fmt.Sprintf("-- %s", comment)}
+	}
+
+	// Maximum content width (excluding "-- " prefix)
+	contentWidth := width - 3
+
+	words := strings.Fields(comment)
+	if len(words) == 0 {
+		return []string{}
+	}
+
+	var lines []string
+	var currentLine strings.Builder
+
+	for i, word := range words {
+		// Check if adding this word would exceed the width
+		if currentLine.Len() > 0 {
+			// +1 for the space before the word
+			if currentLine.Len()+1+len(word) > contentWidth {
+				// Flush current line
+				lines = append(lines, fmt.Sprintf("-- %s", currentLine.String()))
+				currentLine.Reset()
+				currentLine.WriteString(word)
+			} else {
+				currentLine.WriteString(" ")
+				currentLine.WriteString(word)
+			}
+		} else {
+			currentLine.WriteString(word)
+		}
+
+		// Last word - flush the line
+		if i == len(words)-1 && currentLine.Len() > 0 {
+			lines = append(lines, fmt.Sprintf("-- %s", currentLine.String()))
+		}
+	}
+
+	return lines
+}
+
 type luaTypeData struct {
 	value    string
 	optional bool
@@ -126,9 +172,104 @@ func luaType(t reflect.Type) (*luaTypeData, error) {
 	}
 }
 
+// extractComments parses the source file to extract struct and field comments for a struct type
+func extractComments(typeName string) (string, map[string]string, error) {
+	fset := token.NewFileSet()
+
+	// Parse the data.go file which contains the Data struct
+	node, err := parser.ParseFile(fset, "internal/config/data.go", nil, parser.ParseComments)
+	if err != nil {
+		return "", nil, fmt.Errorf("failed to parse data.go: %w", err)
+	}
+
+	var structComment string
+	fieldComments := make(map[string]string)
+
+	// Find the struct declaration
+	ast.Inspect(node, func(n ast.Node) bool {
+		genDecl, ok := n.(*ast.GenDecl)
+		if !ok {
+			return true
+		}
+
+		for _, spec := range genDecl.Specs {
+			typeSpec, ok := spec.(*ast.TypeSpec)
+			if !ok || typeSpec.Name.Name != typeName {
+				continue
+			}
+
+			// Extract struct-level comment from GenDecl
+			if genDecl.Doc != nil {
+				var commentLines []string
+				for _, comment := range genDecl.Doc.List {
+					// Remove "//" prefix and trim spaces
+					text := strings.TrimPrefix(comment.Text, "//")
+					text = strings.TrimSpace(text)
+					if text != "" {
+						commentLines = append(commentLines, text)
+					}
+				}
+				if len(commentLines) > 0 {
+					structComment = strings.Join(commentLines, " ")
+				}
+			}
+
+			structType, ok := typeSpec.Type.(*ast.StructType)
+			if !ok {
+				continue
+			}
+
+			// Extract comments for each field
+			for _, field := range structType.Fields.List {
+				if field.Doc != nil && len(field.Names) > 0 {
+					fieldName := field.Names[0].Name
+					// Combine all comment lines
+					var commentLines []string
+					for _, comment := range field.Doc.List {
+						// Remove "//" prefix and trim spaces
+						text := strings.TrimPrefix(comment.Text, "//")
+						text = strings.TrimSpace(text)
+						if text != "" {
+							commentLines = append(commentLines, text)
+						}
+					}
+					if len(commentLines) > 0 {
+						fieldComments[fieldName] = strings.Join(commentLines, " ")
+					}
+				}
+			}
+
+			return false
+		}
+
+		return true
+	})
+
+	return structComment, fieldComments, nil
+}
+
 func GenerateLuaType(v any) (string, error) {
 	t := reflect.TypeOf(v)
-	lines := []string{fmt.Sprintf("---@class %s", t.Name())}
+	typeName := t.Name()
+
+	// Extract struct and field comments from source
+	structComment, fieldComments, err := extractComments(typeName)
+	if err != nil {
+		// If we can't extract comments, continue without them
+		structComment = ""
+		fieldComments = make(map[string]string)
+	}
+
+	lines := []string{}
+
+	// Add struct-level comment if present
+	if structComment != "" {
+		wrappedLines := wrapComment(structComment, 80)
+		lines = append(lines, wrappedLines...)
+	}
+
+	lines = append(lines, fmt.Sprintf("---@class %s", typeName))
+
 	for i := 0; i < t.NumField(); i++ {
 		f := t.Field(i)
 
@@ -141,7 +282,17 @@ func GenerateLuaType(v any) (string, error) {
 		if err != nil {
 			return "", fmt.Errorf("lines so far:\n%s\nfield %s: %w", strings.Join(lines, "\n"), f.Name, err)
 		}
+
 		fieldName := toSnakeCase(f.Name)
+
+		// Add Go doc comment as Lua comment if present
+		if comment, ok := fieldComments[f.Name]; ok {
+			// Convert field name in comment from Go format to Lua format
+			convertedComment := strings.Replace(comment, f.Name, fieldName, 1)
+			wrappedLines := wrapComment(convertedComment, 80)
+			lines = append(lines, wrappedLines...)
+		}
+
 		if luaTypeData.optional {
 			fieldName += "?"
 		}

@@ -6,10 +6,29 @@
 -- automatically generated from types in internal/config/types.go.
 -- Run `make types` to regenerate.
 
+-- Data holds the configuration data for the application typically loaded from a
+-- Lua file. To log this struct, to use slog's JSON logging to ensure certain
+-- fields are expunged. Sensitive fields should be marked with `json:"-"` struct
+-- tags.
 ---@class Data
+-- debug enables debug mode. When enabled, the application will log additional
+-- debug information.
 ---@field debug boolean
+-- version specifies the application version.
 ---@field version? string
+-- database_path specifies the path to the database file.
 ---@field database_path string
+-- port specifies the port on which the application will run.
 ---@field port string
+-- swagger_url specifies the URL for the Swagger documentation.
 ---@field swagger_url string
+-- first_day_of_week specifies the first day of the week (0 = Sunday, 1 =
+-- Monday, etc.).
 ---@field first_day_of_week number
+-- foo is a sample nested configuration.
+---@field foo FooData
+
+-- FooData is a sample struct to demonstrate Lua type generation.
+---@class FooData
+-- bar is a sample field.
+---@field bar string

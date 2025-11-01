@@ -12,7 +12,7 @@ local M = {
 	database_path = env.Or("DATABASE_PATH", "./tmp/db/data.db"),
 	port = port,
 	swagger_url = env.Or("SWAGGER_URL", "http://localhost:" .. port .. "/docs/swagger.json") .. "?v=" .. version,
-	first_day_of_week = 0, -- 0 = Sunday, 1 = Monday
+	first_day_of_week = 0,
 }
 
 return M
