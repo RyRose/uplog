@@ -3,9 +3,7 @@ all: build
 
 .PHONY: build
 build: types
-	tailwindcss -i web/app/input.css -o web/static/css/output.css
-	sqlc generate
-	templ generate
+	tailwindcss -i web/app/input.css -o web/static/css/output.css & sqlc generate & templ generate & wait
 	go build -o=./tmp/uplog ./cmd/uplog
 
 .PHONY: run
@@ -77,8 +75,8 @@ install:
 	npm ci
 
 .PHONY: gha
-gha: install build format test lint
+gha: install build test lint
 
 .PHONY: ci
-ci: clean gha docker
+ci: clean docs format gha docker
 

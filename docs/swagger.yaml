@@ -12,7 +12,7 @@ info:
   title: Uplog API
   version: "1.0"
 paths:
-  /{$}:
+  /:
     get:
       description: Renders the main index page with specified tab and CSS query parameters
       produces:
@@ -29,7 +29,7 @@ paths:
       summary: Get index page
       tags:
       - index
-  /data/{$}:
+  /data:
     get:
       description: Renders the main index page with specified tab and CSS query parameters
       produces:

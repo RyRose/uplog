@@ -22,7 +22,33 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/data/{$}": {
+        "/": {
+            "get": {
+                "description": "Renders the main index page with specified tab and CSS query parameters",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "index"
+                ],
+                "summary": "Get index page",
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/data": {
             "get": {
                 "description": "Renders the main index page with specified tab and CSS query parameters",
                 "produces": [
@@ -2931,32 +2957,6 @@ const docTemplate = `{
                     "index"
                 ],
                 "summary": "Get main tab view",
-                "responses": {
-                    "200": {
-                        "description": "HTML content",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/{$}": {
-            "get": {
-                "description": "Renders the main index page with specified tab and CSS query parameters",
-                "produces": [
-                    "text/html"
-                ],
-                "tags": [
-                    "index"
-                ],
-                "summary": "Get index page",
                 "responses": {
                     "200": {
                         "description": "HTML content",

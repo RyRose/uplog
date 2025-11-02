@@ -3,7 +3,7 @@
 -- This file is auto-generated. Do not edit manually.
 --
 -- Lua type definitions for Uplog configuration. These are
--- automatically generated from types in internal/config/types.go.
+-- automatically generated from types in internal/config/data.go.
 -- Run `make types` to regenerate.
 
 -- Data holds the configuration data for the application typically loaded from a
